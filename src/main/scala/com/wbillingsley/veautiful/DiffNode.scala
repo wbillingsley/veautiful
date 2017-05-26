@@ -78,7 +78,7 @@ trait DiffNode extends DNode with MakeItSo {
         }
     }
 
-    updating.zip(to).collect({ case (x:DiffNode, y:DiffNode) => x.makeItSo(y) })
+    updating.zip(to).collect({ case (x:MakeItSo, y:MakeItSo) => x.makeItSo(y) })
 
     /*
     for { (c, i) <- children.zipWithIndex } {

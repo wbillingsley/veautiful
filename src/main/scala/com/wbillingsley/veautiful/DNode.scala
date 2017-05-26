@@ -19,7 +19,9 @@ trait DNode extends VNode {
   def attach() = {
     val n = create()
     for { ch <- children } {
+      ch.beforeAttach()
       ch.attach()
+      ch.afterAttach()
     }
 
     for {

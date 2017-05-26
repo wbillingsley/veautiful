@@ -4,21 +4,46 @@
   <title>Example Scala.js application</title>
   <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
 
-  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.css">
-  <link rel="stylesheet" type="text/css" href="planner.css" />
-  <link rel="stylesheet" type="text/css" href="assets/stylesheets/main.css" />
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/css/bootstrap.min.css" integrity="sha384-rwoIResjU2yc3z8GV/NPeZWAv56rSmLldC3R/AZzGRnGxQQKnKkoFVhFQhNUwEyJ" crossorigin="anonymous">
+
+  <style>
+    .well {
+      fill: red;
+    }
+
+    .asteroid {
+      fill: grey;
+      stroke: lightgrey;
+    }
+
+    svg {
+      background: black;
+    }
+
+  </style>
 </head>
 <body>
 
 
 <div class="container-fluid">
-  <div id="render-here">
-    <p>Loading. This site has been tested with Chrome, Safari, and Firefox.</p>
+  <div class="row">
+    <div class="col-sm-12">
+
+      <h1>Veautiful asteroids test</h1>
+      <p>
+
+      </p>
+      <div class="card">
+        <div id="render-here">
+          <p>Loading. This site has been tested with Chrome, Safari, and Firefox.</p>
+        </div>
+      </div>
+    </div>
   </div>
+
 </div>
 
 <script type="text/javascript" src="./target/scala-2.12/example-fastopt.js"></script>
-<script type="text/javascript" src="./target/scala-2.12/example-launcher.js"></script>
 
 </body>
 </html>

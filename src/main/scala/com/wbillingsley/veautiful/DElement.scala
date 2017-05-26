@@ -3,12 +3,17 @@ package com.wbillingsley.veautiful
 import org.scalajs.dom
 import org.scalajs.dom.{Event, html}
 
-case class Lstnr(`type`:String, func:Event => _, usCapture:Boolean=true)
+case class Lstnr(`type`:String, func:Event => _, usCapture:Boolean=false)
 case class AttrVal(name:String, value:String)
 case class InlineStyle(name:String, value:String)
 case class EvtListener[T](`type`:String, f:Function[T, _], capture:Boolean)
 
-case class DElement(name:String, uniqEl:Any = "") extends DiffNode {
+
+object DElement {
+  val htmlNS = "http://www.w3.org/1999/xhtml"
+  val svgNS = "http://www.w3.org/2000/svg"
+}
+case class DElement(name:String, uniqEl:Any = "", ns:String = DElement.htmlNS) extends DiffNode {
 
   var children:Seq[VNode] = Seq.empty
 
@@ -24,17 +29,25 @@ case class DElement(name:String, uniqEl:Any = "") extends DiffNode {
 
   val updateSelf = {
     case el:DElement =>
-      removeAttrsFromNode(attributes.values)
+      val removeA = attributes.values.filter({ a => !el.attributes.contains(a.name)})
+      val updateA = el.attributes.values.filter({ a => !attributes.get(a.name).map(_.value).contains(a.value)})
+      //removeAttrsFromNode(attributes.filter({ x => !el.attributes.contains(x._1) }).values)
+      removeAttrsFromNode(removeA)
       attributes = el.attributes
-      applyAttrsToNode(attributes.values)
+      //applyAttrsToNode(attributes.values)
+      applyAttrsToNode(updateA)
 
       removeStylesFromNode(styles)
       styles = el.styles
       applyStylesToNode(styles)
 
-      removeLsntrsFromNode(listeners.values)
-      listeners = el.listeners
-      applyLsntrsToNode(listeners.values)
+      if (listeners != el.listeners) {
+        println("Listeners differ")
+        removeLsntrsFromNode(listeners.values)
+        listeners = el.listeners
+        applyLsntrsToNode(listeners.values)
+      }
+
   }
 
   def applyAttrsToNode(as:Iterable[AttrVal]):Unit = {
@@ -51,13 +64,13 @@ case class DElement(name:String, uniqEl:Any = "") extends DiffNode {
 
   def applyLsntrsToNode(as:Iterable[Lstnr]):Unit = {
     for { n <- domEl; a <- as } {
-      n.addEventListener(a.`type`, a.func, true)
+      n.addEventListener(a.`type`, a.func, false)
     }
   }
 
   def removeLsntrsFromNode(as:Iterable[Lstnr]):Unit = {
     for { n <- domEl; a <- as } {
-      n.removeEventListener(a.`type`, a.func, true)
+      n.removeEventListener(a.`type`, a.func, false)
     }
   }
 
@@ -104,7 +117,11 @@ case class DElement(name:String, uniqEl:Any = "") extends DiffNode {
 
 
   def create() = {
-    val e = dom.document.createElement(name)
+    val e = if (ns == DElement.htmlNS) {
+      dom.document.createElement(name)
+    } else {
+      dom.document.createElementNS(ns, name)
+    }
 
     for { AttrVal(a, value) <- attributes.values } {
       e.setAttribute(a, value)
@@ -173,8 +190,12 @@ object < {
   def th = apply("th")
   def td = apply("td")
 
+  def svg = apply("svg", ns=DElement.svgNS)
+  def circle = apply("circle", ns=DElement.svgNS)
+  def polygon = apply("polygon", ns=DElement.svgNS)
 
-  def apply(n:String, u:String = "") = DElement(n, u)
+
+  def apply(n:String, u:String = "", ns:String = DElement.htmlNS) = DElement(n, u, ns)
 
 }
 
@@ -182,7 +203,13 @@ object ^ {
 
   case class Attrable(n:String) {
     def :=(s:String) = AttrVal(n, s)
+
+    def :=(i:Int) = AttrVal(n, i.toString)
+
+    def :=(d:Double) = AttrVal(n, d.toString)
   }
+
+  def attr(x:String) = Attrable(x)
 
   def alt = Attrable("alt")
   def src = Attrable("src")
@@ -192,7 +219,7 @@ object ^ {
   def href = Attrable("href")
 
   case class Lsntrable(n:String) {
-    def -->(e: => Unit ) = Lstnr(n, (x:Event) => e, true)
+    def -->(e: => Unit ) = Lstnr(n, (x:Event) => e, false)
   }
 
   def onClick = Lsntrable("click")

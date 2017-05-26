@@ -5,7 +5,7 @@ import org.scalajs.dom
 
 object Attacher {
 
-  class RootNode(el:dom.Element, vNode:VNode) {
+  class RootNode(el:dom.Element) {
     val root = DElement("root")
     root.domNode = Some(el)
 
@@ -14,9 +14,9 @@ object Attacher {
     }
   }
 
-  def render(vdom:VNode, el:dom.Element) = {
+  def render(el:dom.Element) = {
     el.innerHTML = ""
-    new RootNode(el, vdom)
+    new RootNode(el)
   }
 
 }
@@ -24,7 +24,7 @@ object Attacher {
 /*
  * A component that renders itself into the children of a fixed element
  */
-class ElementComponent(el:DElement) extends VNode {
+class ElementComponent(val el:DElement) extends VNode {
 
   def domNode = el.domNode
 

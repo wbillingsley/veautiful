@@ -12,9 +12,12 @@ object Differ {
    */
   def nextDiff[T](leftI:Int, left:Seq[T], rightI:Int, right:Seq[T]):(Int, Int) = {
 
-    var l = leftI;
-    var r = rightI;
-    while (l < left.length && r < right.length && left(l) == right(r)) {
+    var l = leftI
+    var r = rightI
+    val ll = left.length
+    val rl = right.length
+
+    while (l < ll && r < rl && left(l) == right(r)) {
       l += 1
       r += 1
     }
@@ -25,7 +28,6 @@ object Differ {
   def seqDiff[T](before:Seq[T], after:Seq[T]):Seq[LOp[T]] = {
     /* These nodes are common to the old state and the new state, and will be kept */
     val retain = before.toBuffer
-    val afterB = after.toBuffer
 
     /* we'll collect our operations here */
     val ops = Seq.empty[LOp[T]].toBuffer
@@ -51,7 +53,7 @@ object Differ {
 
     // Inserts a node here. Does not call attach or afterAttach
     def insertHere(addIndex:Int) = {
-      val item = afterB(addIndex)
+      val item = after(addIndex)
       ops.append(LInsert(retainCursor, item))
       retain.insert(retainCursor, item)
       retainCursor += 1
@@ -70,7 +72,7 @@ object Differ {
         val templateToInsert = after(targetCursor)
 
         // Look in the retain set first
-        val inRetain = retain.view(retainCursor, retain.length).indexOf(templateToInsert)
+        val inRetain = retain.indexOf(templateToInsert, retainCursor)
         if (inRetain >= 0) {
           moveHere(inRetain + retainCursor)
         } else {
