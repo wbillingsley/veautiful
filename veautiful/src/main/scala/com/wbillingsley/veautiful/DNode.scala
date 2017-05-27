@@ -43,6 +43,8 @@ trait DNode extends VNode {
     for {
       d <- children
     } d.detach()
+
+    domNode = None
   }
 
 }

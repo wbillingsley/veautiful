@@ -108,6 +108,8 @@ object ReactLike {
     override def afterAttach() = {
       super.afterAttach()
       Model.addListener(rerender)
+
+      rerender()
     }
 
     override def beforeDetach() = Model.removeListener(rerender)
@@ -139,22 +141,30 @@ object ReactLike {
           <.p(s"${asteroids.length} asteroids rendering in ${dt}ms"),
           <.div(^.cls := "btn-group",
             <("button")(
-              ^.cls := "btn btn-secondary", ^.onClick --> Model.stopTicking(), "Stop"
+              ^.cls := "btn btn-sm btn-secondary", ^.onClick --> Model.stopTicking(),
+              <("i")(^.cls := "fa fa-pause")
             ),
             <("button")(
-              ^.cls := "btn btn-secondary", ^.onClick --> Model.startTicking(), "Start"
+              ^.cls := "btn btn-sm btn-secondary", ^.onClick --> Model.startTicking(),
+              <("i")(^.cls := "fa fa-play")
             )
           ),
-          "Asteroid count",
-          <("input")(^.attr("type") := "number", ^.attr("value") := asteroidCount,
-            ^.on("change") ==> { event => event.target match {
-              case i:HTMLInputElement => asteroidCount = i.valueAsNumber
-              case _ => // do nothing
-            }}
-          ),
-          <("button")(
-            ^.cls := "btn btn-secondary", ^.onClick --> reset, "Reset"
+          <.div(^.cls := "input-group",
+            <.span(^.cls := "input-group-addon", "Asteroids"),
+            <("input")(^.attr("type") := "number", ^.cls := "form-control",
+              ^.attr("value") := asteroidCount,
+              ^.on("change") ==> { event => event.target match {
+                case i:HTMLInputElement => asteroidCount = i.valueAsNumber
+                case _ => // do nothing
+              }}
+            ),
+            <.span(^.cls := "input-group-btn",
+              <("button")(
+                ^.cls := "btn btn-sm btn-secondary", ^.onClick --> reset, "Reset"
+              )
+            )
           )
+
         )
       )
     }

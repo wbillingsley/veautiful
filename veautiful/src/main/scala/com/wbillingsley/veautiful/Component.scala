@@ -14,7 +14,7 @@ object Attacher {
     }
   }
 
-  def render(el:dom.Element) = {
+  def newRoot(el:dom.Element) = {
     el.innerHTML = ""
     new RootNode(el)
   }

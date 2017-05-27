@@ -74,7 +74,7 @@ object Differ {
         // Look in the retain set first
         val inRetain = retain.indexOf(templateToInsert, retainCursor)
         if (inRetain >= 0) {
-          moveHere(inRetain + retainCursor)
+          moveHere(inRetain)
         } else {
           insertHere(targetCursor)
         }

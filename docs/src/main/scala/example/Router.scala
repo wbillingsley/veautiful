@@ -8,9 +8,10 @@ import com.wbillingsley.veautiful.{<, ElementComponent}
 object Router extends ElementComponent(<.div) {
 
   sealed trait ExampleRoute
+  case object IntroRoute extends ExampleRoute
   case object ReactLikeRoute extends ExampleRoute
 
-  var route:ExampleRoute = ReactLikeRoute
+  var route:ExampleRoute = IntroRoute
 
   override def afterAttach() = {
     println("A router has been attached")
@@ -24,6 +25,7 @@ object Router extends ElementComponent(<.div) {
 
   def rerender() = renderElements(
     route match {
+      case IntroRoute => Intro.page
       case ReactLikeRoute => ReactLike.page
     }
   )
