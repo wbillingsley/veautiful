@@ -24,7 +24,7 @@ object Router extends ElementComponent(<.div) {
 
   def rerender() = renderElements(
     route match {
-      case ReactLikeRoute => ReactLike.reactUI
+      case ReactLikeRoute => ReactLike.page
     }
   )
 

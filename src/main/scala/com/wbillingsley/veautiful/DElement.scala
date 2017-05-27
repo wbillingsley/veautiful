@@ -27,6 +27,19 @@ case class DElement(name:String, uniqEl:Any = "", ns:String = DElement.htmlNS) e
 
   def domEl = domNode.collect({ case e:dom.Element => e })
 
+  /**
+    * In DOM Events, it is very difficult to de-register an anonymous listener.
+    * And in our code, it is very easy to end up with an event listener being an anonymous
+    * function.
+    * So, in order to make changing event listeners practical, instead of registering the
+    * event listener, we always register this dispatcher function as the event listener.
+    */
+  def eventDispatch(e:Event):Unit = {
+    for {
+      h <- listeners.get(e.`type`)
+    } h.func.apply(e)
+  }
+
   val updateSelf = {
     case el:DElement =>
       val removeA = attributes.values.filter({ a => !el.attributes.contains(a.name)})
@@ -41,12 +54,12 @@ case class DElement(name:String, uniqEl:Any = "", ns:String = DElement.htmlNS) e
       styles = el.styles
       applyStylesToNode(styles)
 
-      if (listeners != el.listeners) {
+      if (listeners.keys != el.listeners.keys) {
         println("Listeners differ")
         removeLsntrsFromNode(listeners.values)
-        listeners = el.listeners
         applyLsntrsToNode(listeners.values)
       }
+      listeners = el.listeners
 
   }
 
@@ -64,13 +77,13 @@ case class DElement(name:String, uniqEl:Any = "", ns:String = DElement.htmlNS) e
 
   def applyLsntrsToNode(as:Iterable[Lstnr]):Unit = {
     for { n <- domEl; a <- as } {
-      n.addEventListener(a.`type`, a.func, false)
+      n.addEventListener(a.`type`, eventDispatch, false)
     }
   }
 
   def removeLsntrsFromNode(as:Iterable[Lstnr]):Unit = {
     for { n <- domEl; a <- as } {
-      n.removeEventListener(a.`type`, a.func, false)
+      n.removeEventListener(a.`type`, eventDispatch, false)
     }
   }
 
@@ -103,11 +116,16 @@ case class DElement(name:String, uniqEl:Any = "", ns:String = DElement.htmlNS) e
     this
   }
 
+  def applyAppliable(a: <.DElAppliable) = a match {
+    case attr: <.DEAAttr => attrs(attr.a)
+    case l: <.DEALstnr => on(l.l)
+    case s: <.DEAStyle => style(s.s)
+    case n: <.DEAVNode => children(n.vNode)
+    case nodes: <.DEAIVNode => children(nodes.nodes.toSeq : _*)
+  }
+
   def apply(ac: <.DElAppliable *):DElement = {
-    attrs(ac.collect({ case attr: <.DEAAttr => attr.a }):_*)
-    on(ac.collect({ case attr: <.DEALstnr => attr.l }):_*)
-    style(ac.collect({ case attr: <.DEAStyle => attr.s }):_*)
-    children(ac.collect({ case vn: <.DEAVNode => vn.vNode }):_*)
+    ac.foldLeft(this)({ case (x, y) => x.applyAppliable(y) })
   }
 
   def on(l: Lstnr *) = {
@@ -163,6 +181,7 @@ object < {
 
   trait DElAppliable
   implicit class DEAVNode(val vNode: VNode) extends DElAppliable
+  implicit class DEAIVNode(val nodes: Iterable[VNode]) extends DElAppliable
   implicit class DEAAttr(val a: AttrVal) extends DElAppliable
   implicit class DEALstnr(val l: Lstnr) extends DElAppliable
   implicit class DEAStyle(val s:InlineStyle) extends DElAppliable
@@ -220,9 +239,12 @@ object ^ {
 
   case class Lsntrable(n:String) {
     def -->(e: => Unit ) = Lstnr(n, (x:Event) => e, false)
+
+    def ==>(f: (Event) => Unit) = Lstnr(n, (x:Event) => f(x))
   }
 
   def onClick = Lsntrable("click")
+  def on(s:String) = Lsntrable(s)
 
   case class InlineStylable(n:String) {
     def :=(v:String) = InlineStyle(n, v)

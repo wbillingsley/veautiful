@@ -4,19 +4,17 @@ import scala.collection.mutable
 import scala.scalajs.js.timers
 import scala.scalajs.js.timers.SetIntervalHandle
 
+/**
+  * Asteroids and gravity wells
+  */
 object Model {
 
+  /*
+   * These types make the maths easier
+   */
   type Vec = (Double, Double)
   type Velocity = Vec
   type Position = Vec
-
-  val w = 640
-
-  val h = 480
-
-  var drag = 0.99
-
-  var count = 7;
 
   implicit class VecOps(val v:Vec) extends AnyVal {
     def *(d:Double):Vec = (v._1 * d, v._2 * d)
@@ -31,8 +29,21 @@ object Model {
     def toPolar = (v.magnitude, v.theta)
   }
 
+  val w = 640
+  val h = 480
+
+  /*
+   * These model variables can be edited by the forms
+   */
+  var drag = 0.99
+  var count = 50;
+
+  /**
+    * An asteroid has a position, a velocity and a size
+    */
   case class Asteroid(pos:Vec, velocity:Vec, radius:Double) {
 
+    /** Produce a new asteroid for the next tick */
     def update(acceleration:Vec, dt:Double) = {
       this.copy(
         pos = pos + (velocity * dt),
@@ -43,6 +54,9 @@ object Model {
 
   }
 
+  /**
+    * Gravity wells try to suck in asteroids
+    */
   case class Well(pos:Vec, radius:Double, strength:Double) {
 
     def applyForce(asteroid:Asteroid):Vec = {

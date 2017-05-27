@@ -2,9 +2,11 @@ package example
 
 import com.wbillingsley.veautiful._
 import example.Model.Asteroid
+import org.scalajs.dom.raw.HTMLInputElement
 
 /**
-  * Created by wbilling on 26/05/2017.
+  * A version of the UI that works most closely to a React-style interface. The UI is
+  * made up of elements, and the virtual DOM is diffed at each step.
   */
 object ReactLike {
 
@@ -19,7 +21,7 @@ object ReactLike {
   )
 
   /** Turns an asteroid into an SVG DElement */
-  def svgAsteroid(a:Asteroid) = {
+  def svgAsteroid(a:Asteroid):VNode = {
 
     /** Just defines the shape of an asteroid */
     def polyPoints:Seq[(Int, Int)] = Seq((-10, -2), (-5, 8), (0, 10), (4, 7), (10, -1), (0, -10))
@@ -44,21 +46,51 @@ object ReactLike {
   }
 
   /** Creates an SVG for a gravity well */
-  def svgWell(w:Well) = {
+  def svgWell(w:Well):VNode = {
     val (x, y) = w.pos
 
-    <.circle.attrs(
+    <.circle(
       ^.cls := "well",
       ^.attr("cx") := x, ^.attr("cy") := y, ^.attr("r") := w.radius
     )
   }
 
-  def reactUI:VNode = Common.layout(
-    <.div.children(
+  def page:VNode = Common.layout(
+    <.div(
+      <.h1("React-like rendering into an SVG"),
       <.p(
         """
-          | This version of the UI works most closely to how React.js (or at least
-          | scala-js-react) does.
+          | In this version, the simulation is rendered with SVG elements. The UI is mostly
+          | functional and declarative -- functions returning VNodes, and being diffed as in
+          | React. For example, this is the code for rendering the gravity wells:
+        """.stripMargin
+      ),
+      <("pre")(
+        """
+          |  /** Creates an SVG for a gravity well */
+          |  def svgWell(w:Well):VNode = {
+          |    val (x, y) = w.pos
+          |
+          |    <.circle(
+          |      ^.cls := "well",
+          |      ^.attr("cx") := x, ^.attr("cy") := y, ^.attr("r") := w.radius
+          |    )
+          |  }
+          |
+        """.stripMargin
+      ),
+      <.p(
+        """
+          | There is a single stateful component, SimulationView, that controls
+          | starting, stopping, and editing the simulation. Unlike React, that component can
+          | have its own `rerender()` method, so it is not necessary to regenerate the whole
+          | UI on every tick. Though that could be done by calling `rerender()` on the router.
+        """.stripMargin
+      ),
+      <.p(
+        """
+          | On Chrome, it seems to cope with around 250 asteroids before the framerate slows
+          | below 60fps. Above 1,000 asteroids it judders a bit.
         """.stripMargin
       ),
       SimulationView,
@@ -71,17 +103,11 @@ object ReactLike {
   /**
     * This is the view component.
     */
-  case object SimulationView extends ElementComponent(<.div(^.cls := "boo")) {
+  case object SimulationView extends ElementComponent(<.div()) {
 
     override def afterAttach() = {
       super.afterAttach()
-      println("attaching")
       Model.addListener(rerender)
-    }
-
-    override def attach() = {
-      println("Attaching")
-      super.attach()
     }
 
     override def beforeDetach() = Model.removeListener(rerender)
@@ -89,10 +115,14 @@ object ReactLike {
     var last:Long = System.currentTimeMillis()
     var dt:Long = 0
 
-    renderElements(<.p("Not yet ready"))
+    // When we click reset, these parameters will be set on the model
+    var asteroidCount = Model.count
+    def reset(): Unit = {
+      Model.count = asteroidCount
+      Model.reset()
+    }
 
     def rerender():Unit = {
-      println("SimulationView Rerender")
       val now = System.currentTimeMillis()
       dt = now - last
       last = now
@@ -102,21 +132,28 @@ object ReactLike {
 
     def card(asteroids:Seq[Asteroid]) = {
       <.div(^.cls := "card",
-        svg.children(
-          Model.wells.map(svgWell) ++ Model.asteroids.map(svgAsteroid) :_*
+        svg(
+          Model.wells.map(svgWell) ++ Model.asteroids.map(svgAsteroid)
         ),
         <.div(^.cls := "card-footer",
           <.p(s"${asteroids.length} asteroids rendering in ${dt}ms"),
           <.div(^.cls := "btn-group",
-            <("button")(
-              ^.cls := "btn btn-secondary", ^.onClick --> Model.reset, "Reset"
-            ),
             <("button")(
               ^.cls := "btn btn-secondary", ^.onClick --> Model.stopTicking(), "Stop"
             ),
             <("button")(
               ^.cls := "btn btn-secondary", ^.onClick --> Model.startTicking(), "Start"
             )
+          ),
+          "Asteroid count",
+          <("input")(^.attr("type") := "number", ^.attr("value") := asteroidCount,
+            ^.on("change") ==> { event => event.target match {
+              case i:HTMLInputElement => asteroidCount = i.valueAsNumber
+              case _ => // do nothing
+            }}
+          ),
+          <("button")(
+            ^.cls := "btn btn-secondary", ^.onClick --> reset, "Reset"
           )
         )
       )
