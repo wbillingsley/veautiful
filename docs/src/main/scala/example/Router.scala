@@ -9,6 +9,7 @@ object Router extends ElementComponent(<.div) {
 
   sealed trait ExampleRoute
   case object IntroRoute extends ExampleRoute
+  case object ToDoRoute extends ExampleRoute
   case object ReactLikeRoute extends ExampleRoute
 
   var route:ExampleRoute = IntroRoute
@@ -26,6 +27,7 @@ object Router extends ElementComponent(<.div) {
   def rerender() = renderElements(
     route match {
       case IntroRoute => Intro.page
+      case ToDoRoute => ToDoList.page
       case ReactLikeRoute => ReactLike.page
     }
   )

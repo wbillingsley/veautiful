@@ -198,6 +198,9 @@ object < {
   def h3 = apply("h3")
   def h4 = apply("h4")
 
+  def button = apply("button")
+  def input = apply("input")
+
   def ol = apply("ol")
   def ul = apply("ul")
   def li = apply("li")
