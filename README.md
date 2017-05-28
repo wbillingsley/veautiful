@@ -2,6 +2,8 @@
 
 Veautiful is a home-grown web UI toolkit written in Scala.
 
+[Demo and docs](http://www.wbillingsley.com/veautiful/)
+
 ## Get started
 
 To be added...
