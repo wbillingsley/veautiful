@@ -69,9 +69,3 @@ trait VNode {
   def receive(msg:Any):Future[Unit] = Future.successful("nothing to do")
 
 }
-
-trait MakeItSo {
-
-  def makeItSo:PartialFunction[MakeItSo, _]
-
-}
