@@ -15,7 +15,7 @@ lazy val veautiful = project.in(file("veautiful"))
 
     scalaVersion := scalaVersionStr,
 
-    scalaJSUseMainModuleInitializer := true,
+    scalaJSUseMainModuleInitializer := false,
 
     testFrameworks += new TestFramework("utest.runner.Framework"),
 
