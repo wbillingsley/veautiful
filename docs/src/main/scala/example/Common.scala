@@ -1,7 +1,6 @@
 package example
 
 import com.wbillingsley.veautiful.{<, VNode, ^}
-import example.Router.{ExampleRoute, IntroRoute, ReactLikeRoute, ToDoRoute}
 
 /**
   * Common UI components to all the views
@@ -14,10 +13,9 @@ object Common {
     ReactLikeRoute -> "Example: Rendering asteroids into an SVG"
   )
 
-  def linkToRoute(r:Router.ExampleRoute, s:String):VNode = <.a(
-    ^.href := "#",
+  def linkToRoute(r:ExampleRoute, s:String):VNode = <.a(
+    ^.href := Router.path(r),
     ^.cls := (if (Router.route == r) "nav-link active" else "nav-link"),
-    ^.onClick --> Router.routeTo(r),
     s
   )
 

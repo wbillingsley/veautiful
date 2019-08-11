@@ -12,6 +12,12 @@ object PathDSL {
   def location:Location = dom.window.location
 
   /**
+    * In Hash-Based urls, eg. https://example.com/#/my/path?query=value
+    * Extracts the path and search from the fragment
+    */
+  def hashPathAndSearch: (String, String) = splitFirst(dom.window.location.hash.drop(1), '?')
+
+  /**
     * Splits a string on the first occurance of a character
     * e.g., splitFirst("query=value", '=') produces ("query", "value")
     */
@@ -31,6 +37,21 @@ object PathDSL {
     */
   def pathArray(pathname:String = location.pathname): Array[String] = {
     pathname.drop(1).split('/').map(js.URIUtils.decodeURI)
+  }
+
+  def hashPathArray():Array[String] = {
+    val (path, _) = hashPathAndSearch
+    pathArray(path)
+  }
+
+  def hashSearchMap(): Map[String, String] = {
+    val (_, search) = hashPathAndSearch
+    searchMap(search)
+  }
+
+  def hashSearchMapArray(): Map[String, Array[String]] = {
+    val (_, search) = hashPathAndSearch
+    searchMapArray(search)
   }
 
   /**
@@ -73,6 +94,10 @@ object PathDSL {
 
   case object EmptyPath extends PathComponent {
     def stringify = ""
+  }
+
+  case object /# extends PathComponent {
+    def stringify = "#"
   }
 
   implicit class PathString(val s:String) extends PathComponent {

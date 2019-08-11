@@ -1,35 +1,46 @@
 package example
 
-import com.wbillingsley.veautiful.{<, ElementComponent}
+import com.wbillingsley.veautiful.templates.HistoryRouter
+import com.wbillingsley.veautiful.{<, ElementComponent, PathDSL}
 
-/**
-  * Created by wbilling on 26/05/2017.
-  */
-object Router extends ElementComponent(<.div) {
+sealed trait ExampleRoute
+case object IntroRoute extends ExampleRoute
+case object ToDoRoute extends ExampleRoute
+case object ReactLikeRoute extends ExampleRoute
 
-  sealed trait ExampleRoute
-  case object IntroRoute extends ExampleRoute
-  case object ToDoRoute extends ExampleRoute
-  case object ReactLikeRoute extends ExampleRoute
+object Router extends HistoryRouter[ExampleRoute] {
 
   var route:ExampleRoute = IntroRoute
 
-  override def afterAttach() = {
-    println("A router has been attached")
-    rerender()
-  }
+  def rerender() = renderElements(render())
 
-  def routeTo(r:ExampleRoute) = {
-    route = r
-    rerender()
-  }
-
-  def rerender() = renderElements(
+  def render() = {
     route match {
       case IntroRoute => Intro.page
       case ToDoRoute => ToDoList.page
       case ReactLikeRoute => ReactLike.page
     }
-  )
+  }
+
+  override def path(route: ExampleRoute): String = {
+    import PathDSL._
+
+    route match {
+      case IntroRoute => (/# / "").stringify
+      case ToDoRoute => (/# / "todo").stringify
+      case ReactLikeRoute => (/# / "reactLike").stringify
+    }
+  }
+
+  override def routeFromLocation(): ExampleRoute = PathDSL.hashPathArray() match {
+    case Array("") => IntroRoute
+    case Array("todo") => ToDoRoute
+    case Array("reactLike") => ReactLikeRoute
+    case x =>
+      println(s"path was ${x}")
+      IntroRoute
+
+
+  }
 
 }

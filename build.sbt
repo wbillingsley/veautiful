@@ -68,7 +68,7 @@ lazy val scatter = project.in(file("scatter"))
 
 lazy val docs = project.in(file("docs"))
   .enablePlugins(ScalaJSPlugin)
-  .dependsOn(veautiful)
+  .dependsOn(veautiful, templates)
   .settings(
       name := "veautiful-docs",
 
