@@ -25,6 +25,47 @@ lazy val veautiful = project.in(file("veautiful"))
     )
 )
 
+lazy val templates = project.in(file("templates"))
+  .enablePlugins(ScalaJSPlugin)
+  .dependsOn(veautiful)
+  .settings(
+    name := "veautiful-templates",
+
+    version := versionStr,
+
+    scalaVersion := scalaVersionStr,
+
+    scalaJSUseMainModuleInitializer := true,
+
+    testFrameworks += new TestFramework("utest.runner.Framework"),
+
+    libraryDependencies ++= Seq(
+      "org.scala-js" %%% "scalajs-dom" % "0.9.2",
+      "com.lihaoyi" %%% "utest" % "0.4.5" % "test"
+    )
+  )
+
+lazy val scatter = project.in(file("scatter"))
+  .enablePlugins(ScalaJSPlugin)
+  .dependsOn(veautiful)
+  .settings(
+    name := "scatter",
+
+    version := versionStr,
+
+    scalaVersion := scalaVersionStr,
+
+    scalaJSUseMainModuleInitializer := true,
+
+    testFrameworks += new TestFramework("utest.runner.Framework"),
+
+    libraryDependencies ++= Seq(
+      "org.scala-js" %%% "scalajs-dom" % "0.9.2",
+      "com.lihaoyi" %%% "utest" % "0.4.5" % "test"
+    )
+  )
+
+
 lazy val docs = project.in(file("docs"))
   .enablePlugins(ScalaJSPlugin)
   .dependsOn(veautiful)
