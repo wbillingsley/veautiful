@@ -2,6 +2,8 @@ package com.wbillingsley.veautiful
 
 import org.scalajs.dom
 
+import scala.collection.mutable
+
 /**
   * A DiffNode is a node in the view tree that can mutate itself to match a destination node.
   * It's called a diff node because effectively it "diffs" its children in order to work out how to
@@ -14,7 +16,7 @@ trait DiffNode extends DNode with MakeItSo {
   /**
     * The children of a DiffNode has to be mutable, as it mutates itself to become the destination
     */
-  var children:Seq[VNode]
+  var children:Seq[VNode] = Vector.empty
 
   def updateSelf:PartialFunction[DiffNode, _]
 
@@ -92,6 +94,6 @@ trait DiffNode extends DNode with MakeItSo {
       }
     }*/
 
-    children = updating
+    children = updating.toVector
   }
 }

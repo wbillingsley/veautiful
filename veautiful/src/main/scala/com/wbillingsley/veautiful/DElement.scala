@@ -15,8 +15,6 @@ object DElement {
 }
 case class DElement(name:String, uniqEl:Any = "", ns:String = DElement.htmlNS) extends DiffNode {
 
-  var children:Seq[VNode] = Seq.empty
-
   var attributes:Map[String, AttrVal] = Map.empty
 
   var listeners:Map[String, Lstnr] = Map.empty
@@ -111,8 +109,8 @@ case class DElement(name:String, uniqEl:Any = "", ns:String = DElement.htmlNS) e
     this
   }
 
-  def children(ac:VNode*):DElement = {
-    children ++= ac
+  def addChildren(ac:VNode*):DElement = {
+    children = children ++ ac
     this
   }
 
@@ -120,8 +118,8 @@ case class DElement(name:String, uniqEl:Any = "", ns:String = DElement.htmlNS) e
     case attr: <.DEAAttr => attrs(attr.a)
     case l: <.DEALstnr => on(l.l)
     case s: <.DEAStyle => style(s.s)
-    case n: <.DEAVNode => children(n.vNode)
-    case nodes: <.DEAIVNode => children(nodes.nodes.toSeq : _*)
+    case n: <.DEAVNode => addChildren(n.vNode)
+    case nodes: <.DEAIVNode => addChildren(nodes.nodes.toSeq : _*)
   }
 
   def apply(ac: <.DElAppliable *):DElement = {
