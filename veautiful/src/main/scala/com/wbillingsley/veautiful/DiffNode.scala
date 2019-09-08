@@ -25,6 +25,12 @@ trait DiffNode extends DNode with MakeItSo {
     updateChildren(to.children)
   }
 
+  def upd(to:Seq[VNode]) = {
+
+    // 
+
+  }
+
   def updateChildren(to:Seq[VNode]):Unit = {
     val diffOps = Differ.seqDiff(children, to)
 

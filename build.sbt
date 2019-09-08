@@ -20,8 +20,9 @@ lazy val veautiful = project.in(file("veautiful"))
     testFrameworks += new TestFramework("utest.runner.Framework"),
 
     libraryDependencies ++= Seq(
-        "org.scala-js" %%% "scalajs-dom" % "0.9.2",
-        "com.lihaoyi" %%% "utest" % "0.4.5" % "test"
+      "org.scala-js" %%% "scalajs-dom" % "0.9.2",
+      "com.lihaoyi" %%% "utest" % "0.4.5" % "test",
+      "org.scalatest" %%% "scalatest" % "3.0.0" % "test"
     )
 )
 
@@ -41,7 +42,8 @@ lazy val templates = project.in(file("templates"))
 
     libraryDependencies ++= Seq(
       "org.scala-js" %%% "scalajs-dom" % "0.9.2",
-      "com.lihaoyi" %%% "utest" % "0.4.5" % "test"
+      "com.lihaoyi" %%% "utest" % "0.4.5" % "test",
+      "org.scalatest" %%% "scalatest" % "3.0.0" % "test"
     )
   )
 
@@ -61,7 +63,8 @@ lazy val scatter = project.in(file("scatter"))
 
     libraryDependencies ++= Seq(
       "org.scala-js" %%% "scalajs-dom" % "0.9.2",
-      "com.lihaoyi" %%% "utest" % "0.4.5" % "test"
+      "com.lihaoyi" %%% "utest" % "0.4.5" % "test",
+      "org.scalatest" %%% "scalatest" % "3.0.0" % "test"
     )
   )
 
@@ -81,8 +84,9 @@ lazy val docs = project.in(file("docs"))
       testFrameworks += new TestFramework("utest.runner.Framework"),
 
       libraryDependencies ++= Seq(
-          "org.scala-js" %%% "scalajs-dom" % "0.9.2",
-          "com.lihaoyi" %%% "utest" % "0.4.5" % "test"
+        "org.scala-js" %%% "scalajs-dom" % "0.9.2",
+        "com.lihaoyi" %%% "utest" % "0.4.5" % "test",
+        "org.scalatest" %%% "scalatest" % "3.0.0" % "test"
       )
   )
 
