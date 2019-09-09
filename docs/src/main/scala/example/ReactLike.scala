@@ -167,34 +167,38 @@ object ReactLike {
 
     /** A function to work out what the local VDOM should look like for the current asteroids */
     def card(asteroids:Seq[Asteroid]) = {
-      <.div(^.cls := "card",
+      <.div(^.cls := "card", ^.attr("style") := "width: 642px;",
         svg(
           Model.wells.map(svgWell) ++ Model.asteroids.map(svgAsteroid)
         ),
         <.div(^.cls := "card-footer",
           <.p(s"${asteroids.length} asteroids rendering in ${dt}ms"),
-          <.div(^.cls := "btn-group",
-            <("button")(
-              ^.cls := "btn btn-sm btn-secondary", ^.onClick --> Model.stopTicking(),
-              <("i")(^.cls := "fa fa-pause")
-            ),
-            <("button")(
-              ^.cls := "btn btn-sm btn-secondary", ^.onClick --> Model.startTicking(),
-              <("i")(^.cls := "fa fa-play")
-            )
-          ),
-          <.div(^.cls := "input-group",
-            <.span(^.cls := "input-group-addon", "Asteroids"),
-            <("input")(^.attr("type") := "number", ^.cls := "form-control",
-              ^.attr("value") := asteroidCount,
-              ^.on("change") ==> { event => event.target match {
-                case i:HTMLInputElement => asteroidCount = i.valueAsNumber
-                case _ => // do nothing
-              }}
-            ),
-            <.span(^.cls := "input-group-btn",
+          <.div(^.cls := "form-row",
+            <.div(^.cls := "col-auto btn-group",
               <("button")(
-                ^.cls := "btn btn-sm btn-secondary", ^.onClick --> reset, "Reset"
+                ^.cls := "btn btn-sm btn-secondary", ^.onClick --> Model.stopTicking(),
+                <("i")(^.cls := "fa fa-pause")
+              ),
+              <("button")(
+                ^.cls := "btn btn-sm btn-secondary", ^.onClick --> Model.startTicking(),
+                <("i")(^.cls := "fa fa-play")
+              )
+            ),
+            <.div(^.cls := "input-group col-sm-6",
+              <.div(^.cls := "input-group-prepend",
+                <.span(^.cls := "input-group-text", "Asteroids")
+              ),
+              <("input")(^.attr("type") := "number", ^.cls := "form-control",
+                ^.attr("value") := asteroidCount,
+                ^.on("change") ==> { event => event.target match {
+                  case i:HTMLInputElement => asteroidCount = i.valueAsNumber
+                  case _ => // do nothing
+                }}
+              ),
+              <.span(^.cls := "input-group-append",
+                <("button")(
+                  ^.cls := "btn btn-sm btn-secondary", ^.onClick --> reset, "Reset"
+                )
               )
             )
           )

@@ -51,7 +51,7 @@ object ToDoList {
 
 
   def page:VNode = Common.layout(<.div(
-    <.h1("Example -- To Do List"),
+    <.h1("Example: To Do List"),
     <.p(
       """
         | As a To Do List is a traditional example, here's a very simple one, that works
@@ -59,15 +59,21 @@ object ToDoList {
         | we add to it with a form, and every time we do, the whole thing re-renders.
       """.stripMargin),
     <.div(^.cls := "card",
-      for {
-        (item, idx) <- toDo.zipWithIndex
-      } yield {
-        <.div(^.cls := "card-block",
-          item.s,
-          <.button(^.cls := "btn btn-sm btn-primary float-right",
-            ^.onClick --> done(idx), "remove")
-        )
-      },
+      <.div(^.cls := "card-body",
+        <("h5")(^.cls := "card-title", "To Do list"),
+        <.p(^.cls := "card-text", "This is a simple to-do list rendered as a Bootstrap card")
+      ),
+      <.ul(^.cls := "list-group list-group-flush",
+        for {
+          (item, idx) <- toDo.zipWithIndex
+        } yield {
+          <.li(^.cls := "list-group-item",
+            item.s,
+            <.button(^.cls := "btn btn-sm btn-primary float-right",
+              ^.onClick --> done(idx), "remove")
+          )
+        }
+      ),
       <.div(^.cls := "card-footer",
         <.div(^.cls := "input-group",
           <.input(^.attr("type") := "text", ^.cls := "form-control",
