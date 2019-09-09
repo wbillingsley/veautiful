@@ -9,7 +9,7 @@ import scala.concurrent.Future
   *
   * Once attached, it controls its node. It is up to the VNode to "play nicely".
   */
-trait VNode {
+trait VNode extends Keyable {
 
   /**
     * The dom node that this is currently attached to.

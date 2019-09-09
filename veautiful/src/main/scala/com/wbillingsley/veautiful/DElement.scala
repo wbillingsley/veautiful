@@ -2,6 +2,9 @@ package com.wbillingsley.veautiful
 
 import org.scalajs.dom
 import org.scalajs.dom.{Event, html}
+import dom.html.Input
+
+import scala.scalajs.js
 
 case class Lstnr(`type`:String, func:Event => _, usCapture:Boolean=false)
 case class AttrVal(name:String, value:String)
@@ -40,13 +43,20 @@ case class DElement(name:String, uniqEl:Any = "", ns:String = DElement.htmlNS) e
 
   val updateSelf = {
     case el:DElement =>
-      val removeA = attributes.values.filter({ a => !el.attributes.contains(a.name)})
-      val updateA = el.attributes.values.filter({ a => !attributes.get(a.name).map(_.value).contains(a.value)})
-      //removeAttrsFromNode(attributes.filter({ x => !el.attributes.contains(x._1) }).values)
-      removeAttrsFromNode(removeA)
-      attributes = el.attributes
-      //applyAttrsToNode(attributes.values)
-      applyAttrsToNode(updateA)
+
+      for { n <- domEl } {
+
+        for {
+          (k, _) <- attributes if !el.attributes.contains(k)
+        } n.removeAttribute(k)
+
+        for {
+          (k, v) <- el.attributes if !attributes.get(k).contains(v)
+        } n.setAttribute(v.name, v.value)
+
+        attributes = el.attributes
+
+      }
 
       removeStylesFromNode(styles)
       styles = el.styles
