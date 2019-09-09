@@ -150,6 +150,7 @@ object Differ {
         for { c <- n.domNode } {
           n.beforeDetach()
           p.removeChild(c)
+          n.detach()
           n.afterDetach()
         }
 

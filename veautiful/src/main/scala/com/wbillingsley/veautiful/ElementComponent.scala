@@ -16,7 +16,9 @@ class ElementComponent(val el:DElement) extends VNode {
     el.attach()
   }
 
-  def detach() = el.detach()
+  def detach() = {
+    el.detach()
+  }
 
   def renderElements(ch:VNode) = el.updateChildren(Seq(ch))
 
