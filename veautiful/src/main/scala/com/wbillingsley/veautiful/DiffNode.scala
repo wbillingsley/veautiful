@@ -32,8 +32,9 @@ trait DiffNode extends DNode with MakeItSo {
     children = diffReport.update
 
     // Now we recurse down the list
-    children.zip(to) foreach {
+    children.iterator.zip(to.iterator) foreach {
       case (uu:MakeItSo, tt:MakeItSo) => uu.makeItSo(tt)
+      case (u:Update, _) => u.update()
       case _ => // nothing to do
     }
   }
