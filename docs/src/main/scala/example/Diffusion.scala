@@ -295,8 +295,6 @@ object Diffusion {
     }
 
     override def afterAttach(): Unit = {
-      println(s"After attach on $this")
-
       super.afterAttach()
       reset()
       rerender()

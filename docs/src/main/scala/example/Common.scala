@@ -20,7 +20,7 @@ object Common {
     s
   )
 
-  val leftMenu:VNode = <("nav")(^.cls := "d-none d-md-block bg-light sidebar",
+  def leftMenu:VNode = <("nav")(^.cls := "d-none d-md-block bg-light sidebar",
     <.div(^.cls := "sidebar-sticky",
       <.ul(^.cls := "nav nav-pills flex-column",
         for { (r, t) <- routes } yield <.li(
