@@ -26,6 +26,9 @@ case class DElement(name:String, uniqEl:Any = "", ns:String = DElement.htmlNS) e
 
   override var domNode:Option[dom.Element] = None
 
+  // TODO: Improve this API
+  override def key: Option[Any] = if (uniqEl == "") None else Some(uniqEl)
+
   def domEl = domNode.collect({ case e:dom.Element => e })
 
   /**
