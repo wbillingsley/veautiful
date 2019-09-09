@@ -5,8 +5,6 @@ import org.scalajs.dom
 
 abstract class HistoryRouter[Route] extends ElementComponent(<.div) {
 
-  registerHistoryListeners()
-
   var route:Route
 
   def render:VNode
@@ -14,6 +12,14 @@ abstract class HistoryRouter[Route] extends ElementComponent(<.div) {
   def path(route:Route):String
 
   def routeFromLocation():Route
+
+  def deregisterHistoryListeners():Unit = {
+    dom.window.onpopstate = {
+      event =>
+        // deregistered
+    }
+  }
+
 
   def registerHistoryListeners():Unit = {
     dom.window.onpopstate = {
@@ -31,7 +37,12 @@ abstract class HistoryRouter[Route] extends ElementComponent(<.div) {
     renderElements(render)
   }
 
+  override def afterDetach():Unit = {
+    deregisterHistoryListeners()
+  }
+
   override def afterAttach():Unit = {
+    registerHistoryListeners()
     renderElements(render)
   }
 
