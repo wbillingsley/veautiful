@@ -8,6 +8,7 @@ import scala.scalajs.js
 
 case class Lstnr(`type`:String, func:Event => _, usCapture:Boolean=false)
 case class AttrVal(name:String, value:String)
+case class PropVal(name:String, value:js.Any)
 case class InlineStyle(name:String, value:String)
 case class EvtListener[T](`type`:String, f:Function[T, _], capture:Boolean)
 
@@ -19,6 +20,8 @@ object DElement {
 case class DElement(name:String, uniqEl:Any = "", ns:String = DElement.htmlNS) extends DiffNode {
 
   var attributes:Map[String, AttrVal] = Map.empty
+
+  var properties:Map[String, PropVal] = Map.empty
 
   var listeners:Map[String, Lstnr] = Map.empty
 
@@ -47,6 +50,7 @@ case class DElement(name:String, uniqEl:Any = "", ns:String = DElement.htmlNS) e
   val updateSelf = {
     case el:DElement =>
 
+      // Update attributes
       for { n <- domEl } {
 
         for {
@@ -58,8 +62,11 @@ case class DElement(name:String, uniqEl:Any = "", ns:String = DElement.htmlNS) e
         } n.setAttribute(v.name, v.value)
 
         attributes = el.attributes
-
       }
+
+      // Update properties
+      properties = el.properties
+      applyPropsToNode(properties.values)
 
       removeStylesFromNode(styles)
       styles = el.styles
@@ -72,6 +79,15 @@ case class DElement(name:String, uniqEl:Any = "", ns:String = DElement.htmlNS) e
       }
       listeners = el.listeners
 
+  }
+
+  def applyPropsToNode(props:Iterable[PropVal]):Unit = {
+    for {
+      n <- domEl
+      p <- props
+    } {
+      n.asInstanceOf[js.Dynamic].updateDynamic(p.name)(p.value)
+    }
   }
 
   def applyAttrsToNode(as:Iterable[AttrVal]):Unit = {
@@ -122,6 +138,11 @@ case class DElement(name:String, uniqEl:Any = "", ns:String = DElement.htmlNS) e
     this
   }
 
+  def prop(a:PropVal):DElement = {
+    properties += a.name -> a
+    this
+  }
+
   def addChildren(ac:VNode*):DElement = {
     children = children ++ ac
     this
@@ -129,6 +150,7 @@ case class DElement(name:String, uniqEl:Any = "", ns:String = DElement.htmlNS) e
 
   def applyAppliable(a: <.DElAppliable) = a match {
     case attr: <.DEAAttr => attrs(attr.a)
+    case p: <.DEAProp => prop(p.a)
     case l: <.DEALstnr => on(l.l)
     case s: <.DEAStyle => style(s.s)
     case n: <.DEAVNode => addChildren(n.vNode)
@@ -194,6 +216,7 @@ object < {
   implicit class DEAVNode(val vNode: VNode) extends DElAppliable
   implicit class DEAIVNode(val nodes: Iterable[VNode]) extends DElAppliable
   implicit class DEAAttr(val a: AttrVal) extends DElAppliable
+  implicit class DEAProp(val a: PropVal) extends DElAppliable
   implicit class DEALstnr(val l: Lstnr) extends DElAppliable
   implicit class DEAStyle(val s:InlineStyle) extends DElAppliable
   implicit def DEAText(t: String):DElAppliable = new DEAVNode(Text(t))
@@ -242,7 +265,13 @@ object ^ {
     def :=(d:Double) = AttrVal(n, d.toString)
   }
 
+  case class Propable(n:String) {
+    def :=(j:String) = PropVal(n, j)
+  }
+
   def attr(x:String) = Attrable(x)
+
+  def prop(n:String) = Propable(n)
 
   def alt = Attrable("alt")
   def src = Attrable("src")

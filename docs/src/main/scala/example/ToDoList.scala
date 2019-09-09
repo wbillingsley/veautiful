@@ -3,7 +3,6 @@ package example
 import com.wbillingsley.veautiful.{<, VNode, ^}
 import org.scalajs.dom
 import org.scalajs.dom.raw.HTMLInputElement
-
 import scala.collection.mutable
 
 object ToDoList {
@@ -78,7 +77,7 @@ object ToDoList {
         <.div(^.cls := "input-group",
           <.input(^.attr("type") := "text", ^.cls := "form-control",
             ^.attr("placeholder") := "type item here",
-            ^.attr("value") := adding.getOrElse(""),
+            ^.prop("value") := adding.getOrElse(""),
             ^.on("change") ==> updateAdding
           ),
           <.span(^.cls := "input-group-btn",
