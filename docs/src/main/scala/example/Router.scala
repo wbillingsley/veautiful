@@ -7,6 +7,7 @@ sealed trait ExampleRoute
 case object IntroRoute extends ExampleRoute
 case object ToDoRoute extends ExampleRoute
 case object ReactLikeRoute extends ExampleRoute
+case object DiffusionRoute extends ExampleRoute
 
 object Router extends HistoryRouter[ExampleRoute] {
 
@@ -19,6 +20,7 @@ object Router extends HistoryRouter[ExampleRoute] {
       case IntroRoute => Intro.page
       case ToDoRoute => ToDoList.page
       case ReactLikeRoute => ReactLike.page
+      case DiffusionRoute => Diffusion.SimulationView
     }
   }
 
@@ -29,6 +31,7 @@ object Router extends HistoryRouter[ExampleRoute] {
       case IntroRoute => (/# / "").stringify
       case ToDoRoute => (/# / "todo").stringify
       case ReactLikeRoute => (/# / "reactLike").stringify
+      case DiffusionRoute => (/# / "diffusion").stringify
     }
   }
 
@@ -36,6 +39,7 @@ object Router extends HistoryRouter[ExampleRoute] {
     case Array("") => IntroRoute
     case Array("todo") => ToDoRoute
     case Array("reactLike") => ReactLikeRoute
+    case Array("diffusion") => DiffusionRoute
     case x =>
       println(s"path was ${x}")
       IntroRoute

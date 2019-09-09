@@ -10,7 +10,8 @@ object Common {
   val routes:Seq[(ExampleRoute, String)] = Seq(
     IntroRoute -> "Hello world",
     ToDoRoute -> "Example: To Do List",
-    ReactLikeRoute -> "Example: Rendering asteroids into an SVG"
+    ReactLikeRoute -> "Example: Rendering asteroids into an SVG",
+    DiffusionRoute -> "Example: Diffusion experiment"
   )
 
   def linkToRoute(r:ExampleRoute, s:String):VNode = <.a(
