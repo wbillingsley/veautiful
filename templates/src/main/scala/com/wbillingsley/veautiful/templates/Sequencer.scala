@@ -4,10 +4,12 @@ import com.wbillingsley.veautiful._
 
 object Sequencer {
 
-  def page = Sequencer()(
-    <.div("Page One"),
-    <.div("Page Two")
-  )
+  def page = {
+    VSlides(width=1024, height=680)(
+      <.div("Page One"),
+      <.div("Page Two")
+    )
+  }
 
 
 }
