@@ -140,44 +140,41 @@ object Differ {
   def processDiffs(parent:DNode, ops:Seq[DiffOp[VNode]]):Unit = {
 
     for {
-      p <- parent.domNode
+      nodeOps <- parent.nodeOps
       op <- ops
     } op match {
       case Retain => // do nothing
 
       case Remove(n) =>
         // TODO: check child was attached
-        for { c <- n.domNode } {
+        if (n.isAttached) {
           n.beforeDetach()
-          p.removeChild(c)
+          nodeOps.removeAttachedChild(n)
           n.detach()
           n.afterDetach()
         }
 
       case Append(n) =>
-        n.domNode match {
-          case Some(c) => p.appendChild(c)
-          case _ =>
-            n.beforeAttach()
-            p.appendChild(n.attach())
-            n.afterAttach()
+        if (n.isAttached) {
+          nodeOps.appendAttachedChild(n)
+        } else {
+          n.beforeAttach()
+          n.attach()
+          nodeOps.appendAttachedChild(n)
+          n.afterAttach()
         }
 
       case InsertBefore(n, before) =>
-        if (before.isAttached) {
-          for { b <- before.domNode } {
-            n.domNode match {
-              case Some(c) => p.insertBefore(c, b)
-              case _ =>
-                n.beforeAttach()
-                p.insertBefore(n.attach(), b)
-                n.afterAttach()
-            }
-          }
-        } else throw new IllegalStateException("Can't insert before - node to insert before is not attached")
+        if (n.isAttached) {
+          nodeOps.insertAttachedChildBefore(n, before)
+        } else {
+          n.beforeAttach()
+          n.attach()
+          nodeOps.insertAttachedChildBefore(n, before)
+          n.afterAttach()
+        }
+
     }
-
-
   }
 
 

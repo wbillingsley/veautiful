@@ -36,8 +36,6 @@ lazy val templates = project.in(file("templates"))
 
     scalaVersion := scalaVersionStr,
 
-    scalaJSUseMainModuleInitializer := true,
-
     testFrameworks += new TestFramework("utest.runner.Framework"),
 
     libraryDependencies ++= Seq(
@@ -56,8 +54,6 @@ lazy val scatter = project.in(file("scatter"))
     version := versionStr,
 
     scalaVersion := scalaVersionStr,
-
-    scalaJSUseMainModuleInitializer := true,
 
     testFrameworks += new TestFramework("utest.runner.Framework"),
 
