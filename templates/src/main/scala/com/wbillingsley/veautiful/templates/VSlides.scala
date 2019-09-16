@@ -21,14 +21,12 @@ case class VSlides(width: Int, height: Int, override val key: Option[String] = N
   }
 
   def rescaleEventListener(e:Event):Unit = {
-    rescale(); rerender()
+    rerender()
   }
 
   override def afterAttach(): Unit = {
     super.afterAttach()
     dom.window.addEventListener("resize", rescaleEventListener)
-    rescale()
-    rerender()
   }
 
   override def beforeDetach(): Unit = {
@@ -36,16 +34,21 @@ case class VSlides(width: Int, height: Int, override val key: Option[String] = N
     dom.window.removeEventListener("resize", rescaleEventListener)
   }
 
-  def slide(n:VNode) = <.div(^.attr("style") := s"height: ${height}px; width: ${width}px; margin: 5px",
+  def slide(n:VNode) = <.div(^.cls := "vslide",
     n
   )
 
-  override def render: DiffNode = <.div(^.attr("style") := "position: absolute; width: 100%; height: 100%; background: #d7d8d2",
-    <.div(^.attr("style") := s"transform: scale($scale); transform-origin: top left; width: ${width}px; height: ${height}px; background: white; top: ${top}px; left: ${left}px; position: relative",
-      Sequencer()(
-        content.map(slide):_*
+
+  override def render: DiffNode = {
+    rescale()
+
+    <.div(^.cls := "vslides-top",
+      <.div(^.cls := "vslides-scaler", ^.attr("style") := s"transform: scale($scale); width: ${width}px; height: ${height}px; top: ${top}px; left: ${left}px; ",
+        Sequencer()(
+          content.map(slide):_*
+        )
       )
     )
-  )
+  }
 
 }

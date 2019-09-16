@@ -11,7 +11,8 @@ object Common {
     IntroRoute -> "Hello world",
     ToDoRoute -> "Example: To Do List",
     ReactLikeRoute -> "Example: Rendering asteroids into an SVG",
-    DiffusionRoute -> "Example: Diffusion experiment"
+    DiffusionRoute -> "Example: Diffusion experiment",
+    VSlidesRoute -> "Example: VSlides"
   )
 
   def linkToRoute(r:ExampleRoute, s:String):VNode = <.a(

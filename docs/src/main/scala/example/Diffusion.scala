@@ -259,10 +259,10 @@ object Diffusion {
       // (the <.div() up in the constructor) to update itself so it has the children that
       // are returned by card(asteroids). ie, we're updating a local virtual DOM.
       val r = try {
-        renderElements(Common.layout(<.div(
+        renderElements(<.div(
           style,
           card())
-        ))
+        )
       } catch {
         case x:Throwable =>
           renderElements(<.div("Error: " + x.getMessage))

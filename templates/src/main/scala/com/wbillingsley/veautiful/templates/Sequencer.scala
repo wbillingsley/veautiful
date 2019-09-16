@@ -18,13 +18,38 @@ case class Sequencer(override val key:Option[String] = None)(nodes: VNode*) exte
 
   var index = 0
 
-  override def render: DiffNode = <.div(^.cls := "v-sequencer",
-    for {
-      (n, i) <- nodes.zipWithIndex
-    } yield <.div(
-      ^.cls := (if (index == i) "v-sequencer active" else "v-sequencer"),
-      n
+  def next():Unit = {
+    if (index < nodes.size - 1) {
+      index = index + 1
+      update()
+    }
+  }
+
+  def previous():Unit = {
+    if (index > 0) {
+      index = index - 1
+      update()
+    }
+  }
+
+  def footBox:VNode = {
+    <.div(^.cls := "v-sequencer-footbox",
+      <.button(^.onClick --> previous, "<"),
+      <.span(s" ${index+1} / ${nodes.size} "),
+      <.button(^.onClick --> next, ">")
     )
+  }
+
+  override def render: DiffNode = <.div(^.cls := "v-sequencer",
+    <.div(^.cls := "v-sequencer-inner",
+      for {
+        (n, i) <- nodes.zipWithIndex
+      } yield <.div(
+        ^.cls := (if (index == i) "v-sequencer-slide active" else "v-sequencer-slide inactive"),
+        n
+      )
+    ),
+    footBox
   )
 
 }
