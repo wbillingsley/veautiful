@@ -2,6 +2,7 @@ package com.wbillingsley.veautiful.templates
 
 import com.wbillingsley.veautiful.{<, ElementComponent, VNode}
 import org.scalajs.dom
+import org.scalajs.dom.Event
 
 abstract class HistoryRouter[Route] extends ElementComponent(<.div) {
 
@@ -18,15 +19,28 @@ abstract class HistoryRouter[Route] extends ElementComponent(<.div) {
       event =>
         // deregistered
     }
+
+    dom.window.onhashchange = {
+      event =>
+        // deregistered
+    }
+  }
+
+  def handleHistoryEvent(event: Event):Unit = {
+    println("Popping state!")
+    route = routeFromLocation()
+    renderElements(render)
   }
 
 
   def registerHistoryListeners():Unit = {
-    dom.window.onpopstate = {
-      event =>
-        route = routeFromLocation()
-        renderElements(render)
+
+    dom.window.addEventListener("popstate", handleHistoryEvent)
+    // IE11 doesn't trigger popstate for hashchanges
+    if (dom.window.navigator.userAgent.contains("Trident")) {
+      dom.window.addEventListener("hashchange", handleHistoryEvent)
     }
+
   }
 
   def routeTo(r:Route):Unit = {
