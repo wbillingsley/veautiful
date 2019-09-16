@@ -57,6 +57,7 @@ abstract class HistoryRouter[Route] extends ElementComponent(<.div) {
 
   override def afterAttach():Unit = {
     registerHistoryListeners()
+    route = routeFromLocation()
     renderElements(render)
   }
 
