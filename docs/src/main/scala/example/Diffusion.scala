@@ -241,7 +241,7 @@ object Diffusion {
                 ^.attr("value") := Simulation.heat,
                 ^.on("change") ==> { event =>
                   event.target match {
-                    case i: HTMLInputElement => Simulation.heat = i.valueAsNumber.toInt
+                    case i: HTMLInputElement => Simulation.heat = i.value.toInt
                     case _ => // do nothing
                   }
                 }

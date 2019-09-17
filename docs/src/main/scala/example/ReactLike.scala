@@ -191,7 +191,7 @@ object ReactLike {
               <("input")(^.attr("type") := "number", ^.cls := "form-control",
                 ^.attr("value") := asteroidCount,
                 ^.on("change") ==> { event => event.target match {
-                  case i:HTMLInputElement => asteroidCount = i.valueAsNumber
+                  case i:HTMLInputElement => asteroidCount = i.value.toInt
                   case _ => // do nothing
                 }}
               ),
