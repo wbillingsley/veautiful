@@ -178,8 +178,8 @@ case class DElement(name:String, uniqEl:Any = "", ns:String = DElement.htmlNS) e
       e.setAttribute(a, value)
     }
 
-    for { Lstnr(t, f, cap) <- listeners.values } {
-      e.addEventListener(t, f, cap)
+    for { Lstnr(t, _, cap) <- listeners.values } {
+      e.addEventListener(t, eventDispatch, cap)
     }
 
     applyStylesToNode(styles)
