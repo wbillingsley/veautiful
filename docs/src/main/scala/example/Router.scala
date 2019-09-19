@@ -9,6 +9,7 @@ case object ToDoRoute extends ExampleRoute
 case object ReactLikeRoute extends ExampleRoute
 case object DiffusionRoute extends ExampleRoute
 case object VSlidesRoute extends ExampleRoute
+case object ScatterRoute extends ExampleRoute
 
 object Router extends HistoryRouter[ExampleRoute] {
 
@@ -23,6 +24,7 @@ object Router extends HistoryRouter[ExampleRoute] {
       case ReactLikeRoute => ReactLike.page
       case DiffusionRoute => Common.layout(Diffusion.SimulationView)
       case VSlidesRoute => VSlidesExample.page
+      case ScatterRoute => ScatterExample.page
     }
   }
 
@@ -35,6 +37,7 @@ object Router extends HistoryRouter[ExampleRoute] {
       case ReactLikeRoute => (/# / "reactLike").stringify
       case DiffusionRoute => (/# / "diffusion").stringify
       case VSlidesRoute => (/# / "vslides").stringify
+      case ScatterRoute => (/# / "scatter").stringify
     }
   }
 
@@ -44,6 +47,7 @@ object Router extends HistoryRouter[ExampleRoute] {
     case Array("reactLike") => ReactLikeRoute
     case Array("diffusion") => DiffusionRoute
     case Array("vslides") => VSlidesRoute
+    case Array("scatter") => ScatterRoute
     case x =>
       println(s"path was ${x}")
       IntroRoute
