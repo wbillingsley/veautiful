@@ -1,3 +1,9 @@
+.scatter-area .tile text {
+    dominant-baseline: text-before-edge;
+    stroke: none;
+    fill: black;
+}
+
 .tile {
     stroke: cadetblue;
     fill: aliceblue;

@@ -1,36 +1,36 @@
 package com.wbillingsley.scatter
 
-import com.wbillingsley.veautiful.{<, DElement, DiffComponent, DiffNode, VNode, ^}
+import com.wbillingsley.veautiful.{<, DElement, DiffComponent, DiffNode, SVG, VNode, ^}
 import org.scalajs.dom.raw.SVGElement
 
 
 case class TextTile(text:String) extends Tile with DiffComponent {
 
 
-  var bounds: (Int, Int, Int, Int) = {
-    val (w, h) = prefSize
-    (0, 0, w, h)
+  def boundsPath:VNode = Tile.path(this)
+
+  override def render: DiffNode = {
+    println(s"Rendering at size $size")
+
+    <("g", ns = DElement.svgNS)(^.cls := "tile", ^.attr("transform") := s"translate($x, $y);",
+      boundsPath,
+      SVG.text(^.attr("x") := Tile.contentStart._1, text)
+    )
   }
-
-  val boundsPath:VNode = Tile.path(this)
-
-  override val render: DiffNode = <("g", ns=DElement.svgNS)(^.cls := "tile", ^.attr("transform") := s"translate(${bounds._1}px, ${bounds._2}px);",
-    boundsPath,
-    <("text", ns=DElement.svgNS)(text)
-  )
 
   override def returnType: String = "String"
 
-
-  override def prefSize: (Int, Int) = domNode match {
-    case Some(n:SVGElement) =>
+  override def size: Option[(Int, Int)] = domNode map {
+    case n:SVGElement =>
       val r = n.getBoundingClientRect()
       (r.width.toInt, r.height.toInt)
-    case None => (20, 20)
   }
 
-  override def layout(bounds: (Int, Int, Int, Int)): Unit = {
-    this.bounds = bounds
+
+  override def afterAttach(): Unit = {
+    super.afterAttach()
+    rerender()
   }
+
 }
 

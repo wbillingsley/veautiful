@@ -255,6 +255,19 @@ object < {
 
 }
 
+object SVG {
+
+  def apply(ac: <.DElAppliable *):DElement = <.apply("svg", ns=DElement.svgNS)(ac:_*)
+
+  def circle = <.apply("circle", ns=DElement.svgNS)
+
+  def polygon = <.apply("polygon", ns=DElement.svgNS)
+
+  def text = <.apply("text", ns=DElement.svgNS)
+
+}
+
+
 object ^ {
 
   case class Attrable(n:String) {
