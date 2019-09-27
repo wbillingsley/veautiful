@@ -32,5 +32,12 @@ case class TextTile(text:String) extends Tile with DiffComponent {
     rerender()
   }
 
+  override def setPosition(x: Double, y: Double): Unit = {
+    this.x = x.toInt
+    this.y = y.toInt
+    domNode foreach  { case e:SVGElement =>
+      e.setAttribute("transform", s"translate(${x.toInt.toString}, ${y.toInt.toString})")
+    }
+  }
 }
 

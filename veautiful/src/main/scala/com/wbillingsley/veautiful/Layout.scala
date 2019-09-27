@@ -7,6 +7,8 @@ trait OnScreen {
 
   def size:Option[(Int, Int)]
 
+  def setPosition(x:Double, y:Double)
+
   def bounds: Option[(Int, Int, Int, Int)] = {
     for { (w, h) <- size } yield (x, y, x + w, y + h)
   }

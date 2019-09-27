@@ -1,6 +1,9 @@
 package com.wbillingsley.scatter
 
 import com.wbillingsley.veautiful.{<, DElement, DiffComponent, DiffNode, Layout, OnScreen, Update, VNode, ^}
+import org.scalajs.dom.raw.{HTMLElement, MouseEvent, SVGElement}
+
+case class DragLocation(itemStartX:Double, itemStartY:Double, mouseStartX: Double, mouseStartY:Double)
 
 trait Tile extends OnScreen with VNode {
 
@@ -9,6 +12,41 @@ trait Tile extends OnScreen with VNode {
   def sockets:Seq[Socket] = Seq.empty
 
   def returnType:String
+
+  var mouseDownLoc:Option[DragLocation] = None
+
+  def onMouseDown(e:MouseEvent):Unit = {
+    println(e)
+    mouseDownLoc = Some(DragLocation(x, y, e.clientX, e.clientY))
+  }
+
+  def onMouseDrag(e:MouseEvent):Unit = {
+    for {
+      DragLocation(ix, iy, mx, my) <- mouseDownLoc
+    } {
+      val x = e.clientX
+      val y = e.clientY
+      setPosition(ix + x - mx, iy + y - my)
+    }
+  }
+
+  def onMouseUp(e:MouseEvent):Unit = {
+    mouseDownLoc = None
+  }
+
+  def registerDragListeners():Unit = {
+    for { n <- domNode } {
+      n.addEventListener("mousedown", onMouseDown)
+      n.addEventListener("mousemove", onMouseDrag)
+      n.addEventListener("mouseup", onMouseUp)
+    }
+  }
+
+  override def afterAttach(): Unit = {
+    super.afterAttach()
+    registerDragListeners()
+  }
+
 
 }
 
