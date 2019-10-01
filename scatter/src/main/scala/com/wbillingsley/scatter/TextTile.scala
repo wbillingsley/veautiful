@@ -4,7 +4,7 @@ import com.wbillingsley.veautiful.{<, DElement, DiffComponent, DiffNode, SVG, VN
 import org.scalajs.dom.raw.SVGElement
 
 
-case class TextTile(text:String) extends Tile with DiffComponent {
+case class TextTile(tileSpace:TileSpace, text:String) extends Tile(tileSpace) with DiffComponent {
 
 
   def boundsPath:VNode = Tile.path(this)
