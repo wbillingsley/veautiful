@@ -16,4 +16,16 @@ case class TileSpace(override val key:Option[String] = None)(val prefSize:(Int, 
   override def setPosition(x: Double, y: Double): Unit = ???
 
   override def size: Option[(Int, Int)] = Some(prefSize)
+
+
+  var selectedDraggable:Option[OnScreen] = None
+
+  /**
+    * If this TileSpace is attached (and in the page), determines any scale that has been applied to it through CSS.
+    */
+  def scale = {
+    for { e:SVGElement <- domNode } yield {
+      e.getBoundingClientRect().width / e.clientWidth
+    }
+  }
 }
