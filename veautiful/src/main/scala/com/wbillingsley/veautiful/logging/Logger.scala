@@ -29,7 +29,7 @@ object Logger {
   case object Warning extends Level { val num = 4 }
   case object Error extends Level { val num = 5 }
 
-  var currentLevel:Level = Trace
+  var currentLevel:Level = Info
 
   @JSExport
   def setTrace():Unit = currentLevel = Trace
