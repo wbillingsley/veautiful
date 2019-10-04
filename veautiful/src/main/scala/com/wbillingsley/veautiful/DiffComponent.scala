@@ -19,17 +19,23 @@ trait DiffComponent extends VNode with Update {
 
   def update(): Unit = rerender()
 
-  /**
-    * Called to perform an attach operation -- ie, create the real DOM node and put it into
-    * domNode
-    */
-  override def attach(): Node = lastRendered.getOrElse(rerender()).attach()
+  def delegate:DiffNode = lastRendered.getOrElse(rerender())
 
-  /**
-    * Called to perform a detach operation -- ie, anything necessary to clean up the DOM node,
-    * and then remove it from domNode so we know it's gone.
-    */
+  override def beforeAttach(): Unit = {
+    super.beforeAttach()
+    delegate.attach()
+  }
+
+  override def attach(): Node = delegate.attach()
+
+  override def afterAttach(): Unit = {
+    super.afterAttach()
+    delegate.afterAttach()
+  }
+
+  override def beforeDetach(): Unit = lastRendered.foreach(_.beforeDetach())
   override def detach(): Unit = lastRendered.foreach(_.detach())
+  override def afterDetach(): Unit = lastRendered.foreach(_.afterDetach())
 
 }
 
