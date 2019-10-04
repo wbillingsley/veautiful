@@ -23,7 +23,7 @@ object Socket {
 
   def path(tc:Option[Tile]):VNode = {
     logger.trace(s"Calculating tile path for $tc")
-    val (w, h) = tc.flatMap(_.size) getOrElse (20, 20)
+    val (w, h) = tc.flatMap(_.size) getOrElse (15, 15)
     <("path", ns=DElement.svgNS)(^.attr("d") := boxAndArc(w, h))
   }
 

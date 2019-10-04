@@ -27,4 +27,6 @@ object HBox {
   val logger:Logger = Logger.getLogger(HBox.getClass)
 
   val padding = 3
+
+  val tabDist = 10;
 }

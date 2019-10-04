@@ -1,15 +1,23 @@
+.scatter-area {
+    background: whitesmoke;
+}
+
 .scatter-area .tile text {
     dominant-baseline: text-before-edge;
     stroke: none;
     fill: black;
+    font-family: "Fira Code", monospace;
+    white-space: pre;
 }
 
 .tile {
-    stroke: cadetblue;
-    fill: aliceblue;
+    stroke: darkslategray;
+    fill: white;
+    stroke-width: 2;
+    stroke-linejoin: round;
 }
 
 .scatter-area .socket {
-    stroke: gainsboro;
-    fill: beige;
+    stroke: slategray;
+    fill: whitesmoke;
 }

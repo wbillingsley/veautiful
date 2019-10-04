@@ -12,10 +12,10 @@ class IfElseTile(tileSpace:TileSpace) extends Tile(tileSpace) {
 
   override val tileContent: TileComponent = {
     VBox(
-      HBox(TileText("if "), condition, TileText("{")),
-      trueCase,
+      HBox(TileText("if ("), condition, TileText(") {")),
+      HBox(TileText("  "), trueCase),
       HBox(TileText("} else {")),
-      falseCase,
+      HBox(TileText("  "), falseCase),
       TileText("}")
     )
   }
