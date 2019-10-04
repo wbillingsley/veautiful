@@ -5,17 +5,13 @@ import org.scalajs.dom.raw.{MouseEvent, SVGElement}
 
 import scala.collection.mutable
 
-case class TileSpace(override val key:Option[String] = None)(val prefSize:(Int, Int) = (480, 640)) extends DiffComponent with OnScreen {
+case class TileSpace(override val key:Option[String] = None)(val prefSize:(Int, Int) = (480, 640)) extends DiffComponent {
 
-  val tiles:mutable.SortedSet[Tile] = mutable.SortedSet.empty(Ordering.by(_.hashCode()))
+  val tiles:mutable.Buffer[Tile] = mutable.Buffer.empty
 
   override def render: DiffNode = <.svg(^.attr("width") := prefSize._1.toString, ^.attr("height") := prefSize._2.toString, ^.cls := "scatter-area",
     tiles.toSeq
   )
-
-  override def setPosition(x: Double, y: Double): Unit = ???
-
-  override def size: Option[(Int, Int)] = Some(prefSize)
 
   var dragging:Option[DragInfo] = None
 
@@ -63,6 +59,5 @@ case class TileSpace(override val key:Option[String] = None)(val prefSize:(Int, 
 
   def layout(): Unit = {
     for { t <- tiles } t.layout()
-    rerender()
   }
 }
