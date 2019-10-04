@@ -21,7 +21,9 @@ trait TileComponent extends DiffComponent {
 
   var y = 0
 
-  def layoutChildren():Unit = {}
+  def layoutChildren():Unit = {
+    logger.trace(s"layoutChildren: $this")
+  }
 
   override def update(): Unit = {
 //    layoutChildren()
@@ -29,22 +31,24 @@ trait TileComponent extends DiffComponent {
   }
 
   override def attach(): Node = {
-    logger.trace(s"$uid $this attaching")
+    logger.trace(s"Attach: $this $uid")
     super.attach()
   }
 
   override def detach(): Unit = {
-    logger.trace(s"$uid $this detaching")
+    logger.trace(s"Detach: $this $uid")
     super.detach()
   }
 
 
   def size:Option[(Int, Int)] = {
-    logger.trace(s"$uid $this size with domNode $domNode")
+    logger.trace(s"Size: $this $uid domNode $domNode")
     domNode.map {
       case e:SVGElement =>
         val b = e.asInstanceOf[js.Dynamic].getBBox()
-        (b.width.asInstanceOf[Double].toInt, b.height.asInstanceOf[Double].toInt)
+        val v = (b.width.asInstanceOf[Double].toInt, b.height.asInstanceOf[Double].toInt)
+        logger.trace(s"Size was $v")
+        v
       //case e:HTMLElement => (e.clientWidth, e.clientHeight)
     }
   }

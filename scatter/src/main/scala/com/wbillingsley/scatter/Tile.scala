@@ -31,8 +31,8 @@ abstract class Tile(val ts:TileSpace) extends OnScreen with DiffComponent {
 
     val c = tileContent
 
-    <("g", ns = DElement.svgNS)(^.cls := "tile", ^.attr("transform") := s"translate($x, $y)",
-      Tile.path(c),
+    SVG.g(^.cls := "tile", ^.attr("transform") := s"translate($x, $y)",
+      tileBoundary,
       SVG.g(^.attr("transform") := s"translate(${Tile.boxStartX + Tile.padding}, ${Tile.padding})", c)
     )
   }
@@ -43,6 +43,8 @@ abstract class Tile(val ts:TileSpace) extends OnScreen with DiffComponent {
     * unattached nodes)
     */
   val tileContent:TileComponent
+
+  val tileBoundary:DElement = SVG.path(^.cls := "tile-path")
 
   override def afterAttach(): Unit = {
     super.afterAttach()
@@ -63,8 +65,11 @@ abstract class Tile(val ts:TileSpace) extends OnScreen with DiffComponent {
     }
   }
 
-  def layout() = {
+  def layout():Unit = {
     tileContent.layoutChildren()
+    for { el <- tileBoundary.domEl } {
+      el.setAttribute("d", Tile.path(tileContent))
+    }
   }
 
 }
@@ -73,10 +78,10 @@ object Tile {
 
   val logger:Logger = Logger.getLogger(Tile.getClass)
 
-  def path(tc:TileComponent):VNode = {
+  def path(tc:TileComponent):String = {
     logger.trace(s"Calculating tile path for $tc")
     val (w, h) = tc.size getOrElse (20, 20)
-    <("path", ns=DElement.svgNS)(^.attr("d") := boxAndArc(w, h))
+    boxAndArc(w, h)
   }
 
   def corner:String = "M 9 3 l 0 -3 "
