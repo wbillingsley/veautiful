@@ -1,6 +1,7 @@
 package com.wbillingsley.scatter
 
 import com.wbillingsley.veautiful.{DiffNode, SVG, ^}
+import org.scalajs.dom.Node
 
 case class HBox(children:TileComponent*) extends TileComponent {
 
@@ -11,8 +12,12 @@ case class HBox(children:TileComponent*) extends TileComponent {
     val y = 0
     for { (c, i) <- children.iterator.zipWithIndex } {
       c.x = x
-      println(s"Item $i $c size is ${c.size}")
-      x = x + c.size.map(_._1).getOrElse(0)
+//      println(s"Item $i $c size is ${c.size}")
+      x = x + c.size.map(_._1).getOrElse(0) + HBox.padding
     }
   }
+}
+
+object HBox {
+  val padding = 3
 }

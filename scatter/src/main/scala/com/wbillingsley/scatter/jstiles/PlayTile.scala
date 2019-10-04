@@ -8,7 +8,7 @@ class PlayTile(tileSpace:TileSpace) extends Tile(tileSpace) {
 
   override def returnType: String = "void"
 
-  override def tileContent: TileComponent = {
+  override val tileContent: TileComponent = {
     HBox(
       TileText("play!"),
       socket

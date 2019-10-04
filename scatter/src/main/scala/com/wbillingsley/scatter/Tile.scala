@@ -1,9 +1,12 @@
 package com.wbillingsley.scatter
 
+import com.wbillingsley.veautiful.logging.Logger
 import com.wbillingsley.veautiful.{<, DElement, DiffComponent, DiffNode, Layout, OnScreen, SVG, Update, VNode, ^}
 import org.scalajs.dom.raw.{HTMLElement, MouseEvent, SVGElement}
 
 abstract class Tile(val ts:TileSpace) extends OnScreen with DiffComponent {
+
+  import Tile._
 
   def free:Boolean = within.isEmpty
 
@@ -24,6 +27,8 @@ abstract class Tile(val ts:TileSpace) extends OnScreen with DiffComponent {
   }
 
   override def render: DiffNode = {
+    logger.trace(s"render called on $this")
+
     val c = tileContent
 
     <("g", ns = DElement.svgNS)(^.cls := "tile", ^.attr("transform") := s"translate($x, $y)",
@@ -32,7 +37,12 @@ abstract class Tile(val ts:TileSpace) extends OnScreen with DiffComponent {
     )
   }
 
-  def tileContent:TileComponent
+  /**
+    * The elements to render inside the tile. At the moment, this has to be a val, because components will try to
+    * get their bounds from their domNode (so we need to be able to ask tileContent.size and not generate new
+    * unattached nodes)
+    */
+  val tileContent:TileComponent
 
   override def afterAttach(): Unit = {
     super.afterAttach()
@@ -61,7 +71,10 @@ abstract class Tile(val ts:TileSpace) extends OnScreen with DiffComponent {
 
 object Tile {
 
+  val logger:Logger = Logger.getLogger(Tile.getClass)
+
   def path(tc:TileComponent):VNode = {
+    logger.trace(s"Calculating tile path for $tc")
     val (w, h) = tc.size getOrElse (20, 20)
     <("path", ns=DElement.svgNS)(^.attr("d") := boxAndArc(w, h))
   }
@@ -84,7 +97,13 @@ object Tile {
 
   val typeCorner:String = s"M $boxStartX $typeLoopY1 A $typeLoopRadius $typeLoopRadius 0 1 1 $boxStartX $typeLoopY2 L $boxStartX 0 "
 
-  def boxAndArc(w:Int, h:Int):String = s"$typeCorner l $w 0 l 0 $h l ${-w} 0 z"
+  def boxAndArc(w:Int, h:Int):String = {
+    // Work out the width and height with padding
+    val pw = w + 2 * padding
+    val ph = h + 2 * padding
+
+    s"$typeCorner l $pw 0 l 0 $ph l ${-pw} 0 z"
+  }
 
 }
 
