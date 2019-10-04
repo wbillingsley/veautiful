@@ -61,12 +61,16 @@ trait DNode extends VNode {
     */
   def children:Seq[VNode]
 
+  override def beforeAttach(): Unit = {
+    super.beforeAttach()
+    for { d <- children } d.beforeAttach()
+  }
+
   def attach():dom.Element = {
     val n = create()
     domNode = Some(n)
 
     for { ch <- children } {
-      ch.beforeAttach()
       ch.attach()
     }
 
@@ -75,10 +79,24 @@ trait DNode extends VNode {
       d <- children
     } {
       ops.appendAttachedChild(d)
-      d.afterAttach()
     }
 
     n
+  }
+
+  /**
+    * After this element has been attached, recurse down through the children calling afterAttach
+    */
+  override def afterAttach(): Unit = {
+    super.afterAttach()
+    for {
+      d <- children
+    } d.afterAttach()
+  }
+
+  override def beforeDetach(): Unit = {
+    super.beforeDetach()
+    for { d <- children } d.beforeDetach()
   }
 
   def detach() = {
@@ -86,7 +104,6 @@ trait DNode extends VNode {
       ops <- nodeOps
       d <- children
     } {
-      d.beforeDetach()
       ops.removeAttachedChild(d)
     }
 
@@ -94,10 +111,14 @@ trait DNode extends VNode {
       d <- children
     } {
       d.detach()
-      d.afterDetach()
     }
 
     domNode = None
+  }
+
+  override def afterDetach(): Unit = {
+    super.afterDetach()
+    for { d <- children } d.afterDetach()
   }
 
 }
