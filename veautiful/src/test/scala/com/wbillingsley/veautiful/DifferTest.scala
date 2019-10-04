@@ -1,18 +1,42 @@
 package com.wbillingsley.veautiful
 
-import utest._
+import org.scalatest._
+import scala.util.Random
 
-object DifferTest extends TestSuite with App {
+class DifferTest extends FlatSpec  {
 
   import Differ._
 
-  println("It's " + seqDiff(List(1, 2, 3, 4, 5, 6), List(6, 2, 4)))
-
-  def tests = TestSuite {
-    'Differ {
-
-      assert(seqDiff(List(1, 2, 3), List(1, 2)) == Seq(LRemove[Int](2)))
-    }
+  // An item whose equality is determined by i but identity is determined by uid
+  case class Item(i:Int) extends Keyable {
+    val uid = Random.nextString(5)
   }
+
+  "Differ" should "Detect an appended item" in {
+    val before = (1 to 5).map(Item)
+    val after = (1 to 6).map(Item)
+
+    val report = Differ.diffs(before, after)
+    assert(report.ops == Seq(Append(Item(6))))
+  }
+
+  it should "result in an update set that matches (equality) the right list" in {
+    val before = (1 to 5).map(Item)
+    val after = (1 to 6).map(Item)
+
+    val report = Differ.diffs(before, after)
+    assert(report.update == after)
+  }
+
+  it should "result in an update set that retains (identity) the left list" in {
+    val before = (1 to 5).map(Item)
+    val after = (1 to 6).map(Item)
+
+    val report = Differ.diffs(before, after)
+    assert(report.update.zip(before).forall { case (x, y) => x.uid == y.uid })
+  }
+
+
+
 
 }
