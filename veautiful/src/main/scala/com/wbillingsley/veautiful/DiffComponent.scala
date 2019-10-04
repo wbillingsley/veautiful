@@ -3,7 +3,7 @@ import org.scalajs.dom.Node
 
 trait DiffComponent extends VNode with Update {
 
-  def render:DiffNode
+  protected def render:DiffNode
 
   var lastRendered:Option[DiffNode] = None
 
@@ -23,7 +23,7 @@ trait DiffComponent extends VNode with Update {
     * Called to perform an attach operation -- ie, create the real DOM node and put it into
     * domNode
     */
-  override def attach(): Node = rerender().attach()
+  override def attach(): Node = lastRendered.getOrElse(rerender()).attach()
 
   /**
     * Called to perform a detach operation -- ie, anything necessary to clean up the DOM node,
