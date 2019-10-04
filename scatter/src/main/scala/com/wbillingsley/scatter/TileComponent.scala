@@ -21,6 +21,8 @@ trait TileComponent extends DiffComponent {
 
   var y = 0
 
+  def repositionNode():Unit = rerender()
+
   def layoutChildren():Unit = {
     logger.trace(s"layoutChildren: $this")
   }
