@@ -23,7 +23,7 @@ trait DiffComponent extends VNode with Update {
 
   override def beforeAttach(): Unit = {
     super.beforeAttach()
-    delegate.attach()
+    delegate.beforeAttach()
   }
 
   override def attach(): Node = delegate.attach()
