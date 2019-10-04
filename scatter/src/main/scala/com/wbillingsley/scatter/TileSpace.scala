@@ -49,6 +49,7 @@ case class TileSpace(override val key:Option[String] = None)(val prefSize:(Int, 
   override def afterAttach(): Unit = {
     super.afterAttach()
     registerDragListeners()
+    layout()
   }
 
   /**
@@ -58,5 +59,10 @@ case class TileSpace(override val key:Option[String] = None)(val prefSize:(Int, 
     domNode map { case e:SVGElement =>
       e.getBoundingClientRect().width / e.clientWidth
     }
+  }
+
+  def layout(): Unit = {
+    for { t <- tiles } t.layout()
+    rerender()
   }
 }

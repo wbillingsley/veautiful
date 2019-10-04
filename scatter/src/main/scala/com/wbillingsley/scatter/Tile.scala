@@ -1,9 +1,9 @@
 package com.wbillingsley.scatter
 
-import com.wbillingsley.veautiful.{<, DElement, DiffComponent, DiffNode, Layout, OnScreen, Update, VNode, ^}
+import com.wbillingsley.veautiful.{<, DElement, DiffComponent, DiffNode, Layout, OnScreen, SVG, Update, VNode, ^}
 import org.scalajs.dom.raw.{HTMLElement, MouseEvent, SVGElement}
 
-abstract class Tile(val ts:TileSpace) extends OnScreen with VNode {
+abstract class Tile(val ts:TileSpace) extends OnScreen with DiffComponent {
 
   def free:Boolean = within.isEmpty
 
@@ -23,26 +23,52 @@ abstract class Tile(val ts:TileSpace) extends OnScreen with VNode {
     }
   }
 
+  override def render: DiffNode = {
+    val c = tileContent
+
+    <("g", ns = DElement.svgNS)(^.cls := "tile", ^.attr("transform") := s"translate($x, $y)",
+      Tile.path(c),
+      SVG.g(^.attr("transform") := s"translate(${Tile.boxStartX + Tile.padding}, ${Tile.padding})", c)
+    )
+  }
+
+  def tileContent:TileComponent
+
   override def afterAttach(): Unit = {
     super.afterAttach()
     registerDragListeners()
   }
 
-}
+  override def size: Option[(Int, Int)] = domNode map {
+    case n:SVGElement =>
+      val r = n.getBoundingClientRect()
+      (r.width.toInt, r.height.toInt)
+  }
 
-trait Socket {
+  override def setPosition(x: Double, y: Double): Unit = {
+    this.x = x.toInt
+    this.y = y.toInt
+    domNode foreach  { case e:SVGElement =>
+      e.setAttribute("transform", s"translate(${x.toInt.toString}, ${y.toInt.toString})")
+    }
+  }
+
+  def layout() = {
+    tileContent.layoutChildren()
+  }
 
 }
 
 object Tile {
 
-  def path(tile:Tile):VNode = {
-    val (x, y, w, h) = tile.bounds getOrElse (0, 0, 20, 20)
-
+  def path(tc:TileComponent):VNode = {
+    val (w, h) = tc.size getOrElse (20, 20)
     <("path", ns=DElement.svgNS)(^.attr("d") := boxAndArc(w, h))
   }
 
   def corner:String = "M 9 3 l 0 -3 "
+
+  val padding = 3
 
   val typeLoopRadius = 9
 

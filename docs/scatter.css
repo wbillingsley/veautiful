@@ -8,3 +8,8 @@
     stroke: cadetblue;
     fill: aliceblue;
 }
+
+.scatter-area .socket {
+    stroke: gainsboro;
+    fill: beige;
+}
