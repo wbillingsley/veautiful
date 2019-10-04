@@ -265,6 +265,8 @@ object SVG {
 
   def text = <.apply("text", ns=DElement.svgNS)
 
+  def g = <.apply("g", ns=DElement.svgNS)
+
 }
 
 
