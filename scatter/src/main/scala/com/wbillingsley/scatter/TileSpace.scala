@@ -19,6 +19,14 @@ case class TileSpace(override val key:Option[String] = None)(val prefSize:(Int, 
     dragging = Some(DragInfo(item, item.x, item.y, x, y))
   }
 
+  def onMouseDown(t:Tile, e:MouseEvent):Unit = {
+    if (tiles.contains(t)) {
+      bringToFront(t);
+      layout()
+      startDragging(t, e.clientX, e.clientY)
+    }
+  }
+
   def onMouseDrag(e:MouseEvent):Unit = {
     for {
       DragInfo(tile, ix, iy, mx, my) <- dragging
@@ -46,6 +54,14 @@ case class TileSpace(override val key:Option[String] = None)(val prefSize:(Int, 
     super.afterAttach()
     registerDragListeners()
     layout()
+  }
+
+  def bringToFront(t:Tile):Unit = {
+    val newOrder = tiles.filter(_ != t)
+    newOrder.append(t)
+    tiles.clear
+    tiles.appendAll(newOrder)
+    rerender()
   }
 
   /**

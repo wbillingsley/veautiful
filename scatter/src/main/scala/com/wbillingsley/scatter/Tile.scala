@@ -17,7 +17,7 @@ abstract class Tile(val ts:TileSpace) extends OnScreen with DiffComponent {
   def returnType:String
 
   def onMouseDown(e:MouseEvent):Unit = {
-    ts.startDragging(this, e.clientX, e.clientY)
+    ts.onMouseDown(this, e)
   }
 
   def registerDragListeners():Unit = {
