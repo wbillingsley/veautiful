@@ -7,4 +7,5 @@ case class TileText(text:String) extends TileComponent {
     SVG.text(^.attr("x") := x, ^.attr("y") := y, ^.cls := "tile-text", text)
   }
 
+  override def emptySockets: Seq[(Int, Int, Socket)] = Seq.empty
 }

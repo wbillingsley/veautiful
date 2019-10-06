@@ -21,6 +21,13 @@ case class HBox(children:TileComponent*) extends TileComponent {
       x = x + c.size.map(_._1).getOrElse(0) + HBox.padding
     }
   }
+
+  override def emptySockets: Seq[(Int, Int, Socket)] = {
+    for {
+      c <- children
+      (x, y, s) <- c.emptySockets
+    } yield (c.x + x, c.y + y, s)
+  }
 }
 
 object HBox {

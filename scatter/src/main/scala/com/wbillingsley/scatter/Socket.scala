@@ -9,6 +9,17 @@ class Socket(within:Tile) extends TileComponent {
 
   var content:Option[Tile] = None
 
+  def emptySockets:Seq[(Int, Int, Socket)] = {
+    content match {
+      case Some(t) =>
+        for  {
+          (x, y, e) <- t.emptySockets
+        } yield (t.x + x, t.y + y, e)
+      case _ =>
+        Seq((0, 0, this))
+    }
+  }
+
   override def render: DiffNode = {
     <("g", ns = DElement.svgNS)(^.cls := "socket", ^.attr("transform") := s"translate($x, $y)",
       Socket.path(content)

@@ -1,5 +1,10 @@
 .scatter-area {
     background: whitesmoke;
+    touch-action: none;
+}
+
+.scatter-area * {
+    touch-action: none;
 }
 
 .scatter-area .tile text {
@@ -8,6 +13,7 @@
     fill: black;
     font-family: "Fira Code", monospace;
     white-space: pre;
+    touch-action: none;
 }
 
 .tile {
@@ -20,4 +26,8 @@
 .scatter-area .socket {
     stroke: slategray;
     fill: whitesmoke;
+}
+
+.scatter-area .socket:hover {
+    fill: snow;
 }

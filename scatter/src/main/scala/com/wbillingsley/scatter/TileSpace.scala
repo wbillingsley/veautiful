@@ -15,6 +15,8 @@ case class TileSpace(override val key:Option[String] = None)(val prefSize:(Int, 
 
   var dragging:Option[DragInfo] = None
 
+  var activeSocket:Option[Socket] = None
+
   def startDragging(item:Tile, x:Double, y:Double):Unit = {
     dragging = Some(DragInfo(item, item.x, item.y, x, y))
   }
@@ -42,11 +44,15 @@ case class TileSpace(override val key:Option[String] = None)(val prefSize:(Int, 
     dragging = None
   }
 
+  def activateSocket(x:Int, y:Int) = {
+    val s = tiles.flatMap(_.emptySockets)
+  }
+
   def registerDragListeners():Unit = {
     for { n <- domNode } {
-      n.addEventListener("mousemove", onMouseDrag)
-      n.addEventListener("mouseup", onMouseUp)
-      n.addEventListener("mouseleave", onMouseUp)
+      n.addEventListener("pointermove", onMouseDrag)
+      n.addEventListener("pointerup", onMouseUp)
+      n.addEventListener("pointerleave", onMouseUp)
     }
   }
 

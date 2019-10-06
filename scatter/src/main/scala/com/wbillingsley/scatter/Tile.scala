@@ -12,19 +12,25 @@ abstract class Tile(val ts:TileSpace) extends OnScreen with DiffComponent {
 
   var within:Option[Socket] = None
 
-  def sockets:Seq[Socket] = Seq.empty
-
   def returnType:String
 
   def onMouseDown(e:MouseEvent):Unit = {
     ts.onMouseDown(this, e)
   }
 
+  def emptySockets:Seq[(Int, Int, Socket)] = for {
+    (x, y, e) <- tileContent.emptySockets
+  } yield (contentOffsetX + x, contentOffsetY + y, e)
+
   def registerDragListeners():Unit = {
     for { n <- domNode } {
       n.addEventListener("pointerdown", onMouseDown)
     }
   }
+
+  def contentOffsetX:Int = Tile.boxStartX + Tile.padding
+
+  def contentOffsetY:Int = Tile.padding
 
   override def render: DiffNode = {
     logger.trace(s"render called on $this")
@@ -33,7 +39,7 @@ abstract class Tile(val ts:TileSpace) extends OnScreen with DiffComponent {
 
     SVG.g(^.cls := "tile", ^.attr("transform") := s"translate($x, $y)",
       tileBoundary,
-      SVG.g(^.attr("transform") := s"translate(${Tile.boxStartX + Tile.padding}, ${Tile.padding})", c)
+      SVG.g(^.attr("transform") := s"translate($contentOffsetX, $contentOffsetY)", c)
     )
   }
 

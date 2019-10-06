@@ -27,10 +27,7 @@ trait TileComponent extends DiffComponent {
     logger.trace(s"layoutChildren: $this")
   }
 
-  override def update(): Unit = {
-//    layoutChildren()
-    super.update()
-  }
+  def emptySockets:Seq[(Int, Int, Socket)]
 
   override def attach(): Node = {
     logger.trace(s"Attach: $this $uid")
