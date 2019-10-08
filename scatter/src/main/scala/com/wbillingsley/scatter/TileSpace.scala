@@ -36,12 +36,32 @@ case class TileSpace(override val key:Option[String] = None)(val prefSize:(Int, 
       e.preventDefault()
       val x = e.clientX
       val y = e.clientY
-      tile.setPosition(ix + x - mx, iy + y - my)
+      val newTx = ix + x - mx
+      val newTy = iy + y - my
+      tile.setPosition(newTx, newTy)
+
+      def dist(a:Double, b:Double) = Math.sqrt(Math.pow(a, 2) + Math.pow(b, 2))
+
+      val closestSockets = tiles.flatMap(_.emptySockets)
+        .filter({
+          case (_, _, s) => s.within != tile
+        })
+        .map({
+          case (sx, sy, s) =>
+            val d = dist(s.within.x + sx - newTx, s.within.y + sy - newTy)
+            d -> s
+        })
+        .filter(_._1 < 50)
+
+      activeSocket = if (closestSockets.isEmpty) None else Some(closestSockets.minBy(_._1)._2)
+      rerender()
     }
   }
 
   def onMouseUp(e:MouseEvent):Unit = {
     dragging = None
+    activeSocket = None
+    rerender()
   }
 
   def activateSocket(x:Int, y:Int) = {

@@ -28,6 +28,11 @@
     fill: whitesmoke;
 }
 
+.scatter-area .socket.active {
+    stroke: darkorange;
+    fill: whitesmoke;
+}
+
 .scatter-area .socket:hover {
     fill: snow;
 }
