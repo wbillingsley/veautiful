@@ -17,6 +17,15 @@ trait NodeOps {
 
   def replaceAttachedChild(newNode:VNode, oldNode:VNode):Unit
 
+  /**
+    * Insert operations can move DOM nodes. This means that by the time we get to process a child VNode for removal, it
+    * might already have been moved elsewhere in the tree. Consequently, we want to verify that the DOM node still
+    * has this node as a parent.
+    * @param node
+    * @return
+    */
+  def nodeIsChildOfMine(node:VNode):Boolean
+
 }
 
 /**
@@ -34,6 +43,10 @@ case class DefaultNodeOps(n:dom.Node) extends NodeOps {
   override def replaceAttachedChild(newNode: VNode, oldNode: VNode): Unit = for {
     nc <- newNode.domNode; oc <- oldNode.domNode
   } n.replaceChild(nc, oc)
+
+  override def nodeIsChildOfMine(node: VNode): Boolean = {
+    node.domNode.map(_.parentNode) contains n
+  }
 }
 
 

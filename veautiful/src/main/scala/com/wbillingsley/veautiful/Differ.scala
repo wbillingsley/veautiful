@@ -147,7 +147,7 @@ object Differ {
 
       case Remove(n) =>
         // TODO: check child was attached
-        if (n.isAttached) {
+        if (n.isAttached && nodeOps.nodeIsChildOfMine(n)) {
           n.beforeDetach()
           nodeOps.removeAttachedChild(n)
           n.detach()
