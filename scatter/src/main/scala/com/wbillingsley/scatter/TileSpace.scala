@@ -59,6 +59,11 @@ case class TileSpace(override val key:Option[String] = None)(val prefSize:(Int, 
   }
 
   def onMouseUp(e:MouseEvent):Unit = {
+    for {
+      s <- activeSocket
+      DragInfo(t:Tile, _, _, _, _) <- dragging
+    } dropIntoSocket(t, s)
+
     dragging = None
     activeSocket = None
     rerender()
@@ -66,6 +71,15 @@ case class TileSpace(override val key:Option[String] = None)(val prefSize:(Int, 
 
   def activateSocket(x:Int, y:Int) = {
     val s = tiles.flatMap(_.emptySockets)
+  }
+
+  private def dropIntoSocket(t:Tile, s:Socket):Unit = {
+    println("Drop!")
+
+    s.content = Some(t)
+    t.setPosition(0,0)
+    tiles.remove(tiles.indexOf(t))
+    layout()
   }
 
   def registerDragListeners():Unit = {

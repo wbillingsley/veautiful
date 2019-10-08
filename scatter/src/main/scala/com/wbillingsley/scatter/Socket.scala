@@ -2,7 +2,7 @@ package com.wbillingsley.scatter
 
 import com.wbillingsley.scatter.Tile.{boxAndArc, logger}
 import com.wbillingsley.veautiful.logging.Logger
-import com.wbillingsley.veautiful.{<, DElement, DiffComponent, DiffNode, OnScreen, VNode, ^}
+import com.wbillingsley.veautiful.{<, DElement, DiffComponent, DiffNode, OnScreen, SVG, VNode, ^}
 import org.scalajs.dom.raw.SVGElement
 
 class Socket(val within:Tile) extends TileComponent {
@@ -25,8 +25,11 @@ class Socket(val within:Tile) extends TileComponent {
   def active:Boolean = tileSpace.activeSocket.contains(this)
 
   override def render: DiffNode = {
-    <("g", ns = DElement.svgNS)(^.cls := (if (active) "socket active" else "socket"), ^.attr("transform") := s"translate($x, $y)",
-      Socket.path(content)
+    SVG.g(^.cls := (if (active) "socket active" else "socket"), ^.attr("transform") := s"translate($x, $y)",
+      content match {
+        case Some(t) => t
+        case _ => Socket.path(content)
+      }
     )
   }
 
