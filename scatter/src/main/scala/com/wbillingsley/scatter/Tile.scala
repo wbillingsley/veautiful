@@ -37,10 +37,14 @@ abstract class Tile(val ts:TileSpace) extends OnScreen with DiffComponent {
 
     val c = tileContent
 
-    SVG.g(^.cls := "tile", ^.attr("transform") := s"translate($x, $y)",
-      tileBoundary,
-      SVG.g(^.attr("transform") := s"translate($contentOffsetX, $contentOffsetY)", c)
-    )
+    if (within.isEmpty) {
+      SVG.g(^.cls := "tile", ^.attr("transform") := s"translate($x, $y)",
+        tileBoundary,
+        SVG.g(^.attr("transform") := s"translate($contentOffsetX, $contentOffsetY)", c)
+      )
+    } else {
+      SVG.g(^.cls := "tile contained", c)
+    }
   }
 
   /**

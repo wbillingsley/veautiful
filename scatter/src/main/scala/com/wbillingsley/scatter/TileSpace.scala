@@ -77,6 +77,7 @@ case class TileSpace(override val key:Option[String] = None)(val prefSize:(Int, 
     println("Drop!")
 
     s.content = Some(t)
+    t.within = Some(s)
     t.setPosition(0,0)
     tiles.remove(tiles.indexOf(t))
     layout()
