@@ -38,23 +38,23 @@ abstract class Tile(val ts:TileSpace) extends OnScreen with DiffComponent {
   }
 
   def onMouseDown(e:MouseEvent):Unit = {
-    logger.info(s"Mousedown on $this")
+    logger.trace(s"Mousedown on $this")
     e.stopPropagation()
     ts.onMouseDown(this, e)
   }
 
   def onMouseOver(e:MouseEvent):Unit = {
+    logger.trace(s"Mouse over $this")
     ts.activeTile = Some(this)
     e.stopPropagation()
     rerender()
-    logger.trace(s"Mouse over $this")
   }
 
   def onMouseOut(e:MouseEvent):Unit = {
+    logger.trace(s"Mouse out $this")
     if (ts.activeTile.contains(this)) ts.activeTile = None
     e.stopPropagation()
     rerender()
-    logger.trace(s"Mouse out $this")
   }
 
 
