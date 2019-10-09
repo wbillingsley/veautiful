@@ -269,6 +269,8 @@ object SVG {
 
   def path = <.apply("path", ns=DElement.svgNS)
 
+  def rect = <.apply("rect", ns=DElement.svgNS)
+
 }
 
 

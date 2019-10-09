@@ -3,7 +3,7 @@
     touch-action: none;
 }
 
-.scatter-area * {
+.scatter-area text {
     touch-action: none;
 }
 
@@ -23,6 +23,14 @@
     stroke-linejoin: round;
 }
 
+.scatter-area .tile.contained > rect {
+    stroke: none;
+}
+
+.scatter-area .tile.contained.mouseover {
+    fill: #ffc65c;
+}
+
 .scatter-area .socket {
     stroke: slategray;
     fill: whitesmoke;
@@ -33,6 +41,3 @@
     fill: whitesmoke;
 }
 
-.scatter-area .socket:hover {
-    fill: snow;
-}

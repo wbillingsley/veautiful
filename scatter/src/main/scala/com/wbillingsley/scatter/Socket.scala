@@ -13,6 +13,18 @@ class Socket(val within:Tile) extends TileComponent {
 
   def tileSpace:TileSpace = within.ts
 
+  /**
+    * Called by the tileSpace when the socket is filled to update its internal state
+    * @param t the tile dropped into the socket
+    */
+  def onFilledWith(t:Tile):Unit = {
+    content = Some(t)
+  }
+
+  /**
+    * Traverses the tile structure to find which "free tile" (tile not in a socket) this socket belongs to
+    * @return
+    */
   @tailrec
   final def freeParent:Tile  = within.within match {
     case Some(s) => s.freeParent
@@ -30,6 +42,10 @@ class Socket(val within:Tile) extends TileComponent {
     }
   }
 
+  /**
+    * True if the socket should be highlighted as active for a tile drop on mouse-up
+    * @return
+    */
   def active:Boolean = tileSpace.activeSocket.contains(this)
 
   override def render: DiffNode = {

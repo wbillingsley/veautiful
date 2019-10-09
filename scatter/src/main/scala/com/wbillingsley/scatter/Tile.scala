@@ -14,9 +14,39 @@ abstract class Tile(val ts:TileSpace) extends OnScreen with DiffComponent {
 
   def returnType:String
 
+  /** Whether the mouse is over this tile */
+  var mouseOver:Boolean = false
+
+  /**
+    * Called by the tileSpace if this tile is dropped into a socket, to update its internal state
+    * @param s the socket it is dropped into
+    */
+  def onPlacedInSocket(s:Socket):Unit = {
+    setPosition(0,0)
+    within = Some(s)
+    mouseOver = false
+  }
+
   def onMouseDown(e:MouseEvent):Unit = {
+    logger.info(s"Mousedown on $this")
+    e.stopPropagation()
     ts.onMouseDown(this, e)
   }
+
+  def onMouseOver(e:MouseEvent):Unit = {
+    mouseOver = true
+    e.stopPropagation()
+    rerender()
+    logger.info(s"Mouse over $this")
+  }
+
+  def onMouseOut(e:MouseEvent):Unit = {
+    mouseOver = false
+    e.stopPropagation()
+    rerender()
+    logger.info(s"Mouse out $this")
+  }
+
 
   def emptySockets:Seq[(Int, Int, Socket)] = for {
     (x, y, e) <- tileContent.emptySockets
@@ -25,6 +55,8 @@ abstract class Tile(val ts:TileSpace) extends OnScreen with DiffComponent {
   def registerDragListeners():Unit = {
     for { n <- domNode } {
       n.addEventListener("pointerdown", onMouseDown)
+      n.addEventListener("pointerout", onMouseOut)
+      n.addEventListener("pointerover", onMouseOver)
     }
   }
 
@@ -36,14 +68,25 @@ abstract class Tile(val ts:TileSpace) extends OnScreen with DiffComponent {
     logger.trace(s"render called on $this")
 
     val c = tileContent
+    val (w, h) = c.size getOrElse (20,20)
+
+    def classString: String = {
+      var str = "tile "
+      if (within.nonEmpty) str += "contained "
+      if (mouseOver) str += "mouseover "
+      str
+    }
 
     if (within.isEmpty) {
-      SVG.g(^.cls := "tile", ^.attr("transform") := s"translate($x, $y)",
+      SVG.g(^.cls := classString, ^.attr("transform") := s"translate($x, $y)",
         tileBoundary,
         SVG.g(^.attr("transform") := s"translate($contentOffsetX, $contentOffsetY)", c)
       )
     } else {
-      SVG.g(^.cls := "tile contained", c)
+      SVG.g(^.cls := classString,
+        SVG.rect(^.attr("width") := w, ^.attr("height") := h),
+        c
+      )
     }
   }
 
@@ -55,6 +98,8 @@ abstract class Tile(val ts:TileSpace) extends OnScreen with DiffComponent {
   val tileContent:TileComponent
 
   val tileBoundary:DElement = SVG.path(^.cls := "tile-path")
+
+  val tileBox:DElement = SVG.rect(^.cls := "tile-in-socket")
 
   override def afterAttach(): Unit = {
     super.afterAttach()
@@ -79,6 +124,13 @@ abstract class Tile(val ts:TileSpace) extends OnScreen with DiffComponent {
     tileContent.layoutChildren()
     for { el <- tileBoundary.domEl } {
       el.setAttribute("d", Tile.path(tileContent))
+    }
+    for {
+      el <- tileBox.domEl
+      (w, h) <- tileContent.size
+    } {
+      el.setAttribute("width", w.toString)
+      el.setAttribute("height", h.toString)
     }
   }
 

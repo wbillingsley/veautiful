@@ -23,6 +23,7 @@ case class TileSpace(override val key:Option[String] = None)(val prefSize:(Int, 
   }
 
   def onMouseDown(t:Tile, e:MouseEvent):Unit = {
+    e.preventDefault()
     if (tiles.contains(t)) {
       bringToFront(t);
       layout()
@@ -73,16 +74,11 @@ case class TileSpace(override val key:Option[String] = None)(val prefSize:(Int, 
     rerender()
   }
 
-  def activateSocket(x:Int, y:Int) = {
-    val s = tiles.flatMap(_.emptySockets)
-  }
-
   private def dropIntoSocket(t:Tile, s:Socket):Unit = {
-    println("Drop!")
+    TileSpace.logger.debug(s"Dropped $t into $s")
 
-    s.content = Some(t)
-    t.within = Some(s)
-    t.setPosition(0,0)
+    s.onFilledWith(t)
+    t.onPlacedInSocket(s)
     tiles.remove(tiles.indexOf(t))
     layout()
   }
