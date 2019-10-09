@@ -5,11 +5,19 @@ import com.wbillingsley.veautiful.logging.Logger
 import com.wbillingsley.veautiful.{<, DElement, DiffComponent, DiffNode, OnScreen, SVG, VNode, ^}
 import org.scalajs.dom.raw.SVGElement
 
+import scala.annotation.tailrec
+
 class Socket(val within:Tile) extends TileComponent {
 
   var content:Option[Tile] = None
 
   def tileSpace:TileSpace = within.ts
+
+  @tailrec
+  final def freeParent:Tile  = within.within match {
+    case Some(s) => s.freeParent
+    case _ => within
+  }
 
   def emptySockets:Seq[(Int, Int, Socket)] = {
     content match {

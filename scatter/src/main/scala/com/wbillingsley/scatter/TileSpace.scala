@@ -1,5 +1,6 @@
 package com.wbillingsley.scatter
 
+import com.wbillingsley.veautiful.logging.Logger
 import com.wbillingsley.veautiful.{<, DiffComponent, DiffNode, Layout, OnScreen, ^}
 import org.scalajs.dom.raw.{MouseEvent, SVGElement}
 
@@ -42,13 +43,16 @@ case class TileSpace(override val key:Option[String] = None)(val prefSize:(Int, 
 
       def dist(a:Double, b:Double) = Math.sqrt(Math.pow(a, 2) + Math.pow(b, 2))
 
-      val closestSockets = tiles.flatMap(_.emptySockets)
+      val allSockets = tiles.flatMap(_.emptySockets)
+
+      val closestSockets = allSockets
         .filter({
-          case (_, _, s) => s.within != tile
+          case (_, _, s) => s.freeParent != tile
         })
         .map({
           case (sx, sy, s) =>
-            val d = dist(s.within.x + sx - newTx, s.within.y + sy - newTy)
+            val t = s.freeParent
+            val d = dist(t.x + sx - newTx, t.y + sy - newTy)
             d -> s
         })
         .filter(_._1 < 50)
@@ -117,4 +121,10 @@ case class TileSpace(override val key:Option[String] = None)(val prefSize:(Int, 
   def layout(): Unit = {
     for { t <- tiles } t.layout()
   }
+}
+
+object TileSpace {
+
+  val logger:Logger = Logger.getLogger(TileSpace.getClass)
+
 }
