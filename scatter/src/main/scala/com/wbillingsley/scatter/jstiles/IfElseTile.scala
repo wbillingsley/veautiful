@@ -4,7 +4,7 @@ import com.wbillingsley.scatter.{HBox, Socket, Tile, TileComponent, TileSpace, T
 
 class IfElseTile(tileSpace:TileSpace) extends Tile(tileSpace) {
 
-  val condition = new Socket(this)
+  val condition = new Socket(this, acceptType = Some("Boolean"))
   val trueCase = new Socket(this)
   val falseCase = new Socket(this)
 

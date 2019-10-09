@@ -7,7 +7,7 @@ import org.scalajs.dom.raw.{Element, MouseEvent, SVGElement}
 
 import scala.collection.mutable
 
-case class TileSpace(override val key:Option[String] = None)(val prefSize:(Int, Int) = (480, 640)) extends DiffComponent {
+case class TileSpace(override val key:Option[String] = None, val language:TileLanguage)(val prefSize:(Int, Int) = (480, 640)) extends DiffComponent {
 
   import TileSpace._
 
@@ -19,7 +19,15 @@ case class TileSpace(override val key:Option[String] = None)(val prefSize:(Int, 
 
   var dragging:Option[DragInfo] = None
 
+  /**
+    * The socket that should be highlighted as a target for drop events
+    */
   var activeSocket:Option[Socket] = None
+
+  /**
+    * The tile that should be highlighted as a target for pop events
+    */
+  var activeTile:Option[Tile] = None
 
   var popTimeOut:Option[Int] = None
 

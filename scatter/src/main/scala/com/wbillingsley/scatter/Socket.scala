@@ -7,7 +7,7 @@ import org.scalajs.dom.raw.SVGElement
 
 import scala.annotation.tailrec
 
-class Socket(val within:Tile) extends TileComponent {
+class Socket(val within:Tile, acceptType:Option[String] = None) extends TileComponent {
 
   var content:Option[Tile] = None
 
@@ -60,7 +60,10 @@ class Socket(val within:Tile) extends TileComponent {
     SVG.g(^.cls := (if (active) "socket active" else "socket"), ^.attr("transform") := s"translate($x, $y)",
       content match {
         case Some(t) => t
-        case _ => Socket.path(content)
+        case _ => SVG.g(
+          Socket.path(content),
+          SVG.g(^.cls := "socket-type-icon", within.ts.language.socketIcon(acceptType)),
+        )
       }
     )
   }

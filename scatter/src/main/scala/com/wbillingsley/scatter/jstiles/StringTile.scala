@@ -5,7 +5,7 @@ import com.wbillingsley.veautiful.{DElement, DiffComponent, SVG, ^}
 
 case class StringTile(tileSpace:TileSpace, text:String) extends Tile(tileSpace) with DiffComponent {
 
-  override val tileContent: TileComponent = TileText(text)
+  override val tileContent: TileComponent = TileText(s""""${text}"""")
 
   override def returnType: String = "String"
 

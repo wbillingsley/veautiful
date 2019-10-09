@@ -1,3 +1,5 @@
+@import url('https://fonts.googleapis.com/css?family=Fira+Code&display=swap');
+
 .scatter-area {
     background: whitesmoke;
     touch-action: none;
@@ -25,6 +27,20 @@
 
 .scatter-area .tile.contained > rect {
     stroke: none;
+}
+
+.scatter-area .tile .type-icon > text {
+    dominant-baseline: middle;
+    text-anchor: middle;
+    transform: translate(7px, 10px);
+    fill: dodgerblue;
+}
+
+.scatter-area .tile .socket-type-icon > text {
+    dominant-baseline: middle;
+    text-anchor: middle;
+    transform: translate(7px, 10px);
+    fill: gray;
 }
 
 .scatter-area .tile.contained.mouseover {
