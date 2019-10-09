@@ -115,7 +115,7 @@ trait DNode extends VNode {
   def detach() = {
     for {
       ops <- nodeOps
-      d <- children
+      d <- children if ops.nodeIsChildOfMine(d)
     } {
       ops.removeAttachedChild(d)
     }
