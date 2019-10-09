@@ -2,11 +2,14 @@ package com.wbillingsley.scatter
 
 import com.wbillingsley.veautiful.logging.Logger
 import com.wbillingsley.veautiful.{<, DiffComponent, DiffNode, Layout, OnScreen, ^}
-import org.scalajs.dom.raw.{MouseEvent, SVGElement}
+import org.scalajs.dom
+import org.scalajs.dom.raw.{Element, MouseEvent, SVGElement}
 
 import scala.collection.mutable
 
 case class TileSpace(override val key:Option[String] = None)(val prefSize:(Int, Int) = (480, 640)) extends DiffComponent {
+
+  import TileSpace._
 
   val tiles:mutable.Buffer[Tile] = mutable.Buffer.empty
 
@@ -18,16 +21,65 @@ case class TileSpace(override val key:Option[String] = None)(val prefSize:(Int, 
 
   var activeSocket:Option[Socket] = None
 
+  var popTimeOut:Option[Int] = None
+
+  def setPopTimeOut(t:Tile, s:Socket, x:Int, y:Int, cx:Int, cy:Int):Unit = {
+    logger.trace("Starting pop timeout")
+
+    popTimeOut = Some(dom.window.setTimeout(
+      () => {
+        pullFromSocket(t, s, x, y)
+        rerender()
+        layout()
+        startDragging(t, cx, cy)
+      },
+      500
+    ))
+  }
+
+  def cancelPopTimeOut():Unit = {
+    logger.trace("Cancelling pop timeout")
+
+    popTimeOut.foreach(dom.window.clearTimeout)
+    popTimeOut = None
+  }
+
   def startDragging(item:Tile, x:Double, y:Double):Unit = {
     dragging = Some(DragInfo(item, item.x, item.y, x, y))
   }
 
   def onMouseDown(t:Tile, e:MouseEvent):Unit = {
     e.preventDefault()
-    if (tiles.contains(t)) {
-      bringToFront(t);
-      layout()
-      startDragging(t, e.clientX, e.clientY)
+
+    def readyDrag(ft:Tile):Unit = {
+      if (tiles.contains(ft)) {
+        bringToFront(ft);
+        layout()
+        startDragging(ft, e.clientX, e.clientY)
+      }
+    }
+
+    def screenLocation(n:DiffComponent):(Int, Int) = {
+      n.domNode.map { e =>
+        val r = e.getBoundingClientRect()
+        (r.left.toInt, r.top.toInt)
+      } getOrElse (0, 0)
+    }
+
+    t.within match {
+      case Some(s) =>
+        val (tx, ty) = screenLocation(t)
+        val (mx, my) = screenLocation(this)
+
+        val x = tx - mx
+        val y = ty - my
+        logger.trace(s"Popping with ($tx, $ty) tileSpace ($mx, $my) ")
+
+        setPopTimeOut(t, s, x, y, e.clientX.toInt, e.clientY.toInt)
+        readyDrag(s.freeParent)
+
+      case None =>
+        readyDrag(t)
     }
   }
 
@@ -36,6 +88,8 @@ case class TileSpace(override val key:Option[String] = None)(val prefSize:(Int, 
       DragInfo(tile, ix, iy, mx, my) <- dragging
     } {
       e.preventDefault()
+      cancelPopTimeOut()
+
       val x = e.clientX
       val y = e.clientY
       val newTx = ix + x - mx
@@ -64,6 +118,8 @@ case class TileSpace(override val key:Option[String] = None)(val prefSize:(Int, 
   }
 
   def onMouseUp(e:MouseEvent):Unit = {
+    cancelPopTimeOut()
+
     for {
       s <- activeSocket
       DragInfo(t:Tile, _, _, _, _) <- dragging
@@ -80,6 +136,13 @@ case class TileSpace(override val key:Option[String] = None)(val prefSize:(Int, 
     s.onFilledWith(t)
     t.onPlacedInSocket(s)
     tiles.remove(tiles.indexOf(t))
+    layout()
+  }
+
+  private def pullFromSocket(t:Tile, s:Socket, x:Int, y:Int):Unit = {
+    s.onRemoved(t)
+    t.onRemovedFromSocket(s, x, y)
+    tiles.append(t)
     layout()
   }
 

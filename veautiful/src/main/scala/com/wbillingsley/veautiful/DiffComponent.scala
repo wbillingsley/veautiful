@@ -1,5 +1,5 @@
 package com.wbillingsley.veautiful
-import org.scalajs.dom.Node
+import org.scalajs.dom.{Element, Node}
 
 trait DiffComponent extends VNode with Update {
 
@@ -15,7 +15,7 @@ trait DiffComponent extends VNode with Update {
     }
   }
 
-  def domNode: Option[Node] = lastRendered.flatMap(_.domNode)
+  def domNode: Option[Element] = lastRendered.flatMap(_.domNode)
 
   def update(): Unit = rerender()
 

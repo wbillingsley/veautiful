@@ -22,6 +22,14 @@ class Socket(val within:Tile) extends TileComponent {
   }
 
   /**
+    * Called by the tileSpace when a tile is removed from the socket, to update its internal state
+    * @param t
+    */
+  def onRemoved(t:Tile):Unit = {
+    content = None
+  }
+
+  /**
     * Traverses the tile structure to find which "free tile" (tile not in a socket) this socket belongs to
     * @return
     */

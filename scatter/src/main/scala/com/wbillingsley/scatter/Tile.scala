@@ -27,6 +27,17 @@ abstract class Tile(val ts:TileSpace) extends OnScreen with DiffComponent {
     mouseOver = false
   }
 
+  /**
+    * Called by the tileSpace if this tiled is pulled from a socket, to update its internal state
+    * @param s the socket it was pulled from
+    * @param x the x location the tile should move to
+    * @param y the y location the tile should move to
+    */
+  def onRemovedFromSocket(s:Socket, x:Int, y:Int):Unit = {
+    setPosition(x, y)
+    within = None
+  }
+
   def onMouseDown(e:MouseEvent):Unit = {
     logger.info(s"Mousedown on $this")
     e.stopPropagation()
@@ -37,14 +48,14 @@ abstract class Tile(val ts:TileSpace) extends OnScreen with DiffComponent {
     mouseOver = true
     e.stopPropagation()
     rerender()
-    logger.info(s"Mouse over $this")
+    logger.trace(s"Mouse over $this")
   }
 
   def onMouseOut(e:MouseEvent):Unit = {
     mouseOver = false
     e.stopPropagation()
     rerender()
-    logger.info(s"Mouse out $this")
+    logger.trace(s"Mouse out $this")
   }
 
 
