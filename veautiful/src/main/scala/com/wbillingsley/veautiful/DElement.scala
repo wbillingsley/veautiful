@@ -168,11 +168,7 @@ case class DElement(name:String, uniqEl:Any = "", ns:String = DElement.htmlNS) e
 
 
   def create() = {
-    val e = if (ns == DElement.htmlNS) {
-      dom.document.createElement(name)
-    } else {
-      dom.document.createElementNS(ns, name)
-    }
+    val e = dom.document.createElementNS(ns, name)
 
     for { AttrVal(a, value) <- attributes.values } {
       e.setAttribute(a, value)
@@ -270,6 +266,8 @@ object SVG {
   def path = <.apply("path", ns=DElement.svgNS)
 
   def rect = <.apply("rect", ns=DElement.svgNS)
+
+  def foreignObject = <.apply("foreignObject", ns=DElement.svgNS)
 
 }
 

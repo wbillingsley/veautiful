@@ -2,7 +2,7 @@ package com.wbillingsley.scatter
 
 import com.wbillingsley.veautiful.logging.Logger
 import com.wbillingsley.veautiful.{DiffComponent, VNode}
-import org.scalajs.dom.Node
+import org.scalajs.dom.{Element, Node}
 import org.scalajs.dom.raw.{HTMLElement, SVGElement}
 
 import scala.scalajs.js
@@ -42,18 +42,22 @@ trait TileComponent extends DiffComponent {
 
   def size:Option[(Int, Int)] = {
     logger.trace(s"Size: $this $uid domNode $domNode")
-    domNode.map {
-      case e:SVGElement =>
-        val b = e.asInstanceOf[js.Dynamic].getBBox()
-        val v = (b.width.asInstanceOf[Double].toInt, b.height.asInstanceOf[Double].toInt)
-        logger.trace(s"Size was $v")
-        v
-      //case e:HTMLElement => (e.clientWidth, e.clientHeight)
-    }
+    domNode.map(TileComponent.sizeOf)
   }
 
 }
 
 object TileComponent {
   val logger:Logger = Logger.getLogger(TileComponent.getClass)
+
+  def sizeOf(e:Element):(Int, Int) = e match {
+    case svg:SVGElement =>
+      val b = e.asInstanceOf[js.Dynamic].getBBox()
+      val v = (b.width.asInstanceOf[Double].toInt, b.height.asInstanceOf[Double].toInt)
+      logger.trace(s"Size was $v")
+      v
+
+    case h:HTMLElement =>
+      (h.offsetWidth.toInt, h.offsetHeight.toInt)
+  }
 }
