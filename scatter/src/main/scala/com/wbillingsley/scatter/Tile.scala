@@ -4,7 +4,7 @@ import com.wbillingsley.veautiful.logging.Logger
 import com.wbillingsley.veautiful.{<, DElement, DiffComponent, DiffNode, Layout, OnScreen, SVG, Update, VNode, ^}
 import org.scalajs.dom.raw.{HTMLElement, MouseEvent, SVGElement}
 
-abstract class Tile(val ts:TileSpace, val mobile:Boolean = true) extends OnScreen with DiffComponent {
+abstract class Tile(val ts:TileSpace, val mobile:Boolean = true, val typeLoop:Boolean = true, val cssClass:String = "") extends OnScreen with DiffComponent {
 
   import Tile._
 
@@ -70,7 +70,9 @@ abstract class Tile(val ts:TileSpace, val mobile:Boolean = true) extends OnScree
     }
   }
 
-  def contentOffsetX:Int = Tile.boxStartX + Tile.padding
+  def contentOffsetX:Int = {
+    if (typeLoop) Tile.boxStartX + Tile.padding else Tile.padding
+  }
 
   def contentOffsetY:Int = Tile.padding
 
@@ -81,9 +83,9 @@ abstract class Tile(val ts:TileSpace, val mobile:Boolean = true) extends OnScree
     val (w, h) = c.size getOrElse (20,20)
 
     def classString: String = {
-      var str = "tile "
-      if (within.nonEmpty) str += "contained "
-      if (ts.activeTile.contains(this)) str += "mouseover "
+      var str = "tile " + cssClass
+      if (within.nonEmpty) str += " contained"
+      if (ts.activeTile.contains(this)) str += " mouseover"
       str
     }
 
@@ -132,7 +134,7 @@ abstract class Tile(val ts:TileSpace, val mobile:Boolean = true) extends OnScree
   def layout():Unit = {
     tileContent.layoutChildren()
     for { el <- tileBoundary.domEl } {
-      el.setAttribute("d", Tile.path(tileContent))
+      el.setAttribute("d", Tile.path(tileContent, typeLoop))
     }
   }
 
@@ -142,8 +144,14 @@ object Tile {
 
   val logger:Logger = Logger.getLogger(Tile.getClass)
 
-  def path(tc:TileComponent):String = {
+  def path(tc:TileComponent, typeLoop:Boolean = true):String = {
     logger.trace(s"Calculating tile path for $tc")
+    val (w, h) = tc.size getOrElse (20, 20)
+    if (typeLoop) boxAndArc(w, h) else boxOnly(w, h)
+  }
+
+  def loopLessPath(tc:TileComponent):String = {
+    logger.trace(s"Calculating loopless path for $tc")
     val (w, h) = tc.size getOrElse (20, 20)
     boxAndArc(w, h)
   }
@@ -176,6 +184,12 @@ object Tile {
     val ph = h + 2 * padding
 
     s"$typeCorner l $pw 0 l 0 $ph l ${-pw} 0 z"
+  }
+
+  def boxOnly(w:Int, h:Int):String = {
+    val pw = w + 2 * padding
+    val ph = h + 2 * padding
+    s"M 0 0 l $pw 0 l 0 $ph l -$pw 0 z"
   }
 
 }

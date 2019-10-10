@@ -49,6 +49,10 @@
     stroke: #ffc65c;
 }
 
+.scatter-area .tile.play {
+    stroke: green;
+}
+
 .scatter-area .socket {
     stroke: slategray;
     fill: whitesmoke;

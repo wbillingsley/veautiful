@@ -68,6 +68,11 @@ class Socket(val within:Tile, acceptType:Option[String] = None) extends TileComp
     )
   }
 
+  override def layoutChildren(): Unit = {
+    super.layoutChildren()
+    content.foreach(_.layout())
+  }
+
 }
 
 object Socket {

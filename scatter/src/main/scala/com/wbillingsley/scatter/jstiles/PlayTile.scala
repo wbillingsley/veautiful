@@ -3,7 +3,7 @@ package com.wbillingsley.scatter.jstiles
 import com.wbillingsley.scatter.{HBox, Socket, Tile, TileButton, TileComponent, TileForeignObject, TileSpace, TileText, VBox}
 import com.wbillingsley.veautiful.{<, ^}
 
-class PlayTile(tileSpace:TileSpace, cls:String = "btn btn-primary") extends Tile(tileSpace, false) {
+class PlayTile(tileSpace:TileSpace, cls:String = "btn btn-primary") extends Tile(tileSpace, false, false, cssClass = "play") {
 
   val socket = new Socket(this)
 

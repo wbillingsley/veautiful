@@ -1,5 +1,6 @@
 package com.wbillingsley.scatter
 
+import com.wbillingsley.scatter.TileComponent.logger
 import com.wbillingsley.veautiful.{DiffNode, SVG, ^}
 
 
