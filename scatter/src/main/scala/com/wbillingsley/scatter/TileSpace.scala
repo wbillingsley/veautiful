@@ -195,7 +195,10 @@ case class TileSpace(override val key:Option[String] = None, val language:TileLa
     */
   def scale = {
     domNode map { case e:SVGElement =>
-      e.getBoundingClientRect().width / e.clientWidth
+      val bcrw = e.getBoundingClientRect().width
+      val cw = prefSize._1
+      val s = bcrw / cw
+      s
     }
   }
 
