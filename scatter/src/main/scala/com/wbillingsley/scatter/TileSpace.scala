@@ -185,10 +185,8 @@ case class TileSpace(override val key:Option[String] = None, val language:TileLa
   }
 
   def bringToFront(t:Tile):Unit = {
-    val newOrder = tiles.filter(_ != t)
-    newOrder.append(t)
-    tiles.clear
-    tiles.appendAll(newOrder)
+    tiles.remove(tiles.indexOf(t))
+    tiles.append(t)
     rerender()
   }
 
