@@ -17,7 +17,8 @@ object VSlidesExample {
           <.h2("Slide 2"),
           <.p("Here's some text on slide 2")
         ),
-        Diffusion.SimulationView
+        Diffusion.SimulationView,
+        ScatterExample.scatterCanvas
       )
 
     )

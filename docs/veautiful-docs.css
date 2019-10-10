@@ -36,7 +36,13 @@
 }
 
 .v-sequencer-slide.inactive {
-    display:none;
+    visibility: hidden;
+}
+
+.v-sequencer-slide {
+    position: absolute;
+    top: 0;
+    left: 0;
 }
 
 .v-sequencer .v-sequencer-footbox {

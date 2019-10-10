@@ -77,9 +77,10 @@ case class TileSpace(override val key:Option[String] = None, val language:TileLa
     * @return
     */
   def relativeLocation(tc:DiffComponent):(Int, Int) = {
+    val s = scale getOrElse 1.0
     val (tx, ty) = screenLocation(tc)
     val (mx, my) = screenLocation(this)
-    (tx - mx, ty - my)
+    (((tx - mx) / s).toInt, ((ty - my) / s).toInt)
   }
 
   def onMouseDown(t:Tile, e:MouseEvent):Unit = {
@@ -114,8 +115,9 @@ case class TileSpace(override val key:Option[String] = None, val language:TileLa
 
       val x = e.clientX
       val y = e.clientY
-      val newTx = ix + x - mx
-      val newTy = iy + y - my
+      val s = scale getOrElse 1.0
+      val newTx = ix + (x - mx) / s
+      val newTy = iy + (y - my) / s
       tile.setPosition(newTx, newTy)
 
       def dist(a:Double, b:Double) = Math.sqrt(Math.pow(a, 2) + Math.pow(b, 2))
