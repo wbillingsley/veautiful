@@ -43,8 +43,8 @@
     fill: gray;
 }
 
-.scatter-area .tile.contained.mouseover {
-    fill: #ffc65c;
+.scatter-area .tile.contained.mouseover > rect {
+    stroke: #ffc65c;
 }
 
 .scatter-area .socket {
