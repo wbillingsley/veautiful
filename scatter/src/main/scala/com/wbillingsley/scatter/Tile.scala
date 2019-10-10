@@ -4,7 +4,7 @@ import com.wbillingsley.veautiful.logging.Logger
 import com.wbillingsley.veautiful.{<, DElement, DiffComponent, DiffNode, Layout, OnScreen, SVG, Update, VNode, ^}
 import org.scalajs.dom.raw.{HTMLElement, MouseEvent, SVGElement}
 
-abstract class Tile(val ts:TileSpace) extends OnScreen with DiffComponent {
+abstract class Tile(val ts:TileSpace, val mobile:Boolean = true) extends OnScreen with DiffComponent {
 
   import Tile._
 
@@ -112,7 +112,7 @@ abstract class Tile(val ts:TileSpace) extends OnScreen with DiffComponent {
 
   override def afterAttach(): Unit = {
     super.afterAttach()
-    registerDragListeners()
+    if (mobile) registerDragListeners()
   }
 
   override def size: Option[(Int, Int)] = domNode map {

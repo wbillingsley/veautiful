@@ -86,7 +86,7 @@ case class TileSpace(override val key:Option[String] = None, val language:TileLa
     e.preventDefault()
 
     def readyDrag(ft:Tile):Unit = {
-      if (tiles.contains(ft)) {
+      if (ft.mobile && tiles.contains(ft)) {
         bringToFront(ft);
         layout()
         startDragging(ft, e.clientX, e.clientY)
