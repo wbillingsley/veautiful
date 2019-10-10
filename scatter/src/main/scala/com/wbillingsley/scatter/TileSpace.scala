@@ -17,7 +17,7 @@ case class TileSpace(override val key:Option[String] = None, val language:TileLa
     tiles.toSeq
   )
 
-  var dragging:Option[DragInfo] = None
+  var dragging:Option[DragInfo[Tile]] = None
 
   /**
     * The socket that should be highlighted as a target for drop events
@@ -29,12 +29,14 @@ case class TileSpace(override val key:Option[String] = None, val language:TileLa
     */
   var activeTile:Option[Tile] = None
 
-  var popTimeOut:Option[Int] = None
+  case class PopTimeOut(t:Tile, s:Socket, x:Int, y:Int, cx:Int, cy:Int, timeOutId:Int)
+
+  var popTimeOut:Option[PopTimeOut] = None
 
   def setPopTimeOut(t:Tile, s:Socket, x:Int, y:Int, cx:Int, cy:Int):Unit = {
     logger.trace("Starting pop timeout")
 
-    popTimeOut = Some(dom.window.setTimeout(
+    val id = dom.window.setTimeout(
       () => {
         pullFromSocket(t, s, x, y)
         rerender()
@@ -42,18 +44,42 @@ case class TileSpace(override val key:Option[String] = None, val language:TileLa
         startDragging(t, cx, cy)
       },
       500
-    ))
+    )
+
+    popTimeOut = Some(PopTimeOut(t, s, x, y, cx, cy, id))
+  }
+
+  def resetPopTimeOut(x:Int, y:Int, cx:Int, cy:Int):Unit = {
+    logger.trace("Resetting pop timeout")
+    for { p <- popTimeOut } {
+      dom.window.clearTimeout(p.timeOutId)
+      setPopTimeOut(p.t, p.s, x, y, cx, cy)
+    }
   }
 
   def cancelPopTimeOut():Unit = {
     logger.trace("Cancelling pop timeout")
 
-    popTimeOut.foreach(dom.window.clearTimeout)
+    for {
+      p <- popTimeOut
+    } dom.window.clearTimeout(p.timeOutId)
+
     popTimeOut = None
   }
 
   def startDragging(item:Tile, x:Double, y:Double):Unit = {
     dragging = Some(DragInfo(item, item.x, item.y, x, y))
+  }
+
+  /**
+    * Calculates the relative location of a tile or tile component that is attached and displayed to this tileSpace
+    * @param tc the tileComponent whose co-ordinates should be calculated
+    * @return
+    */
+  def relativeLocation(tc:DiffComponent):(Int, Int) = {
+    val (tx, ty) = screenLocation(tc)
+    val (mx, my) = screenLocation(this)
+    (tx - mx, ty - my)
   }
 
   def onMouseDown(t:Tile, e:MouseEvent):Unit = {
@@ -67,22 +93,9 @@ case class TileSpace(override val key:Option[String] = None, val language:TileLa
       }
     }
 
-    def screenLocation(n:DiffComponent):(Int, Int) = {
-      n.domNode.map { e =>
-        val r = e.getBoundingClientRect()
-        (r.left.toInt, r.top.toInt)
-      } getOrElse (0, 0)
-    }
-
     t.within match {
       case Some(s) =>
-        val (tx, ty) = screenLocation(t)
-        val (mx, my) = screenLocation(this)
-
-        val x = tx - mx
-        val y = ty - my
-        logger.trace(s"Popping with ($tx, $ty) tileSpace ($mx, $my) ")
-
+        val (x, y) = relativeLocation(t)
         setPopTimeOut(t, s, x, y, e.clientX.toInt, e.clientY.toInt)
         readyDrag(s.freeParent)
 
@@ -96,7 +109,8 @@ case class TileSpace(override val key:Option[String] = None, val language:TileLa
       DragInfo(tile, ix, iy, mx, my) <- dragging
     } {
       e.preventDefault()
-      cancelPopTimeOut()
+      val (tx, ty) = relativeLocation(tile)
+      resetPopTimeOut(tx, ty, e.clientX.toInt, e.clientY.toInt)
 
       val x = e.clientX
       val y = e.clientY
@@ -193,5 +207,12 @@ case class TileSpace(override val key:Option[String] = None, val language:TileLa
 object TileSpace {
 
   val logger:Logger = Logger.getLogger(TileSpace.getClass)
+
+  def screenLocation(n:DiffComponent):(Int, Int) = {
+    n.domNode.map { e =>
+      val r = e.getBoundingClientRect()
+      (r.left.toInt, r.top.toInt)
+    } getOrElse (0, 0)
+  }
 
 }
