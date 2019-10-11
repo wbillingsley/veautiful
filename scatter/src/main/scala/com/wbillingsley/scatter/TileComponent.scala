@@ -11,7 +11,7 @@ import scala.util.Random
 /**
   * A tile component is a component that can be included within a tile.
   */
-trait TileComponent extends DiffComponent {
+trait TileComponent[T] extends DiffComponent {
 
   import TileComponent.logger
 
@@ -27,7 +27,7 @@ trait TileComponent extends DiffComponent {
     logger.trace(s"layoutChildren: $this")
   }
 
-  def emptySockets:Seq[(Int, Int, Socket)]
+  def emptySockets:Seq[(Int, Int, Socket[T])]
 
   override def attach(): Node = {
     logger.trace(s"Attach: $this $uid")

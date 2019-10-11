@@ -4,7 +4,7 @@ import com.wbillingsley.scatter.TileComponent.logger
 import com.wbillingsley.veautiful.{DiffNode, SVG, ^}
 
 
-case class VBox(children:TileComponent*) extends TileComponent {
+case class VBox[T](children:TileComponent[T]*) extends TileComponent[T] {
 
   override def render: DiffNode = SVG.g(^.attr("transform") := s"translate($x, $y)", children)
 
@@ -22,7 +22,7 @@ case class VBox(children:TileComponent*) extends TileComponent {
     }
   }
 
-  override def emptySockets: Seq[(Int, Int, Socket)] = {
+  override def emptySockets: Seq[(Int, Int, Socket[T])] = {
     for {
       c <- children
       (x, y, s) <- c.emptySockets

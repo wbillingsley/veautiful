@@ -1,9 +1,9 @@
 package com.wbillingsley.scatter
 import com.wbillingsley.veautiful.{<, DiffNode, SVG, ^}
 
-class TileButton(text:String, action: => Unit, cls:String = "btn btn-primary") extends TileComponent {
+class TileButton[T](text:String, action: => Unit, cls:String = "btn btn-primary") extends TileComponent[T] {
 
-  override def emptySockets: Seq[(Int, Int, Socket)] = Seq.empty
+  override def emptySockets: Seq[(Int, Int, Socket[T])] = Seq.empty
 
   val button = <.button(text, ^.cls := cls, ^.onClick --> action)
 

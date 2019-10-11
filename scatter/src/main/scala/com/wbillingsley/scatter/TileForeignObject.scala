@@ -2,9 +2,9 @@ package com.wbillingsley.scatter
 
 import com.wbillingsley.veautiful.{<, DiffNode, SVG, VNode, ^}
 
-case class TileForeignObject(content: VNode) extends TileComponent {
+case class TileForeignObject[T](content: VNode) extends TileComponent[T] {
 
-  override def emptySockets: Seq[(Int, Int, Socket)] = Seq.empty
+  override def emptySockets: Seq[(Int, Int, Socket[T])] = Seq.empty
 
   var width:Int = 20
   var height:Int = 20

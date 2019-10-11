@@ -3,7 +3,7 @@ package com.wbillingsley.scatter.jstiles
 import com.wbillingsley.scatter.TileLanguage
 import com.wbillingsley.veautiful.{SVG, VNode, ^}
 
-object JSLang extends TileLanguage {
+object JSLang extends TileLanguage[JSExpr] {
 
   def nodeIcon(returnType:String):VNode = returnType match {
 
@@ -20,3 +20,7 @@ object JSLang extends TileLanguage {
     case _ => SVG.g()
   }
 }
+
+
+trait JSExpr
+case object JSBlank extends JSExpr

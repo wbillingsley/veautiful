@@ -7,17 +7,17 @@ import org.scalajs.dom.raw.SVGElement
 
 import scala.annotation.tailrec
 
-class Socket(val within:Tile, acceptType:Option[String] = None, thin:Boolean = false, onChange: (Socket) => Unit = { _ => }) extends TileComponent {
+class Socket[T](val within:Tile[T], acceptType:Option[String] = None, thin:Boolean = false, onChange: (Socket[T]) => Unit = { x:Socket[T] => }) extends TileComponent[T] {
 
-  var content:Option[Tile] = None
+  var content:Option[Tile[T]] = None
 
-  def tileSpace:TileSpace = within.ts
+  def tileSpace:TileSpace[T] = within.ts
 
   /**
     * Called by the tileSpace when the socket is filled to update its internal state
     * @param t the tile dropped into the socket
     */
-  def onFilledWith(t:Tile):Unit = {
+  def onFilledWith(t:Tile[T]):Unit = {
     content = Some(t)
     onChange(this)
   }
@@ -26,7 +26,7 @@ class Socket(val within:Tile, acceptType:Option[String] = None, thin:Boolean = f
     * Called by the tileSpace when a tile is removed from the socket, to update its internal state
     * @param t
     */
-  def onRemoved(t:Tile):Unit = {
+  def onRemoved(t:Tile[T]):Unit = {
     content = None
     onChange(this)
   }
@@ -36,12 +36,12 @@ class Socket(val within:Tile, acceptType:Option[String] = None, thin:Boolean = f
     * @return
     */
   @tailrec
-  final def freeParent:Tile  = within.within match {
+  final def freeParent:Tile[T]  = within.within match {
     case Some(s) => s.freeParent
     case _ => within
   }
 
-  def emptySockets:Seq[(Int, Int, Socket)] = {
+  def emptySockets:Seq[(Int, Int, Socket[T])] = {
     content match {
       case Some(t) =>
         for  {
@@ -98,7 +98,7 @@ object Socket {
 
   val logger:Logger = Logger.getLogger(Socket.getClass)
 
-  def path(tc:Option[Tile]):VNode = {
+  def path[T](tc:Option[Tile[T]]):VNode = {
     logger.trace(s"Calculating tile path for $tc")
     val (w, h) = tc.flatMap(_.size) getOrElse (15, 15)
     <("path", ns=DElement.svgNS)(^.attr("d") := boxAndArc(w, h))

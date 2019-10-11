@@ -4,13 +4,13 @@ import com.wbillingsley.veautiful.logging.Logger
 import com.wbillingsley.veautiful.{<, DElement, DiffComponent, DiffNode, Layout, OnScreen, SVG, Update, VNode, ^}
 import org.scalajs.dom.raw.{HTMLElement, MouseEvent, SVGElement}
 
-abstract class Tile(val ts:TileSpace, val mobile:Boolean = true, val typeLoop:Boolean = true, val cssClass:String = "") extends OnScreen with DiffComponent {
+abstract class Tile[T](val ts:TileSpace[T], val mobile:Boolean = true, val typeLoop:Boolean = true, val cssClass:String = "") extends OnScreen with DiffComponent {
 
   import Tile._
 
   def free:Boolean = within.isEmpty
 
-  var within:Option[Socket] = None
+  var within:Option[Socket[T]] = None
 
   def returnType:String
 
@@ -18,7 +18,7 @@ abstract class Tile(val ts:TileSpace, val mobile:Boolean = true, val typeLoop:Bo
     * Called by the tileSpace if this tile is dropped into a socket, to update its internal state
     * @param s the socket it is dropped into
     */
-  def onPlacedInSocket(s:Socket):Unit = {
+  def onPlacedInSocket(s:Socket[T]):Unit = {
     setPosition(0,0)
     within = Some(s)
     if (ts.activeTile.contains(this)) {
@@ -32,7 +32,7 @@ abstract class Tile(val ts:TileSpace, val mobile:Boolean = true, val typeLoop:Bo
     * @param x the x location the tile should move to
     * @param y the y location the tile should move to
     */
-  def onRemovedFromSocket(s:Socket, x:Int, y:Int):Unit = {
+  def onRemovedFromSocket(s:Socket[T], x:Int, y:Int):Unit = {
     setPosition(x, y)
     within = None
   }
@@ -58,7 +58,7 @@ abstract class Tile(val ts:TileSpace, val mobile:Boolean = true, val typeLoop:Bo
   }
 
 
-  def emptySockets:Seq[(Int, Int, Socket)] = for {
+  def emptySockets:Seq[(Int, Int, Socket[T])] = for {
     (x, y, e) <- tileContent.emptySockets
   } yield (contentOffsetX + x, contentOffsetY + y, e)
 
@@ -108,7 +108,7 @@ abstract class Tile(val ts:TileSpace, val mobile:Boolean = true, val typeLoop:Bo
     * get their bounds from their domNode (so we need to be able to ask tileContent.size and not generate new
     * unattached nodes)
     */
-  val tileContent:TileComponent
+  val tileContent:TileComponent[T]
 
   val tileBoundary:DElement = SVG.path(^.cls := "tile-path")
 
@@ -138,19 +138,21 @@ abstract class Tile(val ts:TileSpace, val mobile:Boolean = true, val typeLoop:Bo
     }
   }
 
+  def toLanguage:T
+
 }
 
 object Tile {
 
   val logger:Logger = Logger.getLogger(Tile.getClass)
 
-  def path(tc:TileComponent, typeLoop:Boolean = true):String = {
+  def path[T](tc:TileComponent[T], typeLoop:Boolean = true):String = {
     logger.trace(s"Calculating tile path for $tc")
     val (w, h) = tc.size getOrElse (20, 20)
     if (typeLoop) boxAndArc(w, h) else boxOnly(w, h)
   }
 
-  def loopLessPath(tc:TileComponent):String = {
+  def loopLessPath[T](tc:TileComponent[T]):String = {
     logger.trace(s"Calculating loopless path for $tc")
     val (w, h) = tc.size getOrElse (20, 20)
     boxAndArc(w, h)

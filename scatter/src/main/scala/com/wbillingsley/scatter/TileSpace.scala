@@ -7,33 +7,33 @@ import org.scalajs.dom.raw.{Element, MouseEvent, SVGElement}
 
 import scala.collection.mutable
 
-case class TileSpace(override val key:Option[String] = None, val language:TileLanguage)(val prefSize:(Int, Int) = (480, 640)) extends DiffComponent {
+case class TileSpace[T](override val key:Option[String] = None, val language:TileLanguage[T])(val prefSize:(Int, Int) = (480, 640)) extends DiffComponent {
 
   import TileSpace._
 
-  val tiles:mutable.Buffer[Tile] = mutable.Buffer.empty
+  val tiles:mutable.Buffer[Tile[T]] = mutable.Buffer.empty
 
   override def render: DiffNode = <.svg(^.attr("width") := prefSize._1.toString, ^.attr("height") := prefSize._2.toString, ^.cls := "scatter-area",
     tiles.toSeq
   )
 
-  var dragging:Option[DragInfo[Tile]] = None
+  var dragging:Option[DragInfo[Tile[T]]] = None
 
   /**
     * The socket that should be highlighted as a target for drop events
     */
-  var activeSocket:Option[Socket] = None
+  var activeSocket:Option[Socket[T]] = None
 
   /**
     * The tile that should be highlighted as a target for pop events
     */
-  var activeTile:Option[Tile] = None
+  var activeTile:Option[Tile[T]] = None
 
-  case class PopTimeOut(t:Tile, s:Socket, x:Int, y:Int, cx:Int, cy:Int, timeOutId:Int)
+  case class PopTimeOut(t:Tile[T], s:Socket[T], x:Int, y:Int, cx:Int, cy:Int, timeOutId:Int)
 
   var popTimeOut:Option[PopTimeOut] = None
 
-  def setPopTimeOut(t:Tile, s:Socket, x:Int, y:Int, cx:Int, cy:Int):Unit = {
+  def setPopTimeOut(t:Tile[T], s:Socket[T], x:Int, y:Int, cx:Int, cy:Int):Unit = {
     logger.trace("Starting pop timeout")
 
     val id = dom.window.setTimeout(
@@ -67,7 +67,7 @@ case class TileSpace(override val key:Option[String] = None, val language:TileLa
     popTimeOut = None
   }
 
-  def startDragging(item:Tile, x:Double, y:Double):Unit = {
+  def startDragging(item:Tile[T], x:Double, y:Double):Unit = {
     dragging = Some(DragInfo(item, item.x, item.y, x, y))
   }
 
@@ -83,10 +83,10 @@ case class TileSpace(override val key:Option[String] = None, val language:TileLa
     (((tx - mx) / s).toInt, ((ty - my) / s).toInt)
   }
 
-  def onMouseDown(t:Tile, e:MouseEvent):Unit = {
+  def onMouseDown(t:Tile[T], e:MouseEvent):Unit = {
     e.preventDefault()
 
-    def readyDrag(ft:Tile):Unit = {
+    def readyDrag(ft:Tile[T]):Unit = {
       if (ft.mobile && tiles.contains(ft)) {
         bringToFront(ft);
         layout()
@@ -146,7 +146,7 @@ case class TileSpace(override val key:Option[String] = None, val language:TileLa
 
     for {
       s <- activeSocket
-      DragInfo(t:Tile, _, _, _, _) <- dragging
+      DragInfo(t:Tile[T], _, _, _, _) <- dragging
     } dropIntoSocket(t, s)
 
     dragging = None
@@ -154,7 +154,7 @@ case class TileSpace(override val key:Option[String] = None, val language:TileLa
     rerender()
   }
 
-  private def dropIntoSocket(t:Tile, s:Socket):Unit = {
+  private def dropIntoSocket(t:Tile[T], s:Socket[T]):Unit = {
     TileSpace.logger.debug(s"Dropped $t into $s")
 
     s.onFilledWith(t)
@@ -163,7 +163,7 @@ case class TileSpace(override val key:Option[String] = None, val language:TileLa
     layout()
   }
 
-  private def pullFromSocket(t:Tile, s:Socket, x:Int, y:Int):Unit = {
+  private def pullFromSocket(t:Tile[T], s:Socket[T], x:Int, y:Int):Unit = {
     s.onRemoved(t)
     t.onRemovedFromSocket(s, x, y)
     tiles.append(t)
@@ -184,7 +184,7 @@ case class TileSpace(override val key:Option[String] = None, val language:TileLa
     layout()
   }
 
-  def bringToFront(t:Tile):Unit = {
+  def bringToFront(t:Tile[T]):Unit = {
     tiles.remove(tiles.indexOf(t))
     tiles.append(t)
     rerender()

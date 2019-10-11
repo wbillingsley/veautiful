@@ -1,13 +1,13 @@
 package com.wbillingsley.scatter
 import com.wbillingsley.veautiful.{DiffNode, SVG, ^}
 
-class SocketList(val within:Tile, acceptType:Option[String] = None) extends TileComponent {
+class SocketList[T](val within:Tile[T], acceptType:Option[String] = None) extends TileComponent[T] {
 
-  var sockets:Seq[Socket] = Seq(new Socket(within, acceptType, false, refreshSockets))
+  var sockets:Seq[Socket[T]] = Seq(new Socket(within, acceptType, false, refreshSockets))
 
   var content = VBox(sockets:_*)
 
-  def refreshSockets(socket: Socket):Unit = {
+  def refreshSockets(socket: Socket[T]):Unit = {
     val filled = sockets.filter(_.content.nonEmpty)
     sockets = (for {
       existing <- filled
@@ -20,7 +20,7 @@ class SocketList(val within:Tile, acceptType:Option[String] = None) extends Tile
     within.ts.layout()
   }
 
-  override def emptySockets: Seq[(Int, Int, Socket)] = {
+  override def emptySockets: Seq[(Int, Int, Socket[T])] = {
     for {
       s <- sockets if s.content.isEmpty
     } yield (s.x, s.y, s)
