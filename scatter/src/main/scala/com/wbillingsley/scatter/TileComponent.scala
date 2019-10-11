@@ -1,7 +1,7 @@
 package com.wbillingsley.scatter
 
 import com.wbillingsley.veautiful.logging.Logger
-import com.wbillingsley.veautiful.{DiffComponent, VNode}
+import com.wbillingsley.veautiful.{DiffComponent, DiffNode, VNode}
 import org.scalajs.dom.{Element, Node}
 import org.scalajs.dom.raw.{HTMLElement, SVGElement}
 

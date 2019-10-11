@@ -9,6 +9,7 @@ object ScatterExample {
   val scatterCanvas = new TileSpace(Some("example"), JSLang)()
   scatterCanvas.tiles.append(
     StringTile(scatterCanvas, "Hello world"),
+    StringTile(scatterCanvas, "Another string"),
     new PlayTile(scatterCanvas),
     new IfElseTile(scatterCanvas)
   )
