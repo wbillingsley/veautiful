@@ -36,8 +36,11 @@ case class TileSpace[T](override val key:Option[String] = None, val language:Til
   def setPopTimeOut(t:Tile[T], s:Socket[T], x:Int, y:Int, cx:Int, cy:Int):Unit = {
     logger.trace("Starting pop timeout")
 
+    cancelPopTimeOut()
+
     val id = dom.window.setTimeout(
       () => {
+        cancelPopTimeOut()
         pullFromSocket(t, s, x, y)
         rerender()
         layout()
@@ -161,10 +164,14 @@ case class TileSpace[T](override val key:Option[String] = None, val language:Til
   }
 
   private def pullFromSocket(t:Tile[T], s:Socket[T], x:Int, y:Int):Unit = {
-    s.onRemoved(t)
-    t.onRemovedFromSocket(s, x, y)
-    tiles.append(t)
-    layout()
+    if (t.within.contains(s)) {
+      s.onRemoved(t)
+      t.onRemovedFromSocket(s, x, y)
+      tiles.append(t)
+      layout()
+    } else {
+      logger.warn(s"Tried to pull $t from $s but it wasn't within it")
+    }
   }
 
   def registerDragListeners():Unit = {
