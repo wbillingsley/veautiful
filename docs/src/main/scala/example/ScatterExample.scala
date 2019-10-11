@@ -1,7 +1,7 @@
 package example
 
-import com.wbillingsley.scatter.jstiles.{IfElseTile, JSLang, NumberInputTile, PlayTile, ProgramTile, StringTile}
-import com.wbillingsley.scatter.TileSpace
+import com.wbillingsley.scatter.jstiles.{FunctionCallTile, IfElseTile, JSLang, NumberInputTile, PlayTile, ProgramTile, StringTile}
+import com.wbillingsley.scatter.{Socket, TileSpace}
 import com.wbillingsley.veautiful.{<, VNode, ^}
 
 object ScatterExample {
@@ -14,6 +14,7 @@ object ScatterExample {
     pt,
     StringTile(scatterCanvas, "Hello world"),
     StringTile(scatterCanvas, "Another string"),
+    new FunctionCallTile(scatterCanvas, "console.log", Seq("String")),
     new NumberInputTile(scatterCanvas),
     new IfElseTile(scatterCanvas)
   )

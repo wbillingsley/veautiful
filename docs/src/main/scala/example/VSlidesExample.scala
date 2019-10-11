@@ -8,7 +8,7 @@ object VSlidesExample {
   def page = Common.layout(<.div(
     <.h1("VSlides"),
     <.div(^.cls := "resizable",
-      VSlides(width=1024, height=680)(
+      VSlides(width=1280, height=720)(
         <.div(
           <.h2("Slide 1"),
           <.p("Here's some text on slide 1")

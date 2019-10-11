@@ -58,3 +58,9 @@ case class JSIfElse(cond: JSExpr, t:JSBlock, f:JSBlock) extends JSExpr {
        |${i}}""".stripMargin
   }
 }
+
+case class FunctionCall(name:String, params:Seq[JSExpr]) extends JSExpr {
+  override def toJS(indent: Int): String = {
+    s"${name}(${params.map(_.toJS(indent)).mkString(", ")})"
+  }
+}
