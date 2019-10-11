@@ -284,6 +284,8 @@ object ^ {
 
   case class Propable(n:String) {
     def :=(j:String) = PropVal(n, j)
+
+    def ?=(j:Option[String]) = j.map { s => PropVal(n, s) } getOrElse PropVal("", "")
   }
 
   def attr(x:String) = Attrable(x)
