@@ -105,8 +105,8 @@ abstract class Tile[T](val ts:TileSpace[T], val mobile:Boolean = true, val typeL
 
   /**
     * The elements to render inside the tile. At the moment, this has to be a val, because components will try to
-    * get their bounds from their domNode (so we need to be able to ask tileContent.size and not generate new
-    * unattached nodes)
+    * layout their tileContent (so we need to be able to call tileContent.layoutChildren and not generate new
+    * unattached nodes that get uselessly laid out)
     */
   val tileContent:TileComponent[T]
 
