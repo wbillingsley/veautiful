@@ -41,7 +41,7 @@ case class DElement(name:String, uniqEl:Any = "", ns:String = DElement.htmlNS) e
     * So, in order to make changing event listeners practical, instead of registering the
     * event listener, we always register this dispatcher function as the event listener.
     */
-  def eventDispatch(e:Event):Unit = {
+  val eventDispatch:(Event) => Unit = (e:Event) => {
     for {
       h <- listeners.get(e.`type`)
     } h.func.apply(e)
