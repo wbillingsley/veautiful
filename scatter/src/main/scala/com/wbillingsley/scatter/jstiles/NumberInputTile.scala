@@ -12,11 +12,11 @@ import org.scalajs.dom.raw.HTMLInputElement
 
   var number:Option[Double] = initial
 
-  val input = <.input(^.attr("type") := "Number", ^.cls := "", ^.on("input") ==> onInput)
+  val input = <.input(^.attr("type") := "Number", ^.cls := "scatter-number-input", ^.on("input") ==> onInput)
 
   def setNumber(n:Double):Unit = {
     number = Some(n)
-    input.makeItSo(<.input(^.attr("type") := "Number", ^.cls := "", ^.on("input") ==> onInput, ^.prop("value") ?= number.map(_.toString)))
+    input.makeItSo(<.input(^.attr("type") := "Number", ^.cls := "scatter-number-input", ^.on("input") ==> onInput, ^.prop("value") ?= number.map(_.toString)))
   }
 
   override def afterAttach(): Unit = {
@@ -38,7 +38,7 @@ import org.scalajs.dom.raw.HTMLInputElement
 
   override def returnType: String = "Number"
 
-  override def toLanguage: JSExpr = JSBlank
+  override def toLanguage: JSExpr = JSNumber(number getOrElse 0)
 }
 
 object NumberInputTile {

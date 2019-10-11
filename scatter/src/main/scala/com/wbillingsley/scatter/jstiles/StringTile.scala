@@ -9,5 +9,5 @@ case class StringTile(tileSpace:TileSpace[JSExpr], text:String) extends Tile(til
 
   override def returnType: String = "String"
 
-  override def toLanguage: JSExpr = JSBlank
+  override def toLanguage: JSExpr = JSString(text)
 }

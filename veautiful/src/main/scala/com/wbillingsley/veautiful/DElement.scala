@@ -230,6 +230,7 @@ object < {
 
   def button = apply("button")
   def input = apply("input")
+  def textarea = apply("textarea")
 
   def ol = apply("ol")
   def ul = apply("ul")

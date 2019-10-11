@@ -20,8 +20,14 @@ class IfElseTile(tileSpace:TileSpace[JSExpr]) extends Tile(tileSpace) {
     )
   }
 
-  def toLanguage:JSExpr = {
-    JSBlank
-  }
+  def toLanguage:JSExpr = JSIfElse(
+    condition.content.map(_.toLanguage) getOrElse JSBlank,
+    JSBlock(
+      trueCase.sockets.flatMap(_.content).map(_.toLanguage)
+    ),
+    JSBlock(
+      falseCase.sockets.flatMap(_.content).map(_.toLanguage)
+    )
+  )
 
 }
