@@ -84,8 +84,6 @@ case class TileSpace[T](override val key:Option[String] = None, val language:Til
   }
 
   def onMouseDown(t:Tile[T], e:MouseEvent):Unit = {
-    e.preventDefault()
-
     def readyDrag(ft:Tile[T]):Unit = {
       if (ft.mobile && tiles.contains(ft)) {
         bringToFront(ft);
@@ -109,7 +107,6 @@ case class TileSpace[T](override val key:Option[String] = None, val language:Til
     for {
       DragInfo(tile, ix, iy, mx, my) <- dragging
     } {
-      e.preventDefault()
       val (tx, ty) = relativeLocation(tile)
       resetPopTimeOut(tx, ty, e.clientX.toInt, e.clientY.toInt)
 
