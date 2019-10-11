@@ -5,9 +5,9 @@ import org.scalajs.dom
 
 import scala.scalajs.js
 
-object Main extends js.JSApp {
+object Main {
 
-  override def main(): Unit = {
+  def main(args:Array[String]): Unit = {
     val root = Attacher.newRoot(dom.document.getElementById("render-here"))
     root.render(Router)
   }
