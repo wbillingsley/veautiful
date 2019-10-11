@@ -22,8 +22,9 @@ class SocketList[T](val within:Tile[T], acceptType:Option[String] = None) extend
 
   override def emptySockets: Seq[(Int, Int, Socket[T])] = {
     for {
-      s <- sockets if s.content.isEmpty
-    } yield (s.x, s.y, s)
+      s <- sockets
+      (x, y, ss) <- s.emptySockets
+    } yield (x + s.x, y + s.y, ss)
   }
 
   override protected def render: DiffNode = SVG.g(^.cls := "socket-list", ^.attr("transform") := s"translate($x, $y)",
