@@ -17,8 +17,6 @@ lazy val veautiful = project.in(file("veautiful"))
 
     scalaJSUseMainModuleInitializer := false,
 
-    testFrameworks += new TestFramework("utest.runner.Framework"),
-
     libraryDependencies ++= Seq(
       "org.scala-js" %%% "scalajs-dom" % "0.9.7",
       "org.scalatest" %%% "scalatest" % "3.0.8" % "test"
@@ -34,8 +32,6 @@ lazy val templates = project.in(file("templates"))
     version := versionStr,
 
     scalaVersion := scalaVersionStr,
-
-    testFrameworks += new TestFramework("utest.runner.Framework"),
 
     libraryDependencies ++= Seq(
       "org.scala-js" %%% "scalajs-dom" % "0.9.7",
@@ -53,7 +49,28 @@ lazy val scatter = project.in(file("scatter"))
 
     scalaVersion := scalaVersionStr,
 
-    testFrameworks += new TestFramework("utest.runner.Framework"),
+    libraryDependencies ++= Seq(
+      "org.scala-js" %%% "scalajs-dom" % "0.9.7",
+      "org.scalatest" %%% "scalatest" % "3.0.8" % "test"
+    )
+  )
+
+/**
+  * Circuit constraint propagator - based on the intelligent book one.
+  * "This little structure (excellent *Sir Kit*)
+  *  Holds forth to us that you bestow'd more wit
+  *  In building it than on all Paul's beside" - from a broadsheet on Sir Christopher Wren and his "Happy invention of
+  *  a pulpit on wheels"
+  */
+lazy val wren = project.in(file("wren"))
+  .enablePlugins(ScalaJSPlugin)
+  .dependsOn(veautiful)
+  .settings(
+    name := "wren",
+
+    version := versionStr,
+
+    scalaVersion := scalaVersionStr,
 
     libraryDependencies ++= Seq(
       "org.scala-js" %%% "scalajs-dom" % "0.9.7",
@@ -61,10 +78,9 @@ lazy val scatter = project.in(file("scatter"))
     )
   )
 
-
 lazy val docs = project.in(file("docs"))
   .enablePlugins(ScalaJSPlugin)
-  .dependsOn(veautiful, templates, scatter)
+  .dependsOn(veautiful, templates, scatter, wren)
   .settings(
       name := "veautiful-docs",
 
@@ -73,8 +89,6 @@ lazy val docs = project.in(file("docs"))
       scalaVersion := scalaVersionStr,
 
       scalaJSUseMainModuleInitializer := true,
-
-      testFrameworks += new TestFramework("utest.runner.Framework"),
 
       scalacOptions ++= Seq("-unchecked", "-deprecation"),
 
