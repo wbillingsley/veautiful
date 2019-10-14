@@ -4,13 +4,18 @@ import com.wbillingsley.scatter.jstiles.{FunctionCallTile, IfElseTile, JSLang, N
 import com.wbillingsley.scatter.{Socket, TileSpace}
 import com.wbillingsley.veautiful.{<, VNode, ^}
 
+import scala.scalajs.js.annotation.{JSExport, JSExportTopLevel}
+
+@JSExportTopLevel("ScatterExample")
 object ScatterExample {
 
+  @JSExport
   val scatterCanvas = new TileSpace(Some("example"), JSLang)()
 
   val pt = new ProgramTile(scatterCanvas, <.button(^.cls := "btn btn-sm btn-primary", ^.onClick --> run, "Run"))
 
-  scatterCanvas.tiles.append(
+  @JSExport
+  val items = Seq(
     pt,
     StringTile(scatterCanvas, "Hello world"),
     StringTile(scatterCanvas, "Another string"),
@@ -18,6 +23,8 @@ object ScatterExample {
     new NumberInputTile(scatterCanvas),
     new IfElseTile(scatterCanvas)
   )
+
+  scatterCanvas.tiles.appendAll(items)
 
   val output = <.textarea(^.attr("placeholder") := "Program will appear here")
 
