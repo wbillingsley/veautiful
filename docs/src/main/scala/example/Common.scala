@@ -13,7 +13,8 @@ object Common {
     ReactLikeRoute -> "Example: Rendering asteroids into an SVG",
     DiffusionRoute -> "Example: Diffusion experiment",
     VSlidesRoute -> "Example: VSlides",
-    ScatterRoute -> "Example: Scatter"
+    ScatterRoute -> "Example: Scatter",
+    WrenRoute -> "Example: Wren"
   )
 
   def linkToRoute(r:ExampleRoute, s:String):VNode = <.a(

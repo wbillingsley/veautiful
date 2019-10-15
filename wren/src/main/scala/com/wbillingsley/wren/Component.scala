@@ -1,14 +1,14 @@
 package com.wbillingsley.wren
 
-import com.wbillingsley.veautiful.VNode
+import com.wbillingsley.veautiful.{DiffComponent, DiffNode, VNode}
 
-trait Component {
+trait Component extends DiffComponent {
 
   def terminals:Seq[Terminal]
 
   def constraints:Seq[Constraint]
 
-  def render:VNode
+  def render:DiffNode
 
 }
 

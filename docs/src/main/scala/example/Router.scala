@@ -10,6 +10,7 @@ case object ReactLikeRoute extends ExampleRoute
 case object DiffusionRoute extends ExampleRoute
 case object VSlidesRoute extends ExampleRoute
 case object ScatterRoute extends ExampleRoute
+case object WrenRoute extends ExampleRoute
 
 object Router extends HistoryRouter[ExampleRoute] {
 
@@ -25,6 +26,7 @@ object Router extends HistoryRouter[ExampleRoute] {
       case DiffusionRoute => Common.layout(Diffusion.SimulationView)
       case VSlidesRoute => VSlidesExample.page
       case ScatterRoute => ScatterExample.page
+      case WrenRoute => WrenExample.page
     }
   }
 
@@ -38,6 +40,7 @@ object Router extends HistoryRouter[ExampleRoute] {
       case DiffusionRoute => (/# / "diffusion").stringify
       case VSlidesRoute => (/# / "vslides").stringify
       case ScatterRoute => (/# / "scatter").stringify
+      case WrenRoute => (/# / "wren").stringify
     }
   }
 
@@ -48,6 +51,7 @@ object Router extends HistoryRouter[ExampleRoute] {
     case Array("diffusion") => DiffusionRoute
     case Array("vslides") => VSlidesRoute
     case Array("scatter") => ScatterRoute
+    case Array("wren") => WrenRoute
     case x =>
       println(s"path was ${x}")
       IntroRoute

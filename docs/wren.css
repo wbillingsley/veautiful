@@ -1,0 +1,28 @@
+.wren-canvas {
+
+}
+
+.wren-component {
+    fill: none;
+    stroke: black;
+}
+
+.wren-component text {
+    fill: black;
+    stroke: none;
+}
+
+.wren-component text.centre.middle {
+    dominant-baseline: middle;
+    text-anchor: middle;
+}
+
+.wren-component .current-source-arrow {
+    font-size: 36px;
+    font-weight: bolder;
+}
+
+.wren-canvas circle.terminal {
+    fill: black;
+    r: 2;
+}

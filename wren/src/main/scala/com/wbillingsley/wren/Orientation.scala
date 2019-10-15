@@ -20,7 +20,7 @@ sealed trait Orientation {
       (m10, m11)
     ) = rotationMatrix
 
-    (m00 * rx + m01 * ry + ox, m10 * rx + m11 * oy + oy)
+    (m00 * rx + m01 * ry + ox, m10 * rx + m11 * ry + oy)
   }
 }
 object Orientation {
