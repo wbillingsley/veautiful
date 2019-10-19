@@ -22,6 +22,8 @@ sealed trait Orientation {
 
     (m00 * rx + m01 * ry + ox, m10 * rx + m11 * ry + oy)
   }
+
+  def deg:Int
 }
 object Orientation {
   case object East extends Orientation {
@@ -29,6 +31,8 @@ object Orientation {
       (1, 0),
       (0, 1)
     )
+
+    override val deg = 0
   }
 
   case object South extends Orientation {
@@ -36,6 +40,8 @@ object Orientation {
       (0, -1),
       (1, 0)
     )
+
+    override val deg = 90
   }
 
   case object West extends Orientation {
@@ -43,6 +49,8 @@ object Orientation {
       (-1, 0),
       (0, -1)
     )
+
+    override val deg = 180
   }
 
   case object North extends Orientation {
@@ -50,6 +58,8 @@ object Orientation {
       (0, 1),
       (-1, 0)
     )
+
+    override val deg = 270
   }
 
 }
