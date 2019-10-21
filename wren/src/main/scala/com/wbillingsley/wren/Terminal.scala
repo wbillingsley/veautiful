@@ -10,9 +10,11 @@ sealed trait Connector {
   def connect(w:Wire):Unit = {
     wires.append(w)
   }
+
+  def pos:(Int, Int)
 }
 
-class Terminal(pos:(Int, Int)) extends Connector with Component {
+class Terminal(val pos:(Int, Int)) extends Connector with Component {
 
   val current = new Value("A", None)
 
@@ -27,16 +29,7 @@ class Terminal(pos:(Int, Int)) extends Connector with Component {
   }
 }
 
-class Junction(pos:(Int, Int)) extends Connector {
-
-}
-
-case class Wire(p1:Connector, p2:Connector) {
-
-  p1.connect(this)
-  p2.connect(this)
-
-
+case class Junction(pos:(Int, Int)) extends Connector {
 
 }
 
