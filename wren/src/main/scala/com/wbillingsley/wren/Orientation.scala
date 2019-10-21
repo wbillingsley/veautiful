@@ -52,4 +52,14 @@ object Orientation {
     )
   }
 
+  implicit class VectorOps(val vec:(Int, Int)) extends AnyVal {
+
+    def +(o:(Int, Int)):(Int, Int) = {
+      val (a, b) = vec
+      val (x, y) = o
+      (a + x, b + y)
+    }
+
+  }
+
 }

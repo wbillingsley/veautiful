@@ -8,9 +8,11 @@ class CurrentSource(pos:(Int,Int), orientation:Orientation = East, initial: Opti
 
   val current = new Value("A", initial.map((_, QuestionSet)))
 
-  val t1 = new Terminal(orientation.rotate((-1, r), (r, r)))
+  val voltage = new Value("V")
 
-  val t2 = new Terminal(orientation.rotate((2 * r + 1, r), (r, r)))
+  val t1 = new Terminal(pos + orientation.rotate((-1, r), (r, r)))
+
+  val t2 = new Terminal(pos + orientation.rotate((2 * r + 1, r), (r, r)))
 
   override def terminals: Seq[Terminal] = Seq(t1, t2)
 
@@ -33,9 +35,7 @@ class CurrentSource(pos:(Int,Int), orientation:Orientation = East, initial: Opti
     val (x, y) = pos
 
     SVG.g(^.cls := "wren-component current-source", ^.attr("transform") := s"translate($x, $y)",
-      icon,
-      t1,
-      t2
+      icon
     )
   }
 }
