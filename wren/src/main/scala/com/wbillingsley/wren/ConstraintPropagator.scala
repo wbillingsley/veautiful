@@ -53,6 +53,41 @@ case class EqualityConstraint(name:String, values:Seq[Value]) extends Constraint
 }
 
 
+case class SumConstraint(name:String, values:Seq[Value], result:Double, tolerance:Double = 0.01) extends Constraint {
+
+  override def calculable: Boolean = values.count(_.value.isEmpty) == 1
+
+  def withinTolerance(a:Double, b:Double):Boolean = Math.abs(a / b) <= tolerance
+
+  override def calculate(): Seq[Value] = {
+    if (calculable) {
+      val s = (for {
+        v <- values
+        (num, _) <- v.value
+      } yield num).sum
+
+      for {
+        v <- values if v.value.isEmpty
+      } yield {
+        v.value = Some((s, Because(this, values.filter(_.value.isEmpty))))
+        v
+      }
+    } else Seq.empty
+
+  }
+
+  override def failed: Boolean = {
+    values.forall(_.value.nonEmpty) && {
+      !withinTolerance(result, (for {
+        v <- values
+        (num, _) <- v.value
+      } yield num).sum)
+    }
+  }
+
+}
+
+
 case class ConstraintPropagator(constraints:Seq[Constraint]) {
 
   def canStep:Boolean = constraints.exists(_.calculable)
