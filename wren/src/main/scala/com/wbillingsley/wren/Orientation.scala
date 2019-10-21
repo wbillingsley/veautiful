@@ -13,7 +13,7 @@ sealed trait Orientation {
   def rotate(pos:(Int, Int), around:(Int, Int) = (0, 0)):(Int, Int) = {
     val (x, y) = pos
     val (ox, oy) = around
-    val (rx, ry) = (ox - x, oy - y)
+    val (rx, ry) = (x - ox, y - oy)
 
     val (
       (m00, m01),

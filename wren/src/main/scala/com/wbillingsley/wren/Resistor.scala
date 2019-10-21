@@ -2,6 +2,7 @@ package com.wbillingsley.wren
 
 import com.wbillingsley.veautiful.{SVG, ^}
 import com.wbillingsley.wren.Orientation.East
+import Orientation._
 
 
 class Resistor(pos:(Int,Int), orientation:Orientation = East, initial: Option[Double] = None) extends Component {
@@ -10,9 +11,9 @@ class Resistor(pos:(Int,Int), orientation:Orientation = East, initial: Option[Do
 
   val current = new Value("A", initial.map((_, QuestionSet)))
 
-  val t1 = new Terminal(orientation.rotate((-r - 1, 0), (0, 0)))
+  val t1 = new Terminal(orientation.rotate((-r - 1, 0), (0, 0)) + pos)
 
-  val t2 = new Terminal(orientation.rotate((r + 1, 0), (0, 0)))
+  val t2 = new Terminal(orientation.rotate((r + 1, 0), (0, 0)) + pos)
 
   override def terminals: Seq[Terminal] = Seq(t1, t2)
 
@@ -31,9 +32,7 @@ class Resistor(pos:(Int,Int), orientation:Orientation = East, initial: Option[Do
     val (x, y) = pos
 
     SVG.g(^.cls := "wren-component current-source", ^.attr("transform") := s"translate($x, $y)",
-      icon,
-      t1,
-      t2
+      icon
     )
   }
 }

@@ -2,6 +2,7 @@ package com.wbillingsley.wren
 
 import com.wbillingsley.veautiful.{SVG, ^}
 import com.wbillingsley.wren.Orientation.East
+import com.wbillingsley.wren.Orientation._
 
 class VoltageSource(pos:(Int,Int), orientation:Orientation = East, initial: Option[Double] = None) extends Component {
 
@@ -9,9 +10,9 @@ class VoltageSource(pos:(Int,Int), orientation:Orientation = East, initial: Opti
 
   val voltage = new Value("V", initial.map((_, QuestionSet)))
 
-  val t1 = new Terminal(orientation.rotate((-r - 1, 0), (0, 0)))
+  val t1 = new Terminal(orientation.rotate((-r - 1, 0), (0, 0)) + pos)
 
-  val t2 = new Terminal(orientation.rotate((r + 1, 0), (0, 0)))
+  val t2 = new Terminal(orientation.rotate((r + 1, 0), (0, 0)) + pos)
 
   override def terminals: Seq[Terminal] = Seq(t1, t2)
 
@@ -33,9 +34,7 @@ class VoltageSource(pos:(Int,Int), orientation:Orientation = East, initial: Opti
     val (x, y) = pos
 
     SVG.g(^.cls := "wren-component voltage-source", ^.attr("transform") := s"translate($x, $y)",
-      icon,
-      t1,
-      t2
+      icon
     )
   }
 }

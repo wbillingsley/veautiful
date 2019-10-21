@@ -10,9 +10,9 @@ class CurrentSource(pos:(Int,Int), orientation:Orientation = East, initial: Opti
 
   val voltage = new Value("V")
 
-  val t1 = new Terminal(orientation.rotate((-r - 1, 0), (0, 0)))
+  val t1 = new Terminal(orientation.rotate((-r - 1, 0), (0, 0)) + pos)
 
-  val t2 = new Terminal(orientation.rotate((r + 1, 0), (0, 0)))
+  val t2 = new Terminal(orientation.rotate((r + 1, 0), (0, 0)) + pos)
 
   override def terminals: Seq[Terminal] = Seq(t1, t2)
 
