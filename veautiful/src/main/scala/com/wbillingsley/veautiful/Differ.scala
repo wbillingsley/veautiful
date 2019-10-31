@@ -2,6 +2,8 @@ package com.wbillingsley.veautiful
 
 import scala.collection.mutable
 import scala.collection.mutable.ArrayBuffer
+import scala.collection
+import scala.scalajs.js
 
 trait Keyable {
   def key: Option[Any] = None
@@ -28,19 +30,22 @@ object Differ {
     * @param ops Operations to perform
     * @tparam K
     */
-  case class DiffReport[K](exit:Seq[K], enter:Seq[K], update:Seq[K], ops:Seq[DiffOp[K]])
+  case class DiffReport[K](exit:collection.Seq[K], enter:collection.Seq[K], update:collection.Seq[K], ops:collection.Seq[DiffOp[K]])
 
   /**
     * Generates a difference report between the two sets of nodes
     * @return
     */
-  def diffs[K <: Keyable](left:Seq[K], right:Seq[K]): DiffReport[K] = {
+  def diffs[K <: Keyable](left:collection.Seq[K], right:collection.Seq[K]): DiffReport[K] = {
 
     val ops = ArrayBuffer.empty[DiffOp[K]]
 
     val create = ArrayBuffer.empty[K]
     val remove = ArrayBuffer.empty[K]
-    val update = ArrayBuffer(right:_*)
+    val update:js.WrappedArray[K] = right match {
+      case a:js.WrappedArray[K] => a
+      case _ => js.WrappedArray.from(right)
+    }
 
     val movedUpSet = mutable.Set.empty[Any]
 
@@ -137,7 +142,7 @@ object Differ {
     )
   }
 
-  def processDiffs(parent:DNode, ops:Seq[DiffOp[VNode]]):Unit = {
+  def processDiffs(parent:DNode, ops:collection.Seq[DiffOp[VNode]]):Unit = {
 
     for {
       nodeOps <- parent.nodeOps

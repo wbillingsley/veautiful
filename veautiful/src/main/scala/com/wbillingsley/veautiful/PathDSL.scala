@@ -73,7 +73,7 @@ object PathDSL {
       val (a, b) = splitFirst(qComponent, '=')
       js.URIUtils.decodeURI(a) -> js.URIUtils.decodeURI(b)
     }
-    pairs.groupBy(_._1).mapValues(_.map(_._2))
+    pairs.groupBy(_._1).map { case (k, arr) => (k, arr.map(_._2)) }
   }
 
   case class Loc(path:PathComponent = EmptyPath, search:SearchComponent = EmptySearch, fragment:String = "") {

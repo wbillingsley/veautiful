@@ -72,7 +72,7 @@ trait DNode extends VNode {
   /**
     * Children VNodes
     */
-  def children:Seq[VNode]
+  def children:collection.Seq[VNode]
 
   override def beforeAttach(): Unit = {
     super.beforeAttach()

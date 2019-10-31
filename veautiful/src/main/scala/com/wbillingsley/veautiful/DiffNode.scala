@@ -16,7 +16,7 @@ trait DiffNode extends DNode with MakeItSo {
   /**
     * The children of a DiffNode has to be mutable, as it mutates itself to become the destination
     */
-  var children:Seq[VNode] = Vector.empty
+  var children:collection.Seq[VNode] = Vector.empty
 
   def updateSelf:PartialFunction[DiffNode, _]
 
@@ -25,7 +25,7 @@ trait DiffNode extends DNode with MakeItSo {
     updateChildren(to.children)
   }
 
-  def updateChildren(to:Seq[VNode]):Unit = {
+  def updateChildren(to:collection.Seq[VNode]):Unit = {
 
     val diffReport = Differ.diffs(children, to)
     Differ.processDiffs(this, diffReport.ops)
