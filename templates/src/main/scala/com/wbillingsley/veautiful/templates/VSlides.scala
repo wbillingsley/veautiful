@@ -1,10 +1,10 @@
 package com.wbillingsley.veautiful.templates
 
-import com.wbillingsley.veautiful.{<, DiffComponent, DiffNode, VNode, ^}
+import com.wbillingsley.veautiful.{<, DiffComponent, DiffNode, MakeItSo, VNode, ^}
 import org.scalajs.dom
 import org.scalajs.dom.raw.{Event, HTMLElement}
 
-case class VSlides(width: Int, height: Int, override val key: Option[String] = None)(content:VNode*) extends DiffComponent {
+case class VSlides(width: Int, height: Int, override val key: Option[String] = None)(var content:Seq[VNode], var index:Int = 0) extends DiffComponent with MakeItSo {
 
   var scale:Double = 1
   var top:Double = 0
@@ -45,10 +45,16 @@ case class VSlides(width: Int, height: Int, override val key: Option[String] = N
     <.div(^.cls := "vslides-top",
       <.div(^.cls := "vslides-scaler", ^.attr("style") := s"transform: scale($scale); width: ${width}px; height: ${height}px; top: ${top}px; left: ${left}px; ",
         Sequencer()(
-          content.map(slide):_*
+          content.map(slide), index
         )
       )
     )
   }
 
+  override def makeItSo: PartialFunction[MakeItSo, _] = {
+    case v:VSlides =>
+      content = v.content
+      index = v.index
+      rerender()
+  }
 }

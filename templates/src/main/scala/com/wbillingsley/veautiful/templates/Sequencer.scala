@@ -5,18 +5,16 @@ import com.wbillingsley.veautiful._
 object Sequencer {
 
   def page = {
-    VSlides(width=1024, height=680)(
+    VSlides(width=1024, height=680)(Seq(
       <.div("Page One"),
       <.div("Page Two")
-    )
+    ))
   }
 
 
 }
 
-case class Sequencer(override val key:Option[String] = None)(nodes: VNode*) extends DiffComponent {
-
-  var index = 0
+case class Sequencer(override val key:Option[String] = None)(var nodes: Seq[VNode], var index:Int = 0) extends DiffComponent with MakeItSo {
 
   def next():Unit = {
     if (index < nodes.size - 1) {
@@ -52,4 +50,10 @@ case class Sequencer(override val key:Option[String] = None)(nodes: VNode*) exte
     footBox
   )
 
+  override def makeItSo: PartialFunction[MakeItSo, _] = {
+    case s:Sequencer =>
+      nodes = s.nodes
+      index = s.index
+      rerender()
+  }
 }

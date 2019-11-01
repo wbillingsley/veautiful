@@ -12,7 +12,7 @@ object Common {
     ToDoRoute -> "Example: To Do List",
     ReactLikeRoute -> "Example: Rendering asteroids into an SVG",
     DiffusionRoute -> "Example: Diffusion experiment",
-    VSlidesRoute -> "Example: VSlides",
+    VSlidesRoute(0) -> "Example: VSlides",
     ScatterRoute -> "Example: Scatter",
     WrenRoute -> "Example: Wren"
   )
