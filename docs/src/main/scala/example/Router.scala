@@ -11,6 +11,7 @@ case object DiffusionRoute extends ExampleRoute
 case class VSlidesRoute(i:Int) extends ExampleRoute
 case object ScatterRoute extends ExampleRoute
 case object WrenRoute extends ExampleRoute
+case object AssemblyRoute extends ExampleRoute
 
 object Router extends HistoryRouter[ExampleRoute] {
 
@@ -27,6 +28,7 @@ object Router extends HistoryRouter[ExampleRoute] {
       case VSlidesRoute(i) => VSlidesExample.page(i)
       case ScatterRoute => ScatterExample.page
       case WrenRoute => WrenExample.page
+      case AssemblyRoute => AssemblyExample.page
     }
   }
 
@@ -43,6 +45,7 @@ object Router extends HistoryRouter[ExampleRoute] {
         (/# / "vslides" / i.toString).stringify
       case ScatterRoute => (/# / "scatter").stringify
       case WrenRoute => (/# / "wren").stringify
+      case AssemblyRoute => (/# / "assembly").stringify
     }
   }
 
@@ -63,6 +66,7 @@ object Router extends HistoryRouter[ExampleRoute] {
     case Array("vslides", i) => VSlidesRoute(parseInt(i, 0))
     case Array("scatter") => ScatterRoute
     case Array("wren") => WrenRoute
+    case Array("assembly") => AssemblyRoute
     case x =>
       println(s"path was ${x}")
       IntroRoute

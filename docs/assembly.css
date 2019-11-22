@@ -1,0 +1,10 @@
+.codewidget {
+    display: grid;
+    grid-template-columns: 40px 1fr;
+
+    font-family: "Fira Code", monospace;
+}
+
+.codewidget .linenums {
+    resize: none;
+}

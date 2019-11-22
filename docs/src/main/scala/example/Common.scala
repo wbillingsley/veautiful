@@ -14,7 +14,8 @@ object Common {
     DiffusionRoute -> "Example: Diffusion experiment",
     VSlidesRoute(0) -> "Example: VSlides",
     ScatterRoute -> "Example: Scatter",
-    WrenRoute -> "Example: Wren"
+    WrenRoute -> "Example: Wren",
+    AssemblyRoute -> "Example: Assembly language sim"
   )
 
   def linkToRoute(r:ExampleRoute, s:String):VNode = <.a(
