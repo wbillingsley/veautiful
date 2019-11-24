@@ -8,3 +8,30 @@
 .codewidget .linenums {
     resize: none;
 }
+
+.exercise-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  column-gap: 2rem;
+}
+
+.register {
+  font-family: "Fira Code", monospace;
+  border: 1px solid lightgray;
+  border-radius: 5px;
+}
+
+.register th {
+  background: lightgray;
+  color: gray;
+}
+
+.register td, th {
+  padding: 5px;
+  border: 1px solid lightgray;
+}
+
+.register th.register-name {
+
+}
+

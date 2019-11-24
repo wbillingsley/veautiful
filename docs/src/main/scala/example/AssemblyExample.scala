@@ -10,24 +10,46 @@ object AssemblyExample {
 
   val codeWidget = new CodeWidget()
 
+  val cpu = new CPU(4, 4, 16)
+
   val deck = <.div(
-    Seq(<.div(
-      <.h1("hello"),
-      codeWidget
-    ))
-  )
+    Seq(<.div(^.cls := "exercise-grid",
+      <.div(^.cls := "exercise-instructions",
+        codeWidget
+      ),
+      <.div(^.cls := "exercise-sim",
+        statusReg(cpu.state)
+
+      )
+    )
+  ))
 
   def page() = {
     Common.layout(<.div(
-      <.h1("VSlides"),
+      <.h1("AVR Assembly simulator"),
       <.div(^.cls := "resizable", deck)))
+  }
+
+  def statusReg(state:CPUState) = {
+    def oneZero(b:Boolean) = if (b) "1" else "0"
+
+    <.table(^.cls := "register status-register",
+        <.tr(
+          <.th(^.cls := "register-name", ^.attr("rowspan") := 2, "Status"),
+          <.th("I"), <.th("T"), <.th("H"), <.th("S"), <.th("V"), <.th("N"), <.th("Z"), <.th("C")
+        ),
+        <.tr(
+          <.td(oneZero(state.i)), <.td(oneZero(state.t)), <.td(oneZero(state.h)), <.td(oneZero(state.s)),
+          <.td(oneZero(state.v)), <.td(oneZero(state.n)), <.td(oneZero(state.z)), <.td(oneZero(state.c))
+        )
+    )
   }
 
 
 
   class CPU(numRegisters:Int, numIO:Int, prog:Int) {
 
-    var status = CPUState(
+    var state = CPUState(
       registers = ArraySeq.fill[Byte](numRegisters)(0x0),
       io = ArraySeq.fill[Byte](numIO)(0x0)
     )
