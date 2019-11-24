@@ -31,6 +31,14 @@
   border: 1px solid lightgray;
 }
 
+.register td.hex {
+  color: cadetblue;
+  font-style: italic;
+}
+.register td.hex::before {
+  content: "0x";
+}
+
 .register th.register-name {
 
 }

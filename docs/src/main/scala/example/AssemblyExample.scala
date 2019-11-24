@@ -18,8 +18,10 @@ object AssemblyExample {
         codeWidget
       ),
       <.div(^.cls := "exercise-sim",
-        statusReg(cpu.state)
-
+        <.h3("Status"),
+        statusReg(cpu.state),
+        <.h3("Registers"),
+        regs(cpu)
       )
     )
   ))
@@ -30,8 +32,23 @@ object AssemblyExample {
       <.div(^.cls := "resizable", deck)))
   }
 
+  def oneZero(b:Boolean):String = if (b) "1" else "0"
+
+  def toBits(b:Byte):Seq[Boolean] = {
+    Seq(
+      (b & 0x01) != 0,
+      (b & 0x02) != 0,
+      (b & 0x04) != 0,
+      (b & 0x08) != 0,
+      (b & 0x10) != 0,
+      (b & 0x20) != 0,
+      (b & 0x40) != 0,
+      (b & 0x80) != 0
+    )
+  }
+
+
   def statusReg(state:CPUState) = {
-    def oneZero(b:Boolean) = if (b) "1" else "0"
 
     <.table(^.cls := "register status-register",
         <.tr(
@@ -45,6 +62,26 @@ object AssemblyExample {
     )
   }
 
+  def regs(cpu:CPU):VNode = {
+    <.table(^.cls := "register reg-registers",
+      (cpu.state.registers.iterator.zipWithIndex map {
+        case (b, i) =>
+          <.tr(
+            <.th(^.cls := "register-name", i.toHexString),
+              toBits(b).map { bit => <.td(oneZero(bit)) },
+            <.td(^.cls := "hex", b.formatted("%02X"))
+          )
+      }).toSeq
+    )
+  }
+
+
+  def io(state:CPUState):VNode = {
+    <.table(^.cls := "register io-registers",
+
+
+    )
+  }
 
 
   class CPU(numRegisters:Int, numIO:Int, prog:Int) {
