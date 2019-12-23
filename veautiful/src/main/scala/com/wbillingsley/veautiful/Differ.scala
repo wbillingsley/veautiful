@@ -142,7 +142,7 @@ object Differ {
     )
   }
 
-  def processDiffs(parent:DNode, ops:collection.Seq[DiffOp[VNode]]):Unit = {
+  def processDiffs[N, C](parent:DNode[N, C], ops:collection.Seq[DiffOp[VNode[C]]]):Unit = {
 
     for {
       nodeOps <- parent.nodeOps

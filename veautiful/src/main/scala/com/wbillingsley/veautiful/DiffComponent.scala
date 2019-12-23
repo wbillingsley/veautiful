@@ -1,13 +1,13 @@
 package com.wbillingsley.veautiful
 import org.scalajs.dom.{Element, Node}
 
-trait DiffComponent extends VNode with Update {
+trait DiffComponent[N, C] extends VNode[N] with Update {
 
-  protected def render:DiffNode
+  protected def render:DiffNode[N, C]
 
-  var lastRendered:Option[DiffNode] = None
+  var lastRendered:Option[DiffNode[N, C]] = None
 
-  def rerender():DiffNode = {
+  def rerender():DiffNode[N, C] = {
     val r = render
     lastRendered match {
       case Some(lr) => lr.makeItSo(r); lr
@@ -19,7 +19,7 @@ trait DiffComponent extends VNode with Update {
 
   def update(): Unit = rerender()
 
-  def delegate:DiffNode = lastRendered.getOrElse(rerender())
+  def delegate:DiffNode[N, C] = lastRendered.getOrElse(rerender())
 
   override def beforeAttach(): Unit = {
     super.beforeAttach()

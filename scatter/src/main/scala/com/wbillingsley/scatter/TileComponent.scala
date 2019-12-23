@@ -1,5 +1,6 @@
 package com.wbillingsley.scatter
 
+import com.wbillingsley.veautiful.html.VHtmlComponent
 import com.wbillingsley.veautiful.logging.Logger
 import com.wbillingsley.veautiful.{DiffComponent, DiffNode, VNode}
 import org.scalajs.dom.{Element, Node}
@@ -11,7 +12,7 @@ import scala.util.Random
 /**
   * A tile component is a component that can be included within a tile.
   */
-trait TileComponent[T] extends DiffComponent {
+trait TileComponent[T] extends VHtmlComponent {
 
   import TileComponent.logger
 

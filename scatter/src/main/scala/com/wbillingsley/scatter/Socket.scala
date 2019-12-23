@@ -1,6 +1,7 @@
 package com.wbillingsley.scatter
 
 import com.wbillingsley.scatter.Tile.{boxAndArc, logger}
+import com.wbillingsley.veautiful.html.{VHtmlDiffNode, VHtmlNode}
 import com.wbillingsley.veautiful.logging.Logger
 import com.wbillingsley.veautiful.{<, DElement, DiffComponent, DiffNode, OnScreen, SVG, VNode, ^}
 import org.scalajs.dom.raw.SVGElement
@@ -78,7 +79,7 @@ class Socket[T](val within:Tile[T], acceptType:Option[String] = None, thin:Boole
     s
   }
 
-  override def render: DiffNode = {
+  override def render: VHtmlDiffNode = {
     SVG.g(^.cls := cssClass, ^.attr("transform") := s"translate($x, $y)",
       content match {
         case Some(t) => t
@@ -98,7 +99,7 @@ object Socket {
 
   val logger:Logger = Logger.getLogger(Socket.getClass)
 
-  def path[T](tc:Option[Tile[T]]):VNode = {
+  def path[T](tc:Option[Tile[T]]):VHtmlNode = {
     logger.trace(s"Calculating tile path for $tc")
     val (w, h) = tc.flatMap(_.size) getOrElse (15, 15)
     <("path", ns=DElement.svgNS)(^.attr("d") := boxAndArc(w, h))

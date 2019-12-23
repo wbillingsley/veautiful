@@ -1,12 +1,13 @@
 package com.wbillingsley.scatter
 
 import com.wbillingsley.scatter.TileComponent.logger
+import com.wbillingsley.veautiful.html.VHtmlDiffNode
 import com.wbillingsley.veautiful.{DiffNode, SVG, ^}
 
 
 case class VBox[T](children:TileComponent[T]*) extends TileComponent[T] {
 
-  override def render: DiffNode = SVG.g(^.attr("transform") := s"translate($x, $y)", children)
+  override def render: VHtmlDiffNode = SVG.g(^.attr("transform") := s"translate($x, $y)", children)
 
   override def layoutChildren():Unit = {
     super.layoutChildren()

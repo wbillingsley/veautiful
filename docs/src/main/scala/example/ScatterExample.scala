@@ -2,6 +2,7 @@ package example
 
 import com.wbillingsley.scatter.jstiles.{FunctionCallTile, IfElseTile, JSLang, NumberInputTile, PlayTile, ProgramTile, StringTile}
 import com.wbillingsley.scatter.{Socket, TileSpace}
+import com.wbillingsley.veautiful.html.VHtmlNode
 import com.wbillingsley.veautiful.{<, VNode, ^}
 
 import scala.scalajs.js.annotation.{JSExport, JSExportTopLevel}
@@ -32,7 +33,7 @@ object ScatterExample {
     output.makeItSo(<.textarea(^.attr("placeholder") := "Program will appear here", pt.toLanguage.toJS(0)))
   }
 
-  def page:VNode = Common.layout(<.div(^.cls := "row",
+  def page:VHtmlNode = Common.layout(<.div(^.cls := "row",
     <.div(^.cls := "col", scatterCanvas),
     <.div(^.cls := "col", output)
   ))

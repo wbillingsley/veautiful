@@ -1,7 +1,7 @@
 package com.wbillingsley.veautiful
 
 import org.scalajs.dom
-import org.scalajs.dom.{Event, html}
+import org.scalajs.dom.{Event, Node, html}
 import dom.html.Input
 
 import scala.scalajs.js
@@ -17,7 +17,7 @@ object DElement {
   val htmlNS = "http://www.w3.org/1999/xhtml"
   val svgNS = "http://www.w3.org/2000/svg"
 }
-case class DElement(name:String, uniqEl:Any = "", ns:String = DElement.htmlNS) extends DiffNode {
+case class DElement(name:String, uniqEl:Any = "", ns:String = DElement.htmlNS) extends DiffNode[dom.Element, dom.Node] {
 
   var attributes:Map[String, AttrVal] = Map.empty
 
@@ -143,7 +143,7 @@ case class DElement(name:String, uniqEl:Any = "", ns:String = DElement.htmlNS) e
     this
   }
 
-  def addChildren(ac:VNode*):DElement = {
+  def addChildren(ac:VNode[dom.Node]*):DElement = {
     children = children ++ ac
     this
   }
@@ -183,10 +183,20 @@ case class DElement(name:String, uniqEl:Any = "", ns:String = DElement.htmlNS) e
     e
   }
 
+  /**
+    * A DNode can itself have multiple nodes. We need to be able to get a NodeOps that can perform low-level operations
+    * such as insterting and replacing nodes in the tree. This method should return one if the DNode is attached.
+    *
+    * By default, the implementation of this function assumes we are just adding any children to the top-level
+    * domNode. Subclasses that wish to add their children elsewhere should override this.
+    *
+    * @return
+    */
+  override def nodeOps: Option[NodeOps[Node]] = domNode.map(DefaultNodeOps(_))
 
 }
 
-case class Text(text:String) extends VNode {
+case class Text(text:String) extends VNode[dom.Node] {
 
   var domNode:Option[dom.Node] = None
 
@@ -209,8 +219,8 @@ case class Text(text:String) extends VNode {
 object < {
 
   trait DElAppliable
-  implicit class DEAVNode(val vNode: VNode) extends DElAppliable
-  implicit class DEAIVNode(val nodes: Iterable[VNode]) extends DElAppliable
+  implicit class DEAVNode(val vNode: VNode[dom.Node]) extends DElAppliable
+  implicit class DEAIVNode(val nodes: Iterable[VNode[dom.Node]]) extends DElAppliable
   implicit class DEAAttr(val a: AttrVal) extends DElAppliable
   implicit class DEAProp(val a: PropVal) extends DElAppliable
   implicit class DEALstnr(val l: Lstnr) extends DElAppliable

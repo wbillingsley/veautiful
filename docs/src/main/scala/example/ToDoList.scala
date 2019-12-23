@@ -1,8 +1,10 @@
 package example
 
+import com.wbillingsley.veautiful.html.VHtmlNode
 import com.wbillingsley.veautiful.{<, VNode, ^}
 import org.scalajs.dom
 import org.scalajs.dom.raw.HTMLInputElement
+
 import scala.collection.mutable
 
 object ToDoList {
@@ -49,7 +51,7 @@ object ToDoList {
   }
 
 
-  def page:VNode = Common.layout(<.div(
+  def page:VHtmlNode = Common.layout(<.div(
     <.h1("Example: To Do List"),
     <.p(
       """

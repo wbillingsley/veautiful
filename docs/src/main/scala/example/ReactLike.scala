@@ -1,6 +1,7 @@
 package example
 
 import com.wbillingsley.veautiful._
+import com.wbillingsley.veautiful.html.VHtmlNode
 import example.Model.Asteroid
 import org.scalajs.dom.raw.HTMLInputElement
 
@@ -26,7 +27,7 @@ object ReactLike {
   )
 
   /** Turns an asteroid into an SVG DElement */
-  def svgAsteroid(a:Asteroid):VNode = {
+  def svgAsteroid(a:Asteroid):VHtmlNode = {
 
     /** Just defines the shape of an asteroid */
     def polyPoints:Seq[(Int, Int)] = Seq((-10, -2), (-5, 8), (0, 10), (4, 7), (10, -1), (0, -10))
@@ -52,7 +53,7 @@ object ReactLike {
   }
 
   /** Creates an SVG for a gravity well */
-  def svgWell(w:Well):VNode = {
+  def svgWell(w:Well):VHtmlNode = {
     val (x, y) = w.pos
 
     // This one's just a circle node
@@ -66,7 +67,7 @@ object ReactLike {
     * The is is the view code that the router directs to (puts into the page) when
     * you click on this page of the docs.
     */
-  def page:VNode = Common.layout(
+  def page:VHtmlNode = Common.layout(
     <.div(
       <.h1("Example -- asteroids rendering into an SVG"),
       <.p(

@@ -1,12 +1,13 @@
 package com.wbillingsley.scatter
 
+import com.wbillingsley.veautiful.html.VHtmlDiffNode
 import com.wbillingsley.veautiful.logging.Logger
 import com.wbillingsley.veautiful.{DiffNode, SVG, ^}
 import org.scalajs.dom.Node
 
 case class HBox[T](children:TileComponent[T]*) extends TileComponent[T] {
 
-  override def render: DiffNode = SVG.g(^.attr("transform") := s"translate($x, $y)", children)
+  override def render: VHtmlDiffNode = SVG.g(^.attr("transform") := s"translate($x, $y)", children)
 
   override def layoutChildren():Unit = {
     super.layoutChildren()

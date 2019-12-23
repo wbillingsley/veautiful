@@ -1,13 +1,14 @@
 package com.wbillingsley.scatter.jstiles
 
 import com.wbillingsley.scatter.TileLanguage
+import com.wbillingsley.veautiful.html.VHtmlNode
 import com.wbillingsley.veautiful.{SVG, VNode, ^}
 
 import scala.scalajs.js.JSON
 
 object JSLang extends TileLanguage[JSExpr] {
 
-  def nodeIcon(returnType:String):VNode = returnType match {
+  def nodeIcon(returnType:String):VHtmlNode = returnType match {
 
     case "String" => SVG.text("$")
     case "void" => SVG.text("x")
@@ -17,7 +18,7 @@ object JSLang extends TileLanguage[JSExpr] {
 
   }
 
-  override def socketIcon(acceptType: Option[String]): VNode = acceptType match {
+  override def socketIcon(acceptType: Option[String]): VHtmlNode = acceptType match {
     case Some(s) => nodeIcon(s)
     case _ => SVG.g()
   }

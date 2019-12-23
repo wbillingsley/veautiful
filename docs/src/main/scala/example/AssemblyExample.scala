@@ -1,5 +1,6 @@
 package example
 
+import com.wbillingsley.veautiful.html.{VHtmlComponent, VHtmlDiffNode, VHtmlNode}
 import com.wbillingsley.veautiful.{<, DiffComponent, DiffNode, Update, VNode, ^}
 import com.wbillingsley.veautiful.templates.VSlides
 import org.scalajs.dom.raw.HTMLTextAreaElement
@@ -62,7 +63,7 @@ object AssemblyExample {
     )
   }
 
-  def regs(cpu:CPU):VNode = {
+  def regs(cpu:CPU):VHtmlNode = {
     <.table(^.cls := "register reg-registers",
       (cpu.state.registers.iterator.zipWithIndex map {
         case (b, i) =>
@@ -76,7 +77,7 @@ object AssemblyExample {
   }
 
 
-  def io(state:CPUState):VNode = {
+  def io(state:CPUState):VHtmlNode = {
     <.table(^.cls := "register io-registers",
 
 
@@ -117,7 +118,7 @@ object AssemblyExample {
 }
 
 
-class CodeWidget(cols:Int = 40, rows:Int = 20) extends DiffComponent {
+class CodeWidget(cols:Int = 40, rows:Int = 20) extends VHtmlComponent {
 
   var currentLine:Option[Int] = None
   var highlights:Seq[(Int, String)] = Seq.empty
@@ -135,7 +136,7 @@ class CodeWidget(cols:Int = 40, rows:Int = 20) extends DiffComponent {
 
   def text:String = ta.domEl.map({ case e:HTMLTextAreaElement => e.value }).getOrElse("")
 
-  override protected def render: DiffNode = {
+  override protected def render: VHtmlDiffNode = {
 
     println(text)
     <.div(^.cls := "codewidget",

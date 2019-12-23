@@ -8,8 +8,10 @@ import scala.concurrent.Future
   * A node in the Virtual DOM.
   *
   * Once attached, it controls its node. It is up to the VNode to "play nicely".
+  *
+  * @tparam N the type of node this VNode controls. E.g., dom.Node, dom.Element, but could be any target
   */
-trait VNode extends Keyable {
+trait VNode[+N] extends Keyable {
 
   /**
     * The dom node that this is currently attached to.
@@ -26,7 +28,7 @@ trait VNode extends Keyable {
     * Note that if a VNode uses more than one real node to implement itself, parent.get.domNode.get might not be
     * the same as domNode.get.getParent(), even if the gets were to succeed.
     */
-  var parent:Option[VNode] = None
+  var parent:Option[VNode[_]] = None
 
   /**
     * Called before a detach operation
@@ -65,7 +67,5 @@ trait VNode extends Keyable {
     * VNode has put one in domNode.
     */
   def isAttached:Boolean = domNode.nonEmpty
-
-  def receive(msg:Any):Future[Unit] = Future.successful("nothing to do")
 
 }

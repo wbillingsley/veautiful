@@ -11,21 +11,21 @@ import scala.collection.mutable
   *
   * This allows React.js-like operation.
   */
-trait DiffNode extends DNode with MakeItSo {
+trait DiffNode[N, C] extends DNode[N, C] with MakeItSo {
 
   /**
     * The children of a DiffNode has to be mutable, as it mutates itself to become the destination
     */
-  var children:collection.Seq[VNode] = Vector.empty
+  var children:collection.Seq[VNode[C]] = Vector.empty
 
-  def updateSelf:PartialFunction[DiffNode, _]
+  def updateSelf:PartialFunction[DiffNode[N, C], _]
 
-  def makeItSo:PartialFunction[MakeItSo, _] = { case to:DiffNode =>
+  def makeItSo:PartialFunction[MakeItSo, _] = { case to:DiffNode[N, C] =>
     updateSelf(to)
     updateChildren(to.children)
   }
 
-  def updateChildren(to:collection.Seq[VNode]):Unit = {
+  def updateChildren(to:collection.Seq[VNode[C]]):Unit = {
 
     val diffReport = Differ.diffs(children, to)
     Differ.processDiffs(this, diffReport.ops)

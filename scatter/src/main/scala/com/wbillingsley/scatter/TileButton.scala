@@ -1,4 +1,5 @@
 package com.wbillingsley.scatter
+import com.wbillingsley.veautiful.html.VHtmlDiffNode
 import com.wbillingsley.veautiful.{<, DiffNode, SVG, ^}
 
 class TileButton[T](text:String, action: => Unit, cls:String = "btn btn-primary") extends TileComponent[T] {
@@ -10,7 +11,7 @@ class TileButton[T](text:String, action: => Unit, cls:String = "btn btn-primary"
   var width:Int = 20
   var height:Int = 20
 
-  override protected def render: DiffNode = SVG.g(
+  override protected def render: VHtmlDiffNode = SVG.g(
     SVG.foreignObject(^.attr("width") := width, ^.attr("height") := height,
       button
     )

@@ -1,5 +1,6 @@
 package com.wbillingsley.scatter
 
+import com.wbillingsley.veautiful.html.{VHtmlComponent, VHtmlDiffNode}
 import com.wbillingsley.veautiful.logging.Logger
 import com.wbillingsley.veautiful.{<, DiffComponent, DiffNode, Layout, OnScreen, ^}
 import org.scalajs.dom
@@ -7,13 +8,13 @@ import org.scalajs.dom.raw.{Element, MouseEvent, SVGElement}
 
 import scala.collection.mutable
 
-case class TileSpace[T](override val key:Option[String] = None, val language:TileLanguage[T])(val prefSize:(Int, Int) = (480, 640)) extends DiffComponent {
+case class TileSpace[T](override val key:Option[String] = None, val language:TileLanguage[T])(val prefSize:(Int, Int) = (480, 640)) extends VHtmlComponent {
 
   import TileSpace._
 
   val tiles:mutable.Buffer[Tile[T]] = mutable.Buffer.empty
 
-  override def render: DiffNode = <.svg(^.attr("width") := prefSize._1.toString, ^.attr("height") := prefSize._2.toString, ^.cls := "scatter-area",
+  override def render: VHtmlDiffNode = <.svg(^.attr("width") := prefSize._1.toString, ^.attr("height") := prefSize._2.toString, ^.cls := "scatter-area",
     tiles.toSeq
   )
 
@@ -79,7 +80,7 @@ case class TileSpace[T](override val key:Option[String] = None, val language:Til
     * @param tc the tileComponent whose co-ordinates should be calculated
     * @return
     */
-  def relativeLocation(tc:DiffComponent):(Int, Int) = {
+  def relativeLocation(tc:VHtmlComponent):(Int, Int) = {
     val s = scale getOrElse 1.0
     val (tx, ty) = screenLocation(tc)
     val (mx, my) = screenLocation(this)
@@ -215,7 +216,7 @@ object TileSpace {
 
   val logger:Logger = Logger.getLogger(TileSpace.getClass)
 
-  def screenLocation(n:DiffComponent):(Int, Int) = {
+  def screenLocation(n:VHtmlComponent):(Int, Int) = {
     n.domNode.map { e =>
       val r = e.getBoundingClientRect()
       (r.left.toInt, r.top.toInt)

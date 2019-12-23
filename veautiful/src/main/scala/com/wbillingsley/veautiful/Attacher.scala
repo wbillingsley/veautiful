@@ -8,7 +8,7 @@ object Attacher {
     val root = DElement("root")
     root.domNode = Some(el)
 
-    def render(e:VNode) = {
+    def render(e:VNode[dom.Node]) = {
       root.updateChildren(Seq(e))
     }
   }

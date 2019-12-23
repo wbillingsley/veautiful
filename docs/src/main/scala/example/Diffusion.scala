@@ -1,6 +1,7 @@
 package example
 
 import com.wbillingsley.veautiful._
+import com.wbillingsley.veautiful.html.VHtmlNode
 import org.scalajs.dom
 import org.scalajs.dom.Node
 import org.scalajs.dom.raw.HTMLInputElement
@@ -86,7 +87,7 @@ object Diffusion {
       val ord = for { _ <- 0 until numOrdinary } yield Molecule(bounds.randomPoint())
       val tracked = for { _ <- 0 until numTracked } yield Molecule(dropRing.randomPoint(), false)
 
-      molecules.append((ord ++ tracked):_*)
+      molecules.appendAll(ord ++ tracked)
     }
 
     def step():Unit = {
@@ -102,7 +103,7 @@ object Diffusion {
 
   }
 
-  class MoleculeView(m:Molecule) extends VNode with Update {
+  class MoleculeView(m:Molecule) extends VHtmlNode with Update {
 
     var domNode: Option[Circle] = None
 
@@ -136,7 +137,7 @@ object Diffusion {
 
     var moleculeNodes = Simulation.molecules.map { m => new MoleculeView(m) }
 
-    def resetMoleculeViews() {
+    def resetMoleculeViews():Unit = {
       moleculeNodes = Simulation.molecules.map { m => new MoleculeView(m) }
     }
 
@@ -179,7 +180,7 @@ object Diffusion {
     )
 
     /** Turns an asteroid into an SVG DElement */
-    def svgMolecule(m:Molecule):VNode = {
+    def svgMolecule(m:Molecule):VHtmlNode = {
       <("circle", ns=DElement.svgNS, u=Random.nextString(7))(
         ^.attr("cx") := m.position.x, ^.attr("cy") := m.position.y, ^.attr("r") := 3,
         ^.cls := (if (m.ordinary) "molecule ordinary" else "molecule tracked")
@@ -187,11 +188,11 @@ object Diffusion {
     }
 
     /** Turns an asteroid into an SVG DElement */
-    def svgRing(m:Ring):VNode = {
+    def svgRing(m:Ring):VHtmlNode = {
       <.circle(^.attr("cx") := m.p.x, ^.attr("cy") := m.p.y, ^.attr("r") := m.r, ^.cls := "ring")
     }
 
-    def table():VNode = <.div(^.cls := "results col-lg overflow-auto",
+    def table():VHtmlNode = <.div(^.cls := "results col-lg overflow-auto",
       <.table(^.cls := "table",
         <.thead(
           <.tr(
@@ -211,7 +212,7 @@ object Diffusion {
     )
 
     /** A function to work out what the local VDOM should look like for the current asteroids */
-    def card():VNode = <.div(^.cls := "row",
+    def card():VHtmlNode = <.div(^.cls := "row",
       <.div(^.cls := "card",
         svg(
           svgRing(Simulation.boundaryRing),

@@ -1,5 +1,6 @@
 package example
 
+import com.wbillingsley.veautiful.html.VHtmlNode
 import com.wbillingsley.veautiful.{<, VNode, ^}
 import com.wbillingsley.wren.{Circuit, CurrentSource, Orientation, Resistor, VoltageSource, Wire}
 
@@ -17,7 +18,7 @@ object WrenExample {
     new Wire(r2.t2, vs.t1, 300 -> 300, 100 -> 300)
   ), 640, 480)
 
-  def page:VNode =  Common.layout(<.div(^.cls := "row",
+  def page:VHtmlNode =  Common.layout(<.div(^.cls := "row",
     <.div(^.cls := "col", circuit)
   ))
 }

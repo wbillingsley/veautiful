@@ -5,7 +5,7 @@ import org.scalajs.dom
 /*
  * A component that renders itself into the children of a fixed element
  */
-class ElementComponent(val el:DElement) extends VNode {
+class ElementComponent(val el:DElement) extends VNode[dom.Node] {
 
   def domNode = el.domNode
 
@@ -20,7 +20,7 @@ class ElementComponent(val el:DElement) extends VNode {
     el.detach()
   }
 
-  def renderElements(ch:VNode) = el.updateChildren(Seq(ch))
+  def renderElements(ch:VNode[dom.Node]) = el.updateChildren(Seq(ch))
 
 }
 

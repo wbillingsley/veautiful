@@ -1,6 +1,7 @@
 package com.wbillingsley.veautiful.templates
 
-import com.wbillingsley.veautiful.{<, ElementComponent, VNode}
+import com.wbillingsley.veautiful.html.VHtmlNode
+import com.wbillingsley.veautiful.{<, ElementComponent}
 import org.scalajs.dom
 import org.scalajs.dom.Event
 
@@ -8,7 +9,7 @@ abstract class HistoryRouter[Route] extends ElementComponent(<.div) {
 
   var route:Route
 
-  def render:VNode
+  def render:VHtmlNode
 
   def path(route:Route):String
 

@@ -1,10 +1,11 @@
 package com.wbillingsley.scatter
 
+import com.wbillingsley.veautiful.html.{VHtmlComponent, VHtmlDiffNode}
 import com.wbillingsley.veautiful.logging.Logger
 import com.wbillingsley.veautiful.{<, DElement, DiffComponent, DiffNode, Layout, OnScreen, SVG, Update, VNode, ^}
 import org.scalajs.dom.raw.{HTMLElement, MouseEvent, SVGElement}
 
-abstract class Tile[T](val ts:TileSpace[T], val mobile:Boolean = true, val typeLoop:Boolean = true, val cssClass:String = "") extends OnScreen with DiffComponent {
+abstract class Tile[T](val ts:TileSpace[T], val mobile:Boolean = true, val typeLoop:Boolean = true, val cssClass:String = "") extends OnScreen with VHtmlComponent {
 
   import Tile._
 
@@ -76,7 +77,7 @@ abstract class Tile[T](val ts:TileSpace[T], val mobile:Boolean = true, val typeL
 
   def contentOffsetY:Int = Tile.padding
 
-  override def render: DiffNode = {
+  override def render: VHtmlDiffNode = {
     logger.trace(s"render called on $this")
 
     val c = tileContent

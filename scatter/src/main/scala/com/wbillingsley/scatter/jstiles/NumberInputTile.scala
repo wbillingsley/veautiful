@@ -1,12 +1,13 @@
 package com.wbillingsley.scatter.jstiles
 
 import com.wbillingsley.scatter.{HBox, Tile, TileComponent, TileForeignObject, TileSpace, TileText}
+import com.wbillingsley.veautiful.html.VHtmlComponent
 import com.wbillingsley.veautiful.logging.Logger
 import com.wbillingsley.veautiful.{<, DElement, DiffComponent, PropVal, ^}
 import org.scalajs.dom
 import org.scalajs.dom.raw.HTMLInputElement
 
-  class NumberInputTile (tileSpace:TileSpace[JSExpr], width:Int = 2, initial:Option[Double] = None) extends Tile(tileSpace) with DiffComponent {
+  class NumberInputTile (tileSpace:TileSpace[JSExpr], width:Int = 2, initial:Option[Double] = None) extends Tile(tileSpace) with VHtmlComponent {
 
   import NumberInputTile._
 
