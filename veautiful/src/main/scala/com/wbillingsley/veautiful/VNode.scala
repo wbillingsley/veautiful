@@ -1,9 +1,5 @@
 package com.wbillingsley.veautiful
 
-import org.scalajs.dom
-
-import scala.concurrent.Future
-
 /**
   * A node in the Virtual DOM.
   *
@@ -19,7 +15,7 @@ trait VNode[+N] extends Keyable {
     * Note that if a VNode uses more than one real node to implement itself, parent.get.domNode.get might not be
     * the same as domNode.get.getParent(), even if the gets were to succeed.
     */
-  def domNode:Option[dom.Node]
+  def domNode:Option[N]
 
   /**
     * The parent node in the Virtual DOM. As we only do one-way connections from the Virtual DOM to the
@@ -54,7 +50,7 @@ trait VNode[+N] extends Keyable {
     * Called to perform an attach operation -- ie, create the real DOM node and put it into
     * domNode
     */
-  def attach():dom.Node
+  def attach():N
 
   /**
     * Called to perform a detach operation -- ie, anything necessary to clean up the DOM node,

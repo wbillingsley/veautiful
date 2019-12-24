@@ -55,9 +55,9 @@ case class DefaultNodeOps(n:dom.Node) extends NodeOps[dom.Node] {
   */
 trait DNode[N, C] extends VNode[N] {
 
-  def create():dom.Element
+  def create():N
 
-  var domNode:Option[dom.Element]
+  var domNode:Option[N]
 
   /**
     * A DNode can itself have multiple nodes. We need to be able to get a NodeOps that can perform low-level operations
@@ -79,7 +79,7 @@ trait DNode[N, C] extends VNode[N] {
     for { d <- children } d.beforeAttach()
   }
 
-  def attach():dom.Element = {
+  def attach():N = {
     val n = create()
     domNode = Some(n)
 

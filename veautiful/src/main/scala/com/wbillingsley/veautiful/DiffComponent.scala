@@ -1,5 +1,4 @@
 package com.wbillingsley.veautiful
-import org.scalajs.dom.{Element, Node}
 
 trait DiffComponent[N, C] extends VNode[N] with Update {
 
@@ -15,7 +14,7 @@ trait DiffComponent[N, C] extends VNode[N] with Update {
     }
   }
 
-  def domNode: Option[Element] = lastRendered.flatMap(_.domNode)
+  def domNode: Option[N] = lastRendered.flatMap(_.domNode)
 
   def update(): Unit = rerender()
 
@@ -26,7 +25,7 @@ trait DiffComponent[N, C] extends VNode[N] with Update {
     delegate.beforeAttach()
   }
 
-  override def attach(): Node = delegate.attach()
+  override def attach(): N = delegate.attach()
 
   override def afterAttach(): Unit = {
     super.afterAttach()

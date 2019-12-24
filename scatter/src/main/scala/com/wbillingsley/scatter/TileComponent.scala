@@ -30,7 +30,7 @@ trait TileComponent[T] extends VHtmlComponent {
 
   def emptySockets:Seq[(Int, Int, Socket[T])]
 
-  override def attach(): Node = {
+  override def attach(): Element = {
     logger.trace(s"Attach: $this $uid")
     super.attach()
   }
