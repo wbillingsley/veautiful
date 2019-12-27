@@ -1,7 +1,6 @@
 package example
 
-import com.wbillingsley.veautiful.html.VHtmlNode
-import com.wbillingsley.veautiful.{<, VNode, ^}
+import com.wbillingsley.veautiful.html.{<, VHtmlNode, ^}
 import org.scalajs.dom
 import org.scalajs.dom.raw.HTMLInputElement
 

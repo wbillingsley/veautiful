@@ -1,8 +1,8 @@
-package com.wbillingsley.veautiful
+package com.wbillingsley.veautiful.html
 
+import com.wbillingsley.veautiful.{DefaultNodeOps, DiffNode, NodeOps, VNode}
 import org.scalajs.dom
 import org.scalajs.dom.{Event, Node, html}
-import dom.html.Input
 
 import scala.scalajs.js
 

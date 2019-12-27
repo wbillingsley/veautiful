@@ -1,8 +1,6 @@
 package com.wbillingsley.wren
 
-import com.wbillingsley.veautiful.html.{VHtmlComponent, VHtmlDiffNode}
-import com.wbillingsley.veautiful.{<, DiffComponent, DiffNode, SVG, VNode, ^}
-import org.scalajs.dom.Node
+import com.wbillingsley.veautiful.html.{<, VHtmlComponent, VHtmlDiffNode, ^}
 
 case class Circuit(components:Seq[Component], width:Int, height:Int) extends VHtmlComponent {
 

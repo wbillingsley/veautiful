@@ -1,9 +1,8 @@
 package example
 
-import com.wbillingsley.scatter.jstiles.{FunctionCallTile, IfElseTile, JSLang, NumberInputTile, PlayTile, ProgramTile, StringTile}
-import com.wbillingsley.scatter.{Socket, TileSpace}
-import com.wbillingsley.veautiful.html.VHtmlNode
-import com.wbillingsley.veautiful.{<, VNode, ^}
+import com.wbillingsley.scatter.TileSpace
+import com.wbillingsley.scatter.jstiles._
+import com.wbillingsley.veautiful.html.{<, VHtmlNode, ^}
 
 import scala.scalajs.js.annotation.{JSExport, JSExportTopLevel}
 

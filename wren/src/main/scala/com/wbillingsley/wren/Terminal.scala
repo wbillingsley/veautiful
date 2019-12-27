@@ -1,6 +1,6 @@
 package com.wbillingsley.wren
 
-import com.wbillingsley.veautiful.{SVG, VNode, ^}
+import com.wbillingsley.veautiful.html.{SVG, ^}
 
 import scala.collection.mutable
 

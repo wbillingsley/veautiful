@@ -1,7 +1,7 @@
 package example
 
+import com.wbillingsley.veautiful.html.{<, ^}
 import com.wbillingsley.veautiful.templates.VSlides
-import com.wbillingsley.veautiful.{<, ^}
 
 object VSlidesExample {
 

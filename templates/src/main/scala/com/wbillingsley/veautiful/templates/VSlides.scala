@@ -1,7 +1,7 @@
 package com.wbillingsley.veautiful.templates
 
-import com.wbillingsley.veautiful.html.{VHtmlComponent, VHtmlDiffNode, VHtmlNode}
-import com.wbillingsley.veautiful.{<, DiffComponent, DiffNode, MakeItSo, VNode, ^}
+import com.wbillingsley.veautiful.html.{<, VHtmlComponent, VHtmlDiffNode, VHtmlNode, ^}
+import com.wbillingsley.veautiful.{MakeItSo}
 import org.scalajs.dom
 import org.scalajs.dom.raw.{Event, HTMLElement}
 

@@ -1,8 +1,6 @@
 package com.wbillingsley.wren
 
-import com.wbillingsley.veautiful.{SVG, ^}
-import com.wbillingsley.wren.Orientation.East
-
+import com.wbillingsley.veautiful.html.{SVG, ^}
 
 class Wire(t1:Connector, t2:Connector, via:(Int,Int)*) extends Component {
 

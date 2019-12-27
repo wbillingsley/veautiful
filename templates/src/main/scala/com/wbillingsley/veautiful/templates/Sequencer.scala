@@ -1,7 +1,7 @@
 package com.wbillingsley.veautiful.templates
 
 import com.wbillingsley.veautiful._
-import com.wbillingsley.veautiful.html.{VHtmlComponent, VHtmlDiffNode, VHtmlNode}
+import com.wbillingsley.veautiful.html.{<, VHtmlComponent, VHtmlDiffNode, VHtmlNode, ^}
 
 object Sequencer {
 

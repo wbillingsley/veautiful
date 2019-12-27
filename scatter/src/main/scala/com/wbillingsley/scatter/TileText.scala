@@ -1,6 +1,5 @@
 package com.wbillingsley.scatter
-import com.wbillingsley.veautiful.html.VHtmlDiffNode
-import com.wbillingsley.veautiful.{DiffNode, SVG, ^}
+import com.wbillingsley.veautiful.html.{SVG, VHtmlDiffNode, ^}
 
 case class TileText[T](text:String) extends TileComponent[T] {
 

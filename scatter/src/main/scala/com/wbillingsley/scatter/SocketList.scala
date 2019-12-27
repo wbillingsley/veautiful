@@ -1,6 +1,5 @@
 package com.wbillingsley.scatter
-import com.wbillingsley.veautiful.html.VHtmlDiffNode
-import com.wbillingsley.veautiful.{DiffNode, SVG, ^}
+import com.wbillingsley.veautiful.html.{SVG, VHtmlDiffNode, ^}
 
 class SocketList[T](val within:Tile[T], acceptType:Option[String] = None) extends TileComponent[T] {
 

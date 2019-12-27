@@ -1,9 +1,7 @@
 package example
 
-import com.wbillingsley.veautiful.{<, Attacher, DElement, ^}
+import com.wbillingsley.veautiful.html.Attacher
 import org.scalajs.dom
-
-import scala.scalajs.js
 
 object Main {
 

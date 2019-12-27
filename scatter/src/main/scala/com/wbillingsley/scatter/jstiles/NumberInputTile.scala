@@ -1,9 +1,8 @@
 package com.wbillingsley.scatter.jstiles
 
-import com.wbillingsley.scatter.{HBox, Tile, TileComponent, TileForeignObject, TileSpace, TileText}
-import com.wbillingsley.veautiful.html.VHtmlComponent
+import com.wbillingsley.scatter.{HBox, Tile, TileComponent, TileForeignObject, TileSpace}
+import com.wbillingsley.veautiful.html.{<, VHtmlComponent, ^}
 import com.wbillingsley.veautiful.logging.Logger
-import com.wbillingsley.veautiful.{<, DElement, DiffComponent, PropVal, ^}
 import org.scalajs.dom
 import org.scalajs.dom.raw.HTMLInputElement
 

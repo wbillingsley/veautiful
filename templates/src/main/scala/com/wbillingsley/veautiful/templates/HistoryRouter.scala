@@ -1,7 +1,6 @@
 package com.wbillingsley.veautiful.templates
 
-import com.wbillingsley.veautiful.html.VHtmlNode
-import com.wbillingsley.veautiful.{<, ElementComponent}
+import com.wbillingsley.veautiful.html.{<, ElementComponent, VHtmlNode}
 import org.scalajs.dom
 import org.scalajs.dom.Event
 

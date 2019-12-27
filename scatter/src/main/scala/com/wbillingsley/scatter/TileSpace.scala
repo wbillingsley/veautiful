@@ -1,10 +1,9 @@
 package com.wbillingsley.scatter
 
-import com.wbillingsley.veautiful.html.{VHtmlComponent, VHtmlDiffNode}
+import com.wbillingsley.veautiful.html.{<, VHtmlComponent, VHtmlDiffNode, ^}
 import com.wbillingsley.veautiful.logging.Logger
-import com.wbillingsley.veautiful.{<, DiffComponent, DiffNode, Layout, OnScreen, ^}
 import org.scalajs.dom
-import org.scalajs.dom.raw.{Element, MouseEvent, SVGElement}
+import org.scalajs.dom.raw.{MouseEvent, SVGElement}
 
 import scala.collection.mutable
 

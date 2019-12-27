@@ -1,10 +1,8 @@
 package com.wbillingsley.scatter
 
 import com.wbillingsley.scatter.Tile.{boxAndArc, logger}
-import com.wbillingsley.veautiful.html.{VHtmlDiffNode, VHtmlNode}
+import com.wbillingsley.veautiful.html.{<, DElement, SVG, VHtmlDiffNode, VHtmlNode, ^}
 import com.wbillingsley.veautiful.logging.Logger
-import com.wbillingsley.veautiful.{<, DElement, DiffComponent, DiffNode, OnScreen, SVG, VNode, ^}
-import org.scalajs.dom.raw.SVGElement
 
 import scala.annotation.tailrec
 

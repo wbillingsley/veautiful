@@ -1,7 +1,7 @@
 package com.wbillingsley.scatter.jstiles
 
-import com.wbillingsley.scatter.{HBox, Socket, Tile, TileButton, TileComponent, TileForeignObject, TileSpace, TileText, VBox}
-import com.wbillingsley.veautiful.{<, ^}
+import com.wbillingsley.scatter.{Socket, Tile, TileForeignObject, TileSpace, VBox}
+import com.wbillingsley.veautiful.html.{<, ^}
 
 class PlayTile(tileSpace:TileSpace[JSExpr], cls:String = "btn btn-primary") extends Tile(tileSpace, false, false, cssClass = "play") {
 

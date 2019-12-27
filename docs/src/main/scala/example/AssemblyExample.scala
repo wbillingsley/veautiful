@@ -1,8 +1,6 @@
 package example
 
-import com.wbillingsley.veautiful.html.{VHtmlComponent, VHtmlDiffNode, VHtmlNode}
-import com.wbillingsley.veautiful.{<, DiffComponent, DiffNode, Update, VNode, ^}
-import com.wbillingsley.veautiful.templates.VSlides
+import com.wbillingsley.veautiful.html._
 import org.scalajs.dom.raw.HTMLTextAreaElement
 
 import scala.collection.immutable.ArraySeq

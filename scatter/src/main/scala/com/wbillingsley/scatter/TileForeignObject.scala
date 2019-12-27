@@ -1,7 +1,6 @@
 package com.wbillingsley.scatter
 
-import com.wbillingsley.veautiful.html.{VHtmlDiffNode, VHtmlNode}
-import com.wbillingsley.veautiful.{<, DiffNode, SVG, VNode, ^}
+import com.wbillingsley.veautiful.html.{SVG, VHtmlDiffNode, VHtmlNode, ^}
 
 case class TileForeignObject[T](content: VHtmlNode) extends TileComponent[T] {
 

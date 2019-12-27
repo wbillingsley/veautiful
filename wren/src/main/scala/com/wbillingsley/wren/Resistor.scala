@@ -1,8 +1,8 @@
 package com.wbillingsley.wren
 
-import com.wbillingsley.veautiful.{SVG, ^}
 import com.wbillingsley.wren.Orientation.East
 import Orientation._
+import com.wbillingsley.veautiful.html.{SVG, ^}
 
 
 class Resistor(pos:(Int,Int), orientation:Orientation = East, initial: Option[Double] = None) extends Component {

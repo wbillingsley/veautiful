@@ -1,5 +1,6 @@
-package com.wbillingsley.veautiful
+package com.wbillingsley.veautiful.html
 
+import com.wbillingsley.veautiful.VNode
 import org.scalajs.dom
 
 /*

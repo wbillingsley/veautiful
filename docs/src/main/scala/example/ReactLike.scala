@@ -1,7 +1,7 @@
 package example
 
 import com.wbillingsley.veautiful._
-import com.wbillingsley.veautiful.html.VHtmlNode
+import com.wbillingsley.veautiful.html.{<, DElement, ElementComponent, VHtmlNode, ^}
 import example.Model.Asteroid
 import org.scalajs.dom.raw.HTMLInputElement
 

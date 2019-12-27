@@ -1,6 +1,6 @@
 package example
 
-import com.wbillingsley.veautiful.<
+import com.wbillingsley.veautiful.html.<
 
 object Intro {
 

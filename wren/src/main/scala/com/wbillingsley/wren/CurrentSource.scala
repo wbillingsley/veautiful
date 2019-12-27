@@ -1,5 +1,5 @@
 package com.wbillingsley.wren
-import com.wbillingsley.veautiful.{SVG, VNode, ^}
+import com.wbillingsley.veautiful.html.{SVG, ^}
 import com.wbillingsley.wren.Orientation._
 
 class CurrentSource(pos:(Int,Int), orientation:Orientation = East, initial: Option[Double] = None) extends Component {

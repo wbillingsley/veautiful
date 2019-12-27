@@ -1,9 +1,7 @@
 package com.wbillingsley.veautiful.templates
 
-import com.wbillingsley.veautiful.<.DElAppliable
-import com.wbillingsley.veautiful.html.VHtmlNode
-import com.wbillingsley.veautiful.{<, DElement, ^}
-import org.scalajs.dom.raw.HTMLTextAreaElement
+import com.wbillingsley.veautiful.html.<.DElAppliable
+import com.wbillingsley.veautiful.html.{<, DElement, VHtmlNode, ^}
 
 /**
   * Layout based on the one that is used for Escape the Lava Maze

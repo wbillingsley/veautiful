@@ -1,8 +1,7 @@
 package com.wbillingsley.scatter.jstiles
 
 import com.wbillingsley.scatter.TileLanguage
-import com.wbillingsley.veautiful.html.VHtmlNode
-import com.wbillingsley.veautiful.{SVG, VNode, ^}
+import com.wbillingsley.veautiful.html.{SVG, VHtmlNode}
 
 import scala.scalajs.js.JSON
 

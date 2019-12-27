@@ -1,8 +1,7 @@
 package example
 
-import com.wbillingsley.veautiful.html.VHtmlNode
-import com.wbillingsley.veautiful.{<, VNode, ^}
-import com.wbillingsley.wren.{Circuit, CurrentSource, Orientation, Resistor, VoltageSource, Wire}
+import com.wbillingsley.veautiful.html.{<, VHtmlNode, ^}
+import com.wbillingsley.wren._
 
 object WrenExample {
 

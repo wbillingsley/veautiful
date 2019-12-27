@@ -1,9 +1,9 @@
 package com.wbillingsley.scatter
 
-import com.wbillingsley.veautiful.html.{VHtmlComponent, VHtmlDiffNode}
+import com.wbillingsley.veautiful.html.{DElement, SVG, VHtmlComponent, VHtmlDiffNode, ^}
 import com.wbillingsley.veautiful.logging.Logger
-import com.wbillingsley.veautiful.{<, DElement, DiffComponent, DiffNode, Layout, OnScreen, SVG, Update, VNode, ^}
-import org.scalajs.dom.raw.{HTMLElement, MouseEvent, SVGElement}
+import com.wbillingsley.veautiful.{OnScreen}
+import org.scalajs.dom.raw.{MouseEvent, SVGElement}
 
 abstract class Tile[T](val ts:TileSpace[T], val mobile:Boolean = true, val typeLoop:Boolean = true, val cssClass:String = "") extends OnScreen with VHtmlComponent {
 

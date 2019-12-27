@@ -1,7 +1,7 @@
 package example
 
 import com.wbillingsley.veautiful.templates.HistoryRouter
-import com.wbillingsley.veautiful.{<, ElementComponent, PathDSL}
+import com.wbillingsley.veautiful.PathDSL
 
 sealed trait ExampleRoute
 case object IntroRoute extends ExampleRoute

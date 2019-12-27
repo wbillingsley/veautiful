@@ -1,9 +1,7 @@
 package com.wbillingsley.scatter
 
-import com.wbillingsley.veautiful.html.VHtmlDiffNode
+import com.wbillingsley.veautiful.html.{SVG, VHtmlDiffNode, ^}
 import com.wbillingsley.veautiful.logging.Logger
-import com.wbillingsley.veautiful.{DiffNode, SVG, ^}
-import org.scalajs.dom.Node
 
 case class HBox[T](children:TileComponent[T]*) extends TileComponent[T] {
 
