@@ -6,7 +6,8 @@ case class Circuit(components:Seq[Component], width:Int, height:Int) extends VHt
 
   override protected def render: VHtmlDiffNode = {
     <.svg(^.attr("width") := width, ^.attr("height") := height, ^.cls := "wren-canvas",
-      components.map(_.render) ++ components.flatMap(_.terminals).map(_.render)
+      components.map(_.render),
+      components.flatMap(_.terminals).map(_.render)
     )
   }
 

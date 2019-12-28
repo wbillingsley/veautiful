@@ -1,15 +1,33 @@
 package com.wbillingsley.wren
 
-import scala.collection.mutable
-
-
 sealed trait Provenance
 case object UserSet extends Provenance
 case object QuestionSet extends Provenance
 case object Unknown extends Provenance
 case class Because(constraint: Constraint, values:Seq[Value]) extends Provenance
 
-class Value(val units:String, var value:Option[(Double, Provenance)] = None)
+class Value(val units:String, var value:Option[(Double, Provenance)] = None) {
+
+  def stringify:String = value match {
+    case Some((x, prov)) =>
+      val (d, p) = prefix(x)
+      s"$d$p$units"
+    case _ => ""
+  }
+
+  def prefix(d:Double):(Double, String) = {
+    if (d >= 1000000000) (d / 1000000000, "G")
+    else if (d >= 1000000) (d / 1000000, "M")
+    else if (d >= 1000) (d / 1000, "k")
+    else if (d >= 1) (d, "")
+    else if (d >= 0.001) (d * 1000, "m")
+    else if (d >= 0.000001) (d * 1000000, "u")
+    else if (d >= 0.000000001) (d * 1000000000, "n")
+    else (d, "")
+  }
+
+
+}
 
 trait Constraint {
 

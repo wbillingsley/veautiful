@@ -5,17 +5,21 @@ import com.wbillingsley.wren._
 
 object WrenExample {
 
-  val cs = new CurrentSource((400, 100))
+  val cs = new CurrentSource((400, 100), initial = Some(0.2))
   val vs = new VoltageSource((100, 150), orientation = Orientation.North)
   val r1 = new Resistor((300,100), orientation = Orientation.South)
   val r2 = new Resistor((300,200), orientation = Orientation.South)
 
-  val circuit = Circuit(Seq(
-    cs, r1, r2, vs,
-    new Wire(vs.t2, r1.t1, 100 -> 50, 300 -> 50),
-    new Wire(r1.t2, r2.t1),
-    new Wire(r2.t2, vs.t1, 300 -> 300, 100 -> 300)
-  ), 640, 480)
+  val circuit = Circuit(
+    Seq(
+      cs, r1, r2, vs,
+      new Wire(vs.t2, r1.t1, 100 -> 50, 300 -> 50),
+      new Wire(r1.t2, r2.t1),
+      new Wire(r2.t2, vs.t1, 300 -> 300, 100 -> 300),
+      new ValueLabel(cs.current, (450, 100))
+    ),
+    640, 480
+  )
 
   def page:VHtmlNode =  Common.layout(<.div(^.cls := "row",
     <.div(^.cls := "col", circuit)
