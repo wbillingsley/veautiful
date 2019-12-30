@@ -11,7 +11,7 @@ class Value(val units:String, var value:Option[(Double, Provenance)] = None) {
   def stringify:String = value match {
     case Some((x, prov)) =>
       val (d, p) = prefix(x)
-      s"$d$p$units"
+      f"$d%.02f$p$units"
     case _ => ""
   }
 
@@ -105,16 +105,62 @@ case class SumConstraint(name:String, values:Seq[Value], result:Double, toleranc
 
 }
 
+case class EquationConstraint(name:String, eqs:Seq[(Value, () => Option[Double])], tolerance:Double = 0.01) extends Constraint {
+
+  def values = eqs.map(_._1)
+
+  override def calculable: Boolean = eqs.count({ case (v, eq) =>
+    v.value.isEmpty && eq().nonEmpty
+  }) == 1
+
+  def withinTolerance(a:Double, b:Double):Boolean = Math.abs(a / b) <= tolerance
+
+  override def calculate(): Seq[Value] = {
+    if (calculable) {
+      for {
+        (v, eq) <- eqs if v.value.isEmpty
+        newVal <- eq()
+      } yield {
+        v.value = Some(newVal -> Because(this, values.filter(_.value.nonEmpty)))
+        v
+      }
+    } else Seq.empty
+
+  }
+
+  override def failed: Boolean = {
+    //TODO: fixme
+    false
+  }
+
+}
+
 
 case class ConstraintPropagator(constraints:Seq[Constraint]) {
 
-  def canStep:Boolean = constraints.exists(_.calculable)
-
-  def step:Seq[Value] = {
+  def clearCalculations():Unit = {
     for {
-      c <- constraints if c.calculable
+      c <- constraints
+      v <- c.values
+      (_, Because(_, _)) <- v.value
+    } {
+      v.value = None
+    }
+  }
+
+  def canStep:Boolean = constraints.exists({ c =>
+    c.values.exists(_.value.isEmpty) && c.calculable
+  })
+
+  def step():Seq[Value] = {
+    for {
+      c <- constraints if c.values.exists(_.value.isEmpty) && c.calculable
       v <- c.calculate()
     } yield v
+  }
+
+  def resolve():Unit = {
+    while (canStep) step()
   }
 
   def violated:Seq[Constraint] = constraints.filter(_.failed)

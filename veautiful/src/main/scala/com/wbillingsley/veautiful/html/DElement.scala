@@ -313,7 +313,10 @@ object ^ {
   case class Lsntrable(n:String) {
     def -->(e: => Unit ) = Lstnr(n, (x:Event) => e, false)
 
-    def ==>(f: (Event) => Unit) = Lstnr(n, (x:Event) => f(x))
+    def ==>(f: (Event) => Unit) = {
+      println(f)
+      Lstnr(n, f, false)
+    }
   }
 
   def onClick = Lsntrable("click")

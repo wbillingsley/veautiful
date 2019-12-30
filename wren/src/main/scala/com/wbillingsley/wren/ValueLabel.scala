@@ -1,7 +1,7 @@
 package com.wbillingsley.wren
 import com.wbillingsley.veautiful.html.{<, SVG, VHtmlDiffNode, ^}
 
-class ValueLabel(v:Value, pos:(Int, Int)) extends Component {
+class ValueLabel(v:Value, pos:(Int, Int), vertical:Boolean = false) extends Component {
 
   def render: VHtmlDiffNode = {
     val (x, y) = pos
