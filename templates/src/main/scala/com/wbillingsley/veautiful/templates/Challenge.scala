@@ -58,4 +58,36 @@ object Challenge {
     )
   }
 
+  trait Stage {
+
+    def completion:Completion
+
+    def kind:String
+
+  }
+
+  trait Level {
+
+    def name:String
+
+    def stages:Seq[Stage]
+
+  }
+
+  sealed trait Completion
+  case object Open extends Completion
+  case object Incomplete extends Completion
+  case class Complete(mark:Option[Double], medal:Option[String]) extends Completion
+
+}
+
+class Challenge(levels: Seq[Challenge.Level],
+                 header: => VHtmlNode = <.div(),
+                 tr: => VHtmlNode = <.div(),
+                 progressBlock: => VHtmlNode = <.div(),
+                 pageControls: (Boolean) => VHtmlNode = _ => <.div(),
+                 readyNext: => Boolean) {
+
+
+
 }
