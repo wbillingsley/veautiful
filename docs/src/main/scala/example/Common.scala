@@ -15,7 +15,8 @@ object Common {
     VSlidesRoute(0) -> "Example: VSlides",
     ScatterRoute -> "Example: Scatter",
     WrenRoute -> "Example: Wren",
-    AssemblyRoute -> "Example: Assembly language sim"
+    AssemblyRoute -> "Example: Assembly language sim",
+    ChallengeRoute(0, 0) -> "Example: Challenge layout"
   )
 
   def linkToRoute(r:ExampleRoute, s:String):VHtmlNode = <.a(

@@ -1,7 +1,7 @@
 package com.wbillingsley.veautiful.templates
 
 import com.wbillingsley.veautiful.html.<.DElAppliable
-import com.wbillingsley.veautiful.html.{<, DElement, VHtmlNode, ^}
+import com.wbillingsley.veautiful.html.{<, DElement, VHtmlComponent, VHtmlNode, ^}
 
 /**
   * Layout based on the one that is used for Escape the Lava Maze
@@ -58,7 +58,7 @@ object Challenge {
     )
   }
 
-  trait Stage {
+  trait Stage extends VHtmlComponent {
 
     def completion:Completion
 
@@ -89,5 +89,10 @@ class Challenge(levels: Seq[Challenge.Level],
                  readyNext: => Boolean) {
 
 
+  def show(level:Int, stage:Int):VHtmlNode = {
+
+    levels(level).stages(stage)
+
+  }
 
 }
