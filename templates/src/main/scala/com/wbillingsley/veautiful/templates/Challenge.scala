@@ -86,13 +86,21 @@ class Challenge(levels: Seq[Challenge.Level],
                  tr: => VHtmlNode = <.div(),
                  progressBlock: => VHtmlNode = <.div(),
                  pageControls: (Boolean) => VHtmlNode = _ => <.div(),
-                 readyNext: => Boolean) {
+                 readyNext: => Boolean) extends VHtmlComponent {
 
+  var level:Int = 0
+  var stage:Int = 0
 
-  def show(level:Int, stage:Int):VHtmlNode = {
+  def show(l:Int, s:Int):VHtmlNode = {
+    level = l
+    stage = s
+    rerender()
+  }
 
-    levels(level).stages(stage)
-
+  def render = {
+    <.div(
+      ScaleToFit(1920, 1080)(levels(level).stages(stage))
+    )
   }
 
 }
