@@ -39,9 +39,13 @@ object Challenge {
 
   def textColumn(ac: DElAppliable *) = <.div(^.cls := "text-column", <.div(ac:_*))
 
-  def split(l:DElement)(r:DElement) = <.div(^.cls := "split2",
-    <.div(l),
-    <.div(r)
+  def textAndEx(left: DElAppliable *)(right: DElAppliable *):VHtmlNode = {
+    split(textColumn(left:_*))(right:_*)
+  }
+
+  def split(l:DElAppliable*)(r:DElAppliable*) = <.div(^.cls := "split2",
+    <.div(l:_*),
+    <.div(r:_*)
   )
 
   def challengeLayout(header: => VHtmlNode = <.div(),
@@ -66,13 +70,15 @@ object Challenge {
 
   }
 
-  trait Level {
+  case class VideoStage(yt:String) extends Stage {
+    var completion = Open
 
-    def name:String
+    val kind = "video"
 
-    def stages:Seq[Stage]
-
+    def render = <.div("This will be a video")
   }
+
+  case class Level(name:String, stages:Seq[Stage])
 
   sealed trait Completion
   case object Open extends Completion
@@ -97,9 +103,29 @@ class Challenge(levels: Seq[Challenge.Level],
     rerender()
   }
 
+  def elements = {
+    for {
+      l <- levels
+      s <- l.stages
+    } yield s
+  }
+
+  def layout(s:Sequencer, si:SequenceItem, i:Int):VHtmlNode = {
+    Challenge.challengeLayout(
+      <.div("This is my header"),
+      <.div("Top right"),
+      <.div("progress block"),
+      (_) => <.div("Page controls"),
+      true
+    )(si.content)
+  }
+
   def render = {
-    <.div(
+    /*<.div(^.attr("id") := "challenge-element",
       ScaleToFit(1920, 1080)(levels(level).stages(stage))
+    )*/
+    <.div(
+      VSlides(1920, 1080, layout=layout)(elements)
     )
   }
 

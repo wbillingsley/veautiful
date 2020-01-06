@@ -5,6 +5,8 @@ import com.wbillingsley.veautiful.html.{<, VHtmlComponent, VHtmlDiffNode, VHtmlN
 
 object Sequencer {
 
+  type LayoutFunc = (Sequencer, SequenceItem, Int) => VHtmlNode
+
   def page = {
     VSlides(width=1024, height=680)(Seq(
       <.div("Page One"),
@@ -12,9 +14,18 @@ object Sequencer {
     ))
   }
 
+
+  def defaultLayout:LayoutFunc = { case (sequencer, s, _) =>
+    <.div(
+      ^.cls := "v-slide",
+      s.content,
+      sequencer.footBox
+    )
+  }
+
 }
 
-case class Sequencer(override val key:Option[String] = None)(var nodes: Seq[SequenceItem], var index:Int = 0) extends VHtmlComponent with MakeItSo {
+case class Sequencer(override val key:Option[String] = None, layout:Sequencer.LayoutFunc = Sequencer.defaultLayout)(var nodes: Seq[SequenceItem], var index:Int = 0) extends VHtmlComponent with MakeItSo {
 
   def next():Unit = {
     if (index < nodes.size - 1) {
@@ -48,10 +59,9 @@ case class Sequencer(override val key:Option[String] = None)(var nodes: Seq[Sequ
         (n, i) <- nodes.zipWithIndex
       } yield <.div(
         ^.cls := (if (index == i) "v-sequencer-slide active" else "v-sequencer-slide inactive"),
-        n
+        layout(this, n, i)
       )
-    ),
-    if (nodes.nonEmpty && nodes(index).showFootBox()) footBox else <.div()
+    )
   )
 
   override def makeItSo: PartialFunction[MakeItSo, _] = {
@@ -65,20 +75,14 @@ case class Sequencer(override val key:Option[String] = None)(var nodes: Seq[Sequ
 
 class SequenceItem(
   var content:VHtmlNode,
-  override val key: Option[String] = None,
   val readyForward: () => Boolean = { () => true },
   val enableForward: () => Boolean = { () => true },
   val readyBack: () => Boolean = { () => true },
   val enableBack: () => Boolean = { () => true },
   val showFootBox: () => Boolean = { () => true }
-) extends VHtmlComponent {
+) {
 
   var active:Boolean = false
-
-  override protected def render: VHtmlDiffNode = <.div(
-    ^.cls := "v-slide",
-    content
-  )
 
 }
 
