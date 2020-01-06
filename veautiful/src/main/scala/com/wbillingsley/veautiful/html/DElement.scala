@@ -148,17 +148,9 @@ case class DElement(name:String, uniqEl:Any = "", ns:String = DElement.htmlNS) e
     this
   }
 
-  def applyAppliable(a: <.DElAppliable) = a match {
-    case attr: <.DEAAttr => attrs(attr.a)
-    case p: <.DEAProp => prop(p.a)
-    case l: <.DEALstnr => on(l.l)
-    case s: <.DEAStyle => style(s.s)
-    case n: <.DEAVNode => addChildren(n.vNode)
-    case nodes: <.DEAIVNode => addChildren(nodes.nodes.toSeq : _*)
-  }
-
   def apply(ac: <.DElAppliable *):DElement = {
-    ac.foldLeft(this)({ case (x, y) => x.applyAppliable(y) })
+    ac.foreach(_.applyTo(this))
+    this
   }
 
   def on(l: Lstnr *) = {
@@ -218,15 +210,41 @@ case class Text(text:String) extends VNode[dom.Node] {
 
 object < {
 
-  trait DElAppliable
-  implicit class DEAVNode(val vNode: VNode[dom.Node]) extends DElAppliable
-  implicit class DEAIVNode(val nodes: Iterable[VNode[dom.Node]]) extends DElAppliable
-  implicit class DEAAttr(val a: AttrVal) extends DElAppliable
-  implicit class DEAProp(val a: PropVal) extends DElAppliable
-  implicit class DEALstnr(val l: Lstnr) extends DElAppliable
-  implicit class DEAStyle(val s:InlineStyle) extends DElAppliable
-  implicit def DEAText(t: String):DElAppliable = new DEAVNode(Text(t))
+  trait DElAppliable {
+    def applyTo(d:DElement):Unit
+  }
 
+  implicit class DEAVNode(val vNode: VNode[dom.Node]) extends DElAppliable {
+    override def applyTo(d: DElement): Unit = d.addChildren(vNode)
+  }
+
+  implicit class DEAIVNode(val nodes: Iterable[VNode[dom.Node]]) extends DElAppliable {
+    override def applyTo(d: DElement):Unit = d.addChildren(nodes.toSeq:_*)
+  }
+
+  implicit class DEAAttr(val a: AttrVal) extends DElAppliable {
+    override def applyTo(d: DElement): Unit = d.attrs(a)
+  }
+
+  implicit class DEAProp(val a: PropVal) extends DElAppliable {
+    override def applyTo(d: DElement): Unit = d.prop(a)
+  }
+
+  implicit class DEALstnr(val l: Lstnr) extends DElAppliable {
+    override def applyTo(d: DElement): Unit = d.on(l)
+  }
+
+  implicit class DEAStyle(val s:InlineStyle) extends DElAppliable {
+    override def applyTo(d: DElement): Unit = d.style(s)
+  }
+
+  implicit class DEAText(t: String) extends DElAppliable {
+    override def applyTo(d: DElement): Unit = d.addChildren(Text(t))
+  }
+
+  implicit class DEAOption[T](opt:Option[T])(implicit ev: T => DElAppliable) extends DElAppliable {
+    override def applyTo(d: DElement): Unit = opt.foreach(_.applyTo(d))
+  }
 
   def p = apply("p")
   def div = apply("div")
@@ -291,6 +309,8 @@ object ^ {
     def :=(i:Int) = AttrVal(n, i.toString)
 
     def :=(d:Double) = AttrVal(n, d.toString)
+
+    def ?=(o:Option[String]) = o.map(:=)
   }
 
   case class Propable(n:String) {
