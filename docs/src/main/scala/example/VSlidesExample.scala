@@ -18,7 +18,14 @@ object VSlidesExample {
           <.p("Here's some text on slide 2")
         ),
         Diffusion.SimulationView,
-        ScatterExample.scatterCanvas
+        ScatterExample.scatterCanvas,
+        <.div(
+          <("iframe")(
+            ^.attr("width") :="1280", ^.attr("height") := "720", ^.src := "https://www.youtube.com/embed/0bcvcJwUE-8",
+            ^.attr("frameborder") := "0", ^.attr("allow") :="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture",
+            ^.attr("allowfullscreen") := "allowfullscreen")
+        )
+
       ), i
 
     ))

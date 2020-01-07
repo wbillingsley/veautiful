@@ -2,6 +2,7 @@ package com.wbillingsley.veautiful.templates
 
 import com.wbillingsley.veautiful._
 import com.wbillingsley.veautiful.html.{<, VHtmlComponent, VHtmlDiffNode, VHtmlNode, ^}
+import com.wbillingsley.veautiful.templates.Sequencer.LayoutFunc
 
 object Sequencer {
 
@@ -17,7 +18,6 @@ object Sequencer {
 
   def defaultLayout:LayoutFunc = { case (sequencer, s, _) =>
     <.div(
-      ^.cls := "v-slide",
       s.content,
       sequencer.footBox
     )
@@ -25,6 +25,15 @@ object Sequencer {
 
 }
 
+/**
+  * A Sequencer renders a series of nodes into the page, styling one of them to be active.
+  * If, in stead, you only want the active element to be present in the dom, just render nodes(i).
+  *
+  * @param key
+  * @param layout
+  * @param nodes
+  * @param index
+  */
 case class Sequencer(override val key:Option[String] = None, layout:Sequencer.LayoutFunc = Sequencer.defaultLayout)(var nodes: Seq[SequenceItem], var index:Int = 0) extends VHtmlComponent with MakeItSo {
 
   def next():Unit = {
@@ -59,7 +68,10 @@ case class Sequencer(override val key:Option[String] = None, layout:Sequencer.La
         (n, i) <- nodes.zipWithIndex
       } yield <.div(
         ^.cls := (if (index == i) "v-sequencer-slide active" else "v-sequencer-slide inactive"),
-        layout(this, n, i)
+        n.layoutOverride match {
+          case Some(lo) => lo(this, n, i)
+          case _ => layout(this, n, i)
+        }
       )
     )
   )
@@ -75,15 +87,9 @@ case class Sequencer(override val key:Option[String] = None, layout:Sequencer.La
 
 class SequenceItem(
   var content:VHtmlNode,
-  val readyForward: () => Boolean = { () => true },
-  val enableForward: () => Boolean = { () => true },
-  val readyBack: () => Boolean = { () => true },
-  val enableBack: () => Boolean = { () => true },
-  val showFootBox: () => Boolean = { () => true }
+  val layoutOverride: Option[LayoutFunc] = None
 ) {
-
   var active:Boolean = false
-
 }
 
 object SequenceItem {

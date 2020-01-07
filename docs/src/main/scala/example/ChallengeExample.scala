@@ -12,18 +12,15 @@ object ChallengeExample {
   val challenge = new Challenge(
     Seq(
       new Level("Intro", Seq(
-        VideoStage("CircuitsVid")
+        VideoStage("CircuitsVid"),
+        VideoStage("Another video")
       ))
-
-    ),
-    <.div("challenge!"),
-    readyNext = false
+    )
   )
 
-  def page:VHtmlNode =  Common.layout(<.div(^.cls := "row",
+  def page(l:Int, s:Int):VHtmlNode =  Common.layout(<.div(^.cls := "row",
     <.div(^.cls := "col", <.div(^.cls := "resizable",
-      challenge
-
+      challenge.show(l, s)
     ))
   ))
 

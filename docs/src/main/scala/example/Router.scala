@@ -29,7 +29,7 @@ object Router extends HistoryRouter[ExampleRoute] {
       case VSlidesRoute(i) => VSlidesExample.page(i)
       case ScatterRoute => ScatterExample.page
       case WrenRoute => WrenExample.page
-      case ChallengeRoute(_, _) => ChallengeExample.page
+      case ChallengeRoute(l, s) => ChallengeExample.page(l, s)
       case AssemblyRoute => AssemblyExample.page
     }
   }
@@ -70,7 +70,7 @@ object Router extends HistoryRouter[ExampleRoute] {
     case Array("scatter") => ScatterRoute
     case Array("wren") => WrenRoute
     case Array("assembly") => AssemblyRoute
-    case Array("challenge", i, j) => ChallengeRoute(parseInt(i, 0), parseInt(i, 0))
+    case Array("challenge", i, j) => ChallengeRoute(parseInt(i, 0), parseInt(j, 0))
     case x =>
       println(s"path was ${x}")
       IntroRoute

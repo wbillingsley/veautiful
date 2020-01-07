@@ -1,11 +1,24 @@
 package com.wbillingsley.veautiful.templates
 
 import com.wbillingsley.veautiful.html.{<, VHtmlComponent, VHtmlDiffNode, VHtmlNode, ^}
-import com.wbillingsley.veautiful.{MakeItSo}
+import com.wbillingsley.veautiful.MakeItSo
+import com.wbillingsley.veautiful.templates.Sequencer.LayoutFunc
 import org.scalajs.dom
 import org.scalajs.dom.raw.{Event, HTMLElement}
 
-case class VSlides(width: Int, height: Int, override val key: Option[String] = None, layout:Sequencer.LayoutFunc = Sequencer.defaultLayout)(var content:Seq[SequenceItem], var index:Int = 0) extends VHtmlComponent with MakeItSo {
+object VSlides {
+
+  def defaultLayout:LayoutFunc = { case (sequencer, s, _) =>
+    <.div(
+      ^.cls := "v-slide",
+      s.content,
+      sequencer.footBox
+    )
+  }
+
+}
+
+case class VSlides(width: Int, height: Int, override val key: Option[String] = None, layout:Sequencer.LayoutFunc = VSlides.defaultLayout)(var content:Seq[SequenceItem], var index:Int = 0) extends VHtmlComponent with MakeItSo {
 
   var scale:Double = 1
   var top:Double = 0
@@ -35,11 +48,6 @@ case class VSlides(width: Int, height: Int, override val key: Option[String] = N
     dom.window.removeEventListener("resize", rescaleEventListener)
   }
 
-  def slide(n:VHtmlNode) = <.div(^.cls := "vslide",
-    n
-  )
-
-
   override def render: VHtmlDiffNode = {
     rescale()
 
@@ -57,5 +65,10 @@ case class VSlides(width: Int, height: Int, override val key: Option[String] = N
       content = v.content
       index = v.index
       rerender()
+  }
+
+  def atSlide(i:Int):VSlides = {
+    index = i
+    this
   }
 }

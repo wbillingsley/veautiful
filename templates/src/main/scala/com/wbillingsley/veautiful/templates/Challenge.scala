@@ -2,6 +2,7 @@ package com.wbillingsley.veautiful.templates
 
 import com.wbillingsley.veautiful.html.<.DElAppliable
 import com.wbillingsley.veautiful.html.{<, DElement, VHtmlComponent, VHtmlNode, ^}
+import com.wbillingsley.veautiful.templates.Sequencer.LayoutFunc
 
 /**
   * Layout based on the one that is used for Escape the Lava Maze
@@ -75,7 +76,7 @@ object Challenge {
 
     val kind = "video"
 
-    def render = <.div("This will be a video")
+    def render = <.div(yt)
   }
 
   case class Level(name:String, stages:Seq[Stage])
@@ -88,11 +89,11 @@ object Challenge {
 }
 
 class Challenge(levels: Seq[Challenge.Level],
-                 header: => VHtmlNode = <.div(),
-                 tr: => VHtmlNode = <.div(),
-                 progressBlock: => VHtmlNode = <.div(),
-                 pageControls: (Boolean) => VHtmlNode = _ => <.div(),
-                 readyNext: => Boolean) extends VHtmlComponent {
+                header: => VHtmlNode = <.div("Header"),
+                tr: => VHtmlNode = <.div("Top-Right"),
+                progressBlock: => VHtmlNode = <.div("Progress Block"),
+                pageControls: LayoutFunc = (_, _, _) => <.div("Page Controls")
+               ) extends VHtmlComponent {
 
   var level:Int = 0
   var stage:Int = 0
@@ -104,28 +105,20 @@ class Challenge(levels: Seq[Challenge.Level],
   }
 
   def elements = {
-    for {
-      l <- levels
-      s <- l.stages
-    } yield s
+    levels(level).stages
   }
 
   def layout(s:Sequencer, si:SequenceItem, i:Int):VHtmlNode = {
     Challenge.challengeLayout(
-      <.div("This is my header"),
-      <.div("Top right"),
-      <.div("progress block"),
-      (_) => <.div("Page controls"),
-      true
+      header, tr, progressBlock, (x:Boolean) => <.div(), false
     )(si.content)
   }
 
   def render = {
-    /*<.div(^.attr("id") := "challenge-element",
-      ScaleToFit(1920, 1080)(levels(level).stages(stage))
-    )*/
+    println(s"Stage $stage")
+
     <.div(
-      VSlides(1920, 1080, layout=layout)(elements)
+      VSlides(1920, 1080, layout=layout)(elements).atSlide(stage)
     )
   }
 
