@@ -68,7 +68,7 @@ object Challenge {
 
   def defaultHeader(homePath:HomePath, homeIcon: => VHtmlNode) = { c:Challenge =>
     <.div(
-      <.a(^.cls := "home-link", ^.href := homePath(c), <.span(^.cls := "material-icons", <("i")("home"))),
+      <.a(^.cls := "home-link", ^.href := homePath(c), <("i")(^.cls := "material-icons", "home")),
       <.span(^.cls := "challenge-name", c.levels(c.level).name)
     )
   }
@@ -76,13 +76,20 @@ object Challenge {
   def defaultTopRight() = { c:Challenge => <.div() }
 
   def progressTile(level:Level, i:Int, levelPath: LevelPath, stagePath: StagePath) = { c:Challenge =>
-  <.div(^.cls := "progress-level",
-      <.div(^.cls := "level-name", level.name),
+
+    def levelActive = c.level == i
+
+    def stageActive(j:Int) = c.level == i && c.stage == j
+
+    <.div(^.cls := (if (levelActive) "progress-level level-active" else "progress-level"),
+      <.div(^.cls := "level-name",
+        <.a(^.href := levelPath(c, i), level.name)
+      ),
       <.div(^.cls := "stage-links",
         for {
           (s, j) <- level.stages.zipWithIndex
         } yield {
-          <.a(^.cls := "stage-link", ^.href := stagePath(c, i, j),
+          <.a(^.cls := (if (stageActive(j)) "stage-link stage-active" else "stage-link"), ^.href := stagePath(c, i, j),
             <("i")(^.cls := "material-icons",
               s.kind match {
                 case "video" => "videocam"
