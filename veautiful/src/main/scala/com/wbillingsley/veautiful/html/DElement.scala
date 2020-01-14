@@ -290,6 +290,8 @@ object SVG {
 
   def text = <.apply("text", ns=DElement.svgNS)
 
+  def tspan = <.apply("tspan", ns=DElement.svgNS)
+
   def g = <.apply("g", ns=DElement.svgNS)
 
   def path = <.apply("path", ns=DElement.svgNS)
