@@ -175,7 +175,7 @@ class Challenge(val levels: Seq[Challenge.Level],
 
   def render = {
     <.div(
-      VSlides(1920, 1080, layout=layout)(elements).atSlide(stage)
+      VSlides(1920, 1080)(elements, layout=layout).atSlide(stage)
     )
   }
 

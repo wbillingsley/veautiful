@@ -34,7 +34,7 @@ object Sequencer {
   * @param nodes
   * @param index
   */
-case class Sequencer(override val key:Option[String] = None, layout:Sequencer.LayoutFunc = Sequencer.defaultLayout)(var nodes: Seq[SequenceItem], var index:Int = 0) extends VHtmlComponent with MakeItSo {
+case class Sequencer(override val key:Option[String] = None)(var nodes: Seq[SequenceItem], var index:Int = 0, var layout:Sequencer.LayoutFunc = Sequencer.defaultLayout) extends VHtmlComponent with MakeItSo {
 
   def next():Unit = {
     if (index < nodes.size - 1) {
@@ -80,6 +80,7 @@ case class Sequencer(override val key:Option[String] = None, layout:Sequencer.La
     case s:Sequencer =>
       nodes = s.nodes
       index = s.index
+      layout = s.layout
       rerender()
   }
 }
