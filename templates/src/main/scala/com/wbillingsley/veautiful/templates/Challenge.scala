@@ -66,7 +66,9 @@ object Challenge {
   type LevelPath = (Challenge, Int) => String
   type StagePath = (Challenge, Int, Int) => String
 
-  def defaultHeader(homePath:HomePath, homeIcon: => VHtmlNode = <("i")(^.cls := "material-icons", "home")) = { c:Challenge =>
+  def defaultHomeIcon:DElement = <("i")(^.cls := "material-icons", "home")
+
+  def defaultHeader(homePath:HomePath, homeIcon: => VHtmlNode = defaultHomeIcon) = { c:Challenge =>
     <.div(
       <.a(^.cls := "home-link", ^.href := homePath(c), homeIcon),
       <.span(^.cls := "challenge-name", c.levels(c.level).name)
@@ -121,7 +123,7 @@ object Challenge {
     )
   }
 
-  def apply(levels: Seq[Challenge.Level], homePath: HomePath, homeIcon: => VHtmlNode, levelPath: LevelPath, stagePath: StagePath) = {
+  def apply(levels: Seq[Challenge.Level], homePath: HomePath, levelPath: LevelPath, stagePath: StagePath, homeIcon: => VHtmlNode = defaultHomeIcon) = {
     new Challenge(levels,
       defaultHeader(homePath, homeIcon),
       defaultTopRight(),
