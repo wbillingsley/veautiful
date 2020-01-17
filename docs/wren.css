@@ -34,3 +34,13 @@ text.right {
 text.middle {
     text-anchor: middle;
 }
+
+.current-arrow {
+    stroke: black;
+    fill: none;
+}
+
+.voltage-markers {
+    text-anchor: middle;
+    dominant-baseline: middle;
+}

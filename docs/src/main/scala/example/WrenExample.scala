@@ -23,8 +23,8 @@ object WrenExample {
       new ValueLabel("R" -> "2", r2.resistance, (330, 200)),
       new ValueSlider(r2.resistance, (330, 210), min = "0.25", max = "47000", onUpdate = onUpdate),
       new ValueLabel("V" -> "1", r1.voltage, (250, 100), "right"),
-      new ValueLabel("V" -> "2", r2.voltage, (250, 200), "right"),
-      new ValueLabel("I" -> "1", r1.t1.current, (100, 10), "middle")
+      new ValueLabel("V" -> "2", r2.voltage, (250, 200), "right", symbol = Seq(ValueLabel.voltageMarkers(280 -> 170, 280 -> 230))),
+      new ValueLabel("I" -> "1", r1.t1.current, (150, 10), "middle", symbol = Seq(ValueLabel.currentArrow((140, 30), Orientation.East)))
     ),
     640, 480
   )
