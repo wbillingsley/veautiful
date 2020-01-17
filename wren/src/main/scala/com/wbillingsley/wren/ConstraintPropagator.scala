@@ -21,7 +21,7 @@ class Value(val units:String, var value:Option[(Double, Provenance)] = None) {
     else if (d >= 1000) (d / 1000, "k")
     else if (d >= 1) (d, "")
     else if (d >= 0.001) (d * 1000, "m")
-    else if (d >= 0.000001) (d * 1000000, "u")
+    else if (d >= 0.000001) (d * 1000000, "μ")
     else if (d >= 0.000000001) (d * 1000000000, "n")
     else (d, "")
   }

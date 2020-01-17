@@ -5,7 +5,7 @@ import org.scalajs.dom.raw.HTMLInputElement
 
 import scala.util.Random
 
-class ValueSlider(v:Value, pos:(Int, Int), orientation: Orientation = Orientation.East, values:Seq[String], onUpdate: () => Unit) extends Component {
+class ValueSlider(v:Value, pos:(Int, Int), orientation: Orientation = Orientation.East, min:String = "1", max:String, values:Seq[String]  = Seq.empty, onUpdate: () => Unit) extends Component {
 
   val id = Random.nextString(5)
 
@@ -20,6 +20,8 @@ class ValueSlider(v:Value, pos:(Int, Int), orientation: Orientation = Orientatio
 
   val slider = <.input(
     ^.attr("type") := "range",
+    ^.attr("min") := min,
+    ^.attr("max") := max,
     ^.attr("list") := id,
     ^.on("input") ==> updateValue
   )
