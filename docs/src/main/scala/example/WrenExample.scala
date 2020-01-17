@@ -16,15 +16,15 @@ object WrenExample {
       new Wire(vs.t2, r1.t1, 100 -> 50, 300 -> 50),
       new Wire(r1.t2, r2.t1),
       new Wire(r2.t2, vs.t1, 300 -> 300, 100 -> 300),
-      new ValueLabel(vs.voltage, (30, 150)),
+      new ValueLabel("V" -> "cc", vs.voltage, (30, 150)),
       new ValueSlider(vs.voltage, (0, 160), values = Seq("1", "2", "3", "4", "5"), onUpdate = onUpdate),
-      new ValueLabel(r1.resistance, (330, 100)),
+      new ValueLabel("R" -> "1", r1.resistance, (330, 100)),
       new ValueSlider(r1.resistance, (330, 110), values = Seq("1", "2", "3", "4", "5"), onUpdate = onUpdate),
-      new ValueLabel(r2.resistance, (330, 200)),
+      new ValueLabel("R" -> "2", r2.resistance, (330, 200)),
       new ValueSlider(r2.resistance, (330, 210), values = Seq("1", "2", "3", "4", "5"), onUpdate = onUpdate),
-      new ValueLabel(r1.voltage, (250, 100)),
-      new ValueLabel(r2.voltage, (250, 200)),
-      new ValueLabel(r1.t1.current, (100, 10))
+      new ValueLabel("V" -> "1", r1.voltage, (250, 100), "right"),
+      new ValueLabel("V" -> "2", r2.voltage, (250, 200), "right"),
+      new ValueLabel("I" -> "1", r1.t1.current, (100, 10), "middle")
     ),
     640, 480
   )

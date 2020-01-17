@@ -26,3 +26,11 @@
     fill: black;
     r: 2;
 }
+
+text.right {
+    text-anchor: end;
+}
+
+text.middle {
+    text-anchor: middle;
+}
