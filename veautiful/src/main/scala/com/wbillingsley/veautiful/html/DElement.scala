@@ -336,7 +336,6 @@ object ^ {
     def -->(e: => Unit ) = Lstnr(n, (x:Event) => e, false)
 
     def ==>(f: (Event) => Unit) = {
-      println(f)
       Lstnr(n, f, false)
     }
   }
