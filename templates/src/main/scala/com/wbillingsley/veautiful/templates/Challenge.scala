@@ -55,12 +55,20 @@ object Challenge {
     def render = <.div(yt)
   }
 
-  case class Level(name:String, stages:Seq[Stage])
+  case class Level(name:String, stages:Seq[Stage]) 
 
-  sealed trait Completion
-  case object Open extends Completion
-  case object Incomplete extends Completion
-  case class Complete(mark:Option[Double], medal:Option[String]) extends Completion
+  sealed trait Completion {
+    def cssClass:String
+  }
+  case object Open extends Completion {
+    val cssClass = "open"
+  }
+  case object Incomplete extends Completion {
+    val cssClass = "incomplete"
+  }
+  case class Complete(mark:Option[Double], medal:Option[String]) extends Completion {
+    def cssClass = "complete " + medal.getOrElse("")
+  }
 
   type HomePath = (Challenge) => String
   type LevelPath = (Challenge, Int) => String
@@ -91,7 +99,8 @@ object Challenge {
         for {
           (s, j) <- level.stages.zipWithIndex
         } yield {
-          <.a(^.cls := (if (stageActive(j)) "stage-link stage-active" else "stage-link"), ^.href := stagePath(c, i, j),
+          <.a(^.cls :=
+            s"stage-link ${if (stageActive(j)) "stage-active" else ""} ${s.completion.cssClass}", ^.href := stagePath(c, i, j),
             <("i")(^.cls := "material-icons",
               s.kind match {
                 case "video" => "videocam"
