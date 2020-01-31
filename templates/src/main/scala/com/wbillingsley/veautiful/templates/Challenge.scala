@@ -154,7 +154,7 @@ class Challenge(val levels: Seq[Challenge.Level],
 
   def previous:Option[(Int, Int)] = {
     if (level <= 0 && stage <= 0) None else Some(
-      if (stage > 0) (level, stage - 1) else (level, levels(level).stages.length - 1)
+      if (stage > 0) (level, stage - 1) else (level - 1, levels(level - 1).stages.length - 1)
     )
   }
 
