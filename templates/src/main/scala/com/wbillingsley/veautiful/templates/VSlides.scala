@@ -20,7 +20,7 @@ object VSlides {
 
 }
 
-case class VSlides(width: Int, height: Int, override val key: Option[String] = None)(var content:Seq[SequenceItem], var index:Int = 0, var layout:Sequencer.LayoutFunc = VSlides.defaultLayout) extends VHtmlComponent with MakeItSo {
+case class VSlides(width: Int, height: Int, override val key: Option[String] = None, scaleToWindow:Boolean = true)(var content:Seq[SequenceItem], var index:Int = 0, var layout:Sequencer.LayoutFunc = VSlides.defaultLayout) extends VHtmlComponent with MakeItSo {
 
   var scale:Double = 1
   var top:Double = 0
@@ -54,8 +54,13 @@ case class VSlides(width: Int, height: Int, override val key: Option[String] = N
   override def render: VHtmlDiffNode = {
     rescale()
 
-    <.div(^.cls := "vslides-top",
-      <.div(^.cls := "vslides-scaler", ^.attr("style") := s"transform: scale($scale); width: ${width}px; height: ${height}px; top: ${top}px; left: ${left}px; ",
+    <.div(^.cls := (if (scaleToWindow) "vslides-top scaled" else "vslides-top unscaled"),
+      <.div(^.cls := (if (scaleToWindow) "vslides-scaler scaled" else "vslides-scaler unscaled"),
+        ^.attr("style") := (if (scaleToWindow) {
+          s"transform: scale($scale); width: ${width}px; height: ${height}px; top: ${top}px; left: ${left}px; "
+        } else {
+          s"width: ${width}px; height: ${height}px; "
+        }),
         Sequencer()(
           content, index, layout = layout
         )

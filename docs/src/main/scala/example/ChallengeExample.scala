@@ -18,14 +18,12 @@ object ChallengeExample {
     ),
     homePath = { _ => Router.path(IntroRoute) },
     levelPath = { (c, l) => Router.path(ChallengeRoute(l, 0)) },
-    stagePath = { (c, l, s) => Router.path(ChallengeRoute(l, s)) }
+    stagePath = { (c, l, s) => Router.path(ChallengeRoute(l, s)) },
+    scaleToWindow = false
   )
 
-  def page(l:Int, s:Int):VHtmlNode =  Common.layout(<.div(^.cls := "row",
-    <.div(^.cls := "col", <.div(^.cls := "resizable",
+  def page(l:Int, s:Int):VHtmlNode =
       challenge.show(l, s)
-    ))
-  ))
 
 
 

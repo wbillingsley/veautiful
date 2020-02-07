@@ -132,12 +132,13 @@ object Challenge {
     )
   }
 
-  def apply(levels: Seq[Challenge.Level], homePath: HomePath, levelPath: LevelPath, stagePath: StagePath, homeIcon: => VHtmlNode = defaultHomeIcon) = {
+  def apply(levels: Seq[Challenge.Level], homePath: HomePath, levelPath: LevelPath, stagePath: StagePath, homeIcon: => VHtmlNode = defaultHomeIcon, scaleToWindow:Boolean = true) = {
     new Challenge(levels,
       defaultHeader(homePath, homeIcon),
       defaultTopRight(),
       defaultProgressBlock(levels, levelPath, stagePath),
-      defaultPageControls(levels, levelPath, stagePath)
+      defaultPageControls(levels, levelPath, stagePath),
+      scaleToWindow
     )
   }
 }
@@ -146,7 +147,8 @@ class Challenge(val levels: Seq[Challenge.Level],
                 val header: (Challenge) => VHtmlNode,
                 val tr: (Challenge) => VHtmlNode,
                 val progressBlock: (Challenge) => VHtmlNode,
-                val pageControls: (Challenge) => VHtmlNode
+                val pageControls: (Challenge) => VHtmlNode,
+                scaleToWindow:Boolean = true
                ) extends VHtmlComponent {
 
   var level:Int = 0
@@ -186,7 +188,7 @@ class Challenge(val levels: Seq[Challenge.Level],
 
   def render = {
     <.div(
-      VSlides(1920, 1080)(elements, layout=layout).atSlide(stage)
+      VSlides(1920, 1080, scaleToWindow=scaleToWindow)(elements, layout=layout).atSlide(stage)
     )
   }
 

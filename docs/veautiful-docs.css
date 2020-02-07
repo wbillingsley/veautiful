@@ -18,6 +18,9 @@
     background: #d7d8d2;
     overflow: hidden;
 }
+.vslides-top.unscaled {
+    overflow: inherit;
+}
 
 .vslides-top .vslides-scaler {
     transform-origin: top left;
