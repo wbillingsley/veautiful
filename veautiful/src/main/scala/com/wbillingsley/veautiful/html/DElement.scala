@@ -3,6 +3,7 @@ package com.wbillingsley.veautiful.html
 import com.wbillingsley.veautiful.{DefaultNodeOps, DiffNode, NodeOps, VNode}
 import org.scalajs.dom
 import org.scalajs.dom.{Event, Node, html}
+import html.Div
 
 import scala.scalajs.js
 
@@ -17,7 +18,7 @@ object DElement {
   val htmlNS = "http://www.w3.org/1999/xhtml"
   val svgNS = "http://www.w3.org/2000/svg"
 }
-case class DElement(name:String, uniqEl:Any = "", ns:String = DElement.htmlNS) extends DiffNode[dom.Element, dom.Node] {
+case class DElement[+T <: dom.Element](name:String, uniqEl:Any = "", ns:String = DElement.htmlNS) extends DiffNode[T, dom.Node] {
 
   var attributes:Map[String, AttrVal] = Map.empty
 
@@ -27,12 +28,21 @@ case class DElement(name:String, uniqEl:Any = "", ns:String = DElement.htmlNS) e
 
   var styles:Seq[InlineStyle] = Seq.empty
 
-  override var domNode:Option[dom.Element] = None
+  private[this] var _domNode:Option[T] = None
+  def domNode = _domNode
+
+  override def attachSelf():T = {
+    val n = create()
+    _domNode = Some(n)
+    n
+  }
+
+  override def detachSelf():Unit = {
+    _domNode = None
+  }
 
   // TODO: Improve this API
   override def key: Option[Any] = if (uniqEl == "") None else Some(uniqEl)
-
-  def domEl = domNode.collect({ case e:dom.Element => e })
 
   /**
     * In DOM Events, it is very difficult to de-register an anonymous listener.
@@ -47,11 +57,11 @@ case class DElement(name:String, uniqEl:Any = "", ns:String = DElement.htmlNS) e
     } h.func.apply(e)
   }
 
-  val updateSelf = {
-    case el:DElement =>
+  def updateSelf = {
+    case el:DElement[T] =>
 
       // Update attributes
-      for { n <- domEl } {
+      for { n <- domNode } {
 
         for {
           (k, _) <- attributes if !el.attributes.contains(k)
@@ -83,7 +93,7 @@ case class DElement(name:String, uniqEl:Any = "", ns:String = DElement.htmlNS) e
 
   def applyPropsToNode(props:Iterable[PropVal]):Unit = {
     for {
-      n <- domEl
+      n <- domNode
       p <- props
     } {
       n.asInstanceOf[js.Dynamic].updateDynamic(p.name)(p.value)
@@ -91,25 +101,25 @@ case class DElement(name:String, uniqEl:Any = "", ns:String = DElement.htmlNS) e
   }
 
   def applyAttrsToNode(as:Iterable[AttrVal]):Unit = {
-    for { n <- domEl; a <- as } {
+    for { n <- domNode; a <- as } {
       n.setAttribute(a.name, a.value)
     }
   }
 
   def removeAttrsFromNode(as:Iterable[AttrVal]):Unit = {
-    for { n <- domEl; a <- as } {
+    for { n <- domNode; a <- as } {
       n.removeAttribute(a.name)
     }
   }
 
   def applyLsntrsToNode(as:Iterable[Lstnr]):Unit = {
-    for { n <- domEl; a <- as } {
+    for { n <- domNode; a <- as } {
       n.addEventListener(a.`type`, eventDispatch, false)
     }
   }
 
   def removeLsntrsFromNode(as:Iterable[Lstnr]):Unit = {
-    for { n <- domEl; a <- as } {
+    for { n <- domNode; a <- as } {
       n.removeEventListener(a.`type`, eventDispatch, false)
     }
   }
@@ -120,14 +130,14 @@ case class DElement(name:String, uniqEl:Any = "", ns:String = DElement.htmlNS) e
   }
 
   def applyStylesToNode(as:Iterable[InlineStyle]):Unit = {
-    domEl match {
+    domNode match {
       case Some(h:html.Element) => as.foreach({x => h.style.setProperty(x.name, x.value) })
       case _ => // nothing
     }
   }
 
   def removeStylesFromNode(as:Iterable[InlineStyle]):Unit = {
-    domEl match {
+    domNode match {
       case Some(h:html.Element) => as.foreach({x => h.style.removeProperty(x.name) })
       case _ => // nothing
     }
@@ -138,17 +148,17 @@ case class DElement(name:String, uniqEl:Any = "", ns:String = DElement.htmlNS) e
     this
   }
 
-  def prop(a:PropVal):DElement = {
+  def prop(a:PropVal):DElement[T] = {
     properties += a.name -> a
     this
   }
 
-  def addChildren(ac:VNode[dom.Node]*):DElement = {
+  def addChildren(ac:VNode[dom.Node]*):DElement[T] = {
     children = children ++ ac
     this
   }
 
-  def apply(ac: <.DElAppliable *):DElement = {
+  def apply(ac: <.DElAppliable[T] *):DElement[T] = {
     ac.foreach(_.applyTo(this))
     this
   }
@@ -160,7 +170,7 @@ case class DElement(name:String, uniqEl:Any = "", ns:String = DElement.htmlNS) e
 
 
   def create() = {
-    val e = dom.document.createElementNS(ns, name)
+    val e = dom.document.createElementNS(ns, name).asInstanceOf[T]
 
     for { AttrVal(a, value) <- attributes.values } {
       e.setAttribute(a, value)
@@ -188,117 +198,109 @@ case class DElement(name:String, uniqEl:Any = "", ns:String = DElement.htmlNS) e
 
 }
 
-case class Text(text:String) extends VNode[dom.Node] {
-
-  var domNode:Option[dom.Node] = None
-
-  def create() = {
-    dom.document.createTextNode(text)
-  }
-
-  def attach() = {
-    val n = create()
-    domNode = Some(n)
-    n
-  }
-
-  def detach() = {
-    domNode = None
-  }
-
-}
 
 object < {
 
-  trait DElAppliable {
-    def applyTo(d:DElement):Unit
+  type VHTMLElement = DElement[html.Element]
+  type VSVGElement = DElement[dom.svg.Element]
+  type VDOMElement = DElement[dom.Element]
+
+
+  type HTMLAppliable = DElAppliable[html.Element]
+  type SVGAppliable = DElAppliable[dom.svg.Element]
+
+  trait DElAppliable[-T <: dom.Element] {
+    def applyTo[TT <: T](d:DElement[TT]):Unit
   }
 
-  implicit class DEAVNode(val vNode: VNode[dom.Node]) extends DElAppliable {
-    override def applyTo(d: DElement): Unit = d.addChildren(vNode)
+  implicit class DEAVNode(val vNode: VNode[dom.Node]) extends DElAppliable[dom.Element] {
+    override def applyTo[T <: dom.Element](d: DElement[T]): Unit = d.addChildren(vNode)
   }
 
-  implicit class DEAIVNode(val nodes: Iterable[VNode[dom.Node]]) extends DElAppliable {
-    override def applyTo(d: DElement):Unit = d.addChildren(nodes.toSeq:_*)
+  implicit class DEAIVNode(val nodes: Iterable[VNode[dom.Node]]) extends DElAppliable[dom.Element] {
+    override def applyTo[T <: dom.Element](d: DElement[T]):Unit = d.addChildren(nodes.toSeq:_*)
   }
 
-  implicit class DEAAttr(val a: AttrVal) extends DElAppliable {
-    override def applyTo(d: DElement): Unit = d.attrs(a)
+  implicit class DEAAttr(val a: AttrVal) extends DElAppliable[dom.Element] {
+    override def applyTo[T <: dom.Element](d: DElement[T]): Unit = d.attrs(a)
   }
 
-  implicit class DEAProp(val a: PropVal) extends DElAppliable {
-    override def applyTo(d: DElement): Unit = d.prop(a)
+  implicit class DEAProp(val a: PropVal) extends DElAppliable[dom.Element] {
+    override def applyTo[T <: dom.Element](d: DElement[T]): Unit = d.prop(a)
   }
 
-  implicit class DEALstnr(val l: Lstnr) extends DElAppliable {
-    override def applyTo(d: DElement): Unit = d.on(l)
+  implicit class DEALstnr(val l: Lstnr) extends DElAppliable[dom.Element] {
+    override def applyTo[T <: dom.Element](d: DElement[T]): Unit = d.on(l)
   }
 
-  implicit class DEAStyle(val s:InlineStyle) extends DElAppliable {
-    override def applyTo(d: DElement): Unit = d.style(s)
+  implicit class DEAStyle(val s:InlineStyle) extends DElAppliable[html.Element] {
+    override def applyTo[T <: dom.Element](d: DElement[T]): Unit = d.style(s)
   }
 
-  implicit class DEAText(t: String) extends DElAppliable {
-    override def applyTo(d: DElement): Unit = d.addChildren(Text(t))
+  implicit class DEAText(t: String) extends DElAppliable[dom.Element] {
+    override def applyTo[T <: dom.Element](d: DElement[T]): Unit = d.addChildren(Text(t))
   }
 
-  implicit class DEAOption[T](opt:Option[T])(implicit ev: T => DElAppliable) extends DElAppliable {
-    override def applyTo(d: DElement): Unit = opt.foreach(_.applyTo(d))
+  implicit class DEAOption[T, E <: dom.Element](opt:Option[T])(implicit ev: T => DElAppliable[E]) extends DElAppliable[E] {
+    override def applyTo[TT <: E](d: DElement[TT]): Unit = opt.foreach(ev(_).applyTo(d))
   }
 
-  def p = apply("p")
-  def div = apply("div")
-  def img = apply("img")
-  def a = apply("a")
-  def span = apply("span")
-  def h1 = apply("h1")
-  def h2 = apply("h2")
-  def h3 = apply("h3")
-  def h4 = apply("h4")
+  def p = applyT[html.Paragraph]("p")
+  def div = applyT[html.Div]("div")
+  def img = applyT[html.Image]("img")
+  def a = applyT[html.Anchor]("a")
+  def span = applyT[html.Span]("span")
+  def h1 = applyT[html.Heading]("h1")
+  def h2 = applyT[html.Heading]("h2")
+  def h3 = applyT[html.Heading]("h3")
+  def h4 = applyT[html.Heading]("h4")
 
-  def button = apply("button")
-  def input = apply("input")
-  def textarea = apply("textarea")
+  def button = applyT[html.Button]("button")
+  def input = applyT[html.Input]("input")
+  def textarea = applyT[html.TextArea]("textarea")
 
-  def ol = apply("ol")
-  def ul = apply("ul")
-  def li = apply("li")
+  def ol = applyT[html.OList]("ol")
+  def ul = applyT[html.UList]("ul")
+  def li = applyT[html.LI]("li")
 
-  def table = apply("table")
+  def table = applyT[html.Table]("table")
   def thead = apply("thead")
   def tbody = apply("tbody")
-  def tr = apply("tr")
-  def th = apply("th")
-  def td = apply("td")
+  def tr = applyT[html.TableRow]("tr")
+  def th = applyT[html.TableHeaderCell]("th")
+  def td = applyT[html.TableCell]("td")
 
-  def svg = apply("svg", ns=DElement.svgNS)
-  def circle = apply("circle", ns=DElement.svgNS)
-  def polygon = apply("polygon", ns=DElement.svgNS)
+  def svg = SVG.svg
 
+  def apply(n:String):VHTMLElement = DElement[html.Element](n, "", DElement.htmlNS)
 
-  def apply(n:String, u:String = "", ns:String = DElement.htmlNS) = DElement(n, u, ns)
+  def applyT[T <: dom.Element](n:String):DElement[T] = DElement[T](n, "", DElement.htmlNS)
+
+  def apply[T <: dom.Element](n:String, u:String = "", ns:String):DElement[T] = DElement[T](n, u, ns)
 
 }
 
 object SVG {
 
-  def apply(ac: <.DElAppliable *):DElement = <.apply("svg", ns=DElement.svgNS)(ac:_*)
+  def apply(ac: <.DElAppliable[dom.svg.Element] *):DElement[dom.svg.Element] = <.apply("svg", ns=DElement.svgNS)(ac:_*)
 
-  def circle = <.apply("circle", ns=DElement.svgNS)
+  def svg = <.apply[org.scalajs.dom.svg.SVG]("svg", ns=DElement.svgNS)
 
-  def polygon = <.apply("polygon", ns=DElement.svgNS)
+  def circle = <.apply[dom.svg.Circle]("circle", ns=DElement.svgNS)
 
-  def text = <.apply("text", ns=DElement.svgNS)
+  def polygon = <.apply[dom.svg.Polygon]("polygon", ns=DElement.svgNS)
 
-  def tspan = <.apply("tspan", ns=DElement.svgNS)
+  def text = <.apply[dom.svg.Text]("text", ns=DElement.svgNS)
 
-  def g = <.apply("g", ns=DElement.svgNS)
+  def tspan = <.apply[dom.svg.TSpan]("tspan", ns=DElement.svgNS)
 
-  def path = <.apply("path", ns=DElement.svgNS)
+  def g = <.apply[dom.svg.G]("g", ns=DElement.svgNS)
 
-  def rect = <.apply("rect", ns=DElement.svgNS)
+  def path = <.apply[dom.svg.Path]("path", ns=DElement.svgNS)
 
-  def foreignObject = <.apply("foreignObject", ns=DElement.svgNS)
+  def rect = <.apply[dom.svg.Element]("rect", ns=DElement.svgNS)
+
+  def foreignObject = <.apply[dom.svg.Element]("foreignObject", ns=DElement.svgNS)
 
 }
 

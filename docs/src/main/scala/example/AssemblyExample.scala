@@ -132,7 +132,7 @@ class CodeWidget(cols:Int = 40, rows:Int = 20) extends VHtmlComponent {
     (1 to (text + " ").linesIterator.size).mkString("\n")
   )
 
-  def text:String = ta.domEl.map({ case e:HTMLTextAreaElement => e.value }).getOrElse("")
+  def text:String = ta.domNode.map({ case e:HTMLTextAreaElement => e.value }).getOrElse("")
 
   override protected def render: VHtmlDiffNode = {
 

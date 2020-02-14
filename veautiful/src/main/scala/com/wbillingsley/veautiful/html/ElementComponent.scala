@@ -6,7 +6,7 @@ import org.scalajs.dom
 /*
  * A component that renders itself into the children of a fixed element
  */
-class ElementComponent(val el:DElement) extends VNode[dom.Node] {
+class ElementComponent[T <: dom.Element](val el:DElement[T]) extends VNode[dom.Node] {
 
   def domNode = el.domNode
 

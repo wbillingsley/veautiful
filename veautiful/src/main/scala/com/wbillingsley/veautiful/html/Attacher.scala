@@ -1,22 +1,38 @@
 package com.wbillingsley.veautiful.html
 
-import com.wbillingsley.veautiful.VNode
+import com.wbillingsley.veautiful.{DefaultNodeOps, DiffNode, NodeOps, VNode}
 import org.scalajs.dom
+import org.scalajs.dom.{Element, Node}
 
 object Attacher {
 
-  class RootNode(el:dom.Element) {
-    val root = DElement("root")
-    root.domNode = Some(el)
+  class RootNode(el:dom.Element) extends VHtmlDiffNode {
 
-    def render(e:VNode[dom.Node]) = {
-      root.updateChildren(Seq(e))
+    var domNode:Option[dom.Element] = None
+
+    def render(e: VNode[dom.Node]):Unit = {
+      updateChildren(Seq(e))
     }
+
+    override def updateSelf: PartialFunction[DiffNode[_, Node], _] = { case _ => /* Do Nothing */ }
+
+    override def nodeOps: Option[NodeOps[Node]] = domNode.map(DefaultNodeOps(_))
+
+    override def attachSelf(): Element = {
+      domNode = Some(el)
+      el
+    }
+
+    override def detachSelf(): Unit = {
+      domNode = None
+    }
+
   }
 
   def newRoot(el:dom.Element) = {
-    el.innerHTML = ""
-    new RootNode(el)
+    val rn = new RootNode(el)
+    rn.attach()
+    rn
   }
 
 }

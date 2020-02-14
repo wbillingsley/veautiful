@@ -1,7 +1,8 @@
 package example
 
 import com.wbillingsley.veautiful._
-import com.wbillingsley.veautiful.html.{<, DElement, ElementComponent, VHtmlNode, ^}
+import com.wbillingsley.veautiful.html.<.{VHTMLElement, VSVGElement}
+import com.wbillingsley.veautiful.html.{<, DElement, ElementComponent, SVG, VHtmlNode, ^}
 import org.scalajs.dom
 import org.scalajs.dom.Node
 import org.scalajs.dom.raw.HTMLInputElement
@@ -108,7 +109,7 @@ object Diffusion {
     var domNode: Option[Circle] = None
 
     override def attach(): Node = {
-      val c = <.circle(
+      val c = SVG.circle(
         ^.attr("cx") := m.position.x, ^.attr("cy") := m.position.y, ^.attr("r") := 3,
         ^.cls := (if (m.ordinary) "molecule ordinary" else "molecule tracked")
       ).create().asInstanceOf[Circle]
@@ -141,7 +142,7 @@ object Diffusion {
       moleculeNodes = Simulation.molecules.map { m => new MoleculeView(m) }
     }
 
-    val style:DElement = <("style")(
+    val style:VHTMLElement = <("style")(
       """
         |svg {
         |  background: none;
@@ -173,7 +174,7 @@ object Diffusion {
     /**
      * The SVG that will contain the asteroid field
      */
-    def svg:DElement = <.svg.attrs(
+    def svg:VSVGElement = <.svg.attrs(
       ^.attr("viewbox") := s"${Simulation.bounds.p1.x} ${Simulation.bounds.p1.y} ${Simulation.bounds.p2.x} ${Simulation.bounds.p2.y}",
       ^.attr("width") := s"${Simulation.bounds.p2.x - Simulation.bounds.p1.x}",
       ^.attr("height") := s"${Simulation.bounds.p2.y - Simulation.bounds.p1.y}"
@@ -189,7 +190,7 @@ object Diffusion {
 
     /** Turns an asteroid into an SVG DElement */
     def svgRing(m:Ring):VHtmlNode = {
-      <.circle(^.attr("cx") := m.p.x, ^.attr("cy") := m.p.y, ^.attr("r") := m.r, ^.cls := "ring")
+      SVG.circle(^.attr("cx") := m.p.x, ^.attr("cy") := m.p.y, ^.attr("r") := m.r, ^.cls := "ring")
     }
 
     def table():VHtmlNode = <.div(^.cls := "results col-lg overflow-auto",

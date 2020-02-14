@@ -1,6 +1,6 @@
 package com.wbillingsley.veautiful.templates
 
-import com.wbillingsley.veautiful.html.<.DElAppliable
+import com.wbillingsley.veautiful.html.<.{DElAppliable, HTMLAppliable, VHTMLElement}
 import com.wbillingsley.veautiful.html.{<, DElement, VHtmlComponent, VHtmlNode, ^}
 import com.wbillingsley.veautiful.templates.Challenge.{HomePath, LevelPath, StagePath}
 import com.wbillingsley.veautiful.templates.Sequencer.LayoutFunc
@@ -12,28 +12,28 @@ object Challenge {
 
   def hgutter = <.div(^.cls := "row hgutter")
 
-  def card(s:String)(ac: DElAppliable *) = <.div(^.cls := "card",
+  def card(s:String)(ac: HTMLAppliable *) = <.div(^.cls := "card",
     <.div(^.cls := "card-body",
       <.div(^.cls := "card-title", <.h4(s)),
       <.div(ac:_*)
     )
   )
 
-  def card(ac: DElAppliable *) = <.div(^.cls := "card",
+  def card(ac: HTMLAppliable *) = <.div(^.cls := "card",
     <.div(^.cls := "card-body",
       <.div(ac:_*)
     )
   )
 
-  def cardText(ac: DElAppliable *) = <.div(^.cls := "card-text", <.div(ac:_*))
+  def cardText(ac: HTMLAppliable *) = <.div(^.cls := "card-text", <.div(ac:_*))
 
-  def textColumn(ac: DElAppliable *) = <.div(^.cls := "text-column", <.div(ac:_*))
+  def textColumn(ac: HTMLAppliable *) = <.div(^.cls := "text-column", <.div(ac:_*))
 
-  def textAndEx(left: DElAppliable *)(right: DElAppliable *):VHtmlNode = {
+  def textAndEx(left: HTMLAppliable *)(right: HTMLAppliable *):VHtmlNode = {
     split(textColumn(left:_*))(right:_*)
   }
 
-  def split(l:DElAppliable*)(r:DElAppliable*) = <.div(^.cls := "split2",
+  def split(l:HTMLAppliable*)(r:HTMLAppliable*) = <.div(^.cls := "split2",
     <.div(l:_*),
     <.div(r:_*)
   )
@@ -74,7 +74,7 @@ object Challenge {
   type LevelPath = (Challenge, Int) => String
   type StagePath = (Challenge, Int, Int) => String
 
-  def defaultHomeIcon:DElement = <("i")(^.cls := "material-icons", "home")
+  def defaultHomeIcon:VHTMLElement = <("i")(^.cls := "material-icons", "home")
 
   def defaultHeader(homePath:HomePath, homeIcon: => VHtmlNode = defaultHomeIcon) = { c:Challenge =>
     <.div(

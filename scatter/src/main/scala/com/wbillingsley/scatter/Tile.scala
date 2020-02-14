@@ -2,7 +2,8 @@ package com.wbillingsley.scatter
 
 import com.wbillingsley.veautiful.html.{DElement, SVG, VHtmlComponent, VHtmlDiffNode, ^}
 import com.wbillingsley.veautiful.logging.Logger
-import com.wbillingsley.veautiful.{OnScreen}
+import com.wbillingsley.veautiful.OnScreen
+import com.wbillingsley.veautiful.html.<.{VDOMElement, VSVGElement}
 import org.scalajs.dom.raw.{MouseEvent, SVGElement}
 
 abstract class Tile[T](val ts:TileSpace[T], val mobile:Boolean = true, val typeLoop:Boolean = true, val cssClass:String = "") extends OnScreen with VHtmlComponent {
@@ -111,7 +112,7 @@ abstract class Tile[T](val ts:TileSpace[T], val mobile:Boolean = true, val typeL
     */
   val tileContent:TileComponent[T]
 
-  val tileBoundary:DElement = SVG.path(^.cls := "tile-path")
+  val tileBoundary:VSVGElement = SVG.path(^.cls := "tile-path")
 
   override def afterAttach(): Unit = {
     super.afterAttach()
@@ -134,7 +135,7 @@ abstract class Tile[T](val ts:TileSpace[T], val mobile:Boolean = true, val typeL
 
   def layout():Unit = {
     tileContent.layoutChildren()
-    for { el <- tileBoundary.domEl } {
+    for { el <- tileBoundary.domNode } {
       el.setAttribute("d", Tile.path(tileContent, typeLoop))
     }
   }

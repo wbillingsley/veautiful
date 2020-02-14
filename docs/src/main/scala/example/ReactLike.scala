@@ -1,7 +1,8 @@
 package example
 
 import com.wbillingsley.veautiful._
-import com.wbillingsley.veautiful.html.{<, DElement, ElementComponent, VHtmlNode, ^}
+import com.wbillingsley.veautiful.html.<.VSVGElement
+import com.wbillingsley.veautiful.html.{<, DElement, ElementComponent, SVG, VHtmlNode, ^}
 import example.Model.Asteroid
 import org.scalajs.dom.raw.HTMLInputElement
 
@@ -20,7 +21,7 @@ object ReactLike {
   /**
     * The SVG that will contain the asteroid field
     */
-  def svg:DElement = <.svg.attrs(
+  def svg:VSVGElement = <.svg.attrs(
     ^.attr("viewbox") := "0 0 640 480",
     ^.attr("width") := "100%",
     ^.attr("height") := "480"
@@ -48,7 +49,7 @@ object ReactLike {
     } yield (p._1 + a.pos._1.toInt, p._2 + a.pos._2.toInt)
 
     // Once we've worked out what to put into it, the asteroid is just a polygon node
-    <.polygon.attrs(^.attr("points") := polyString(points), ^.cls := "asteroid")
+    SVG.polygon.attrs(^.attr("points") := polyString(points), ^.cls := "asteroid")
 
   }
 
@@ -57,7 +58,7 @@ object ReactLike {
     val (x, y) = w.pos
 
     // This one's just a circle node
-    <.circle(
+    SVG.circle(
       ^.cls := "well",
       ^.attr("cx") := x, ^.attr("cy") := y, ^.attr("r") := w.radius
     )

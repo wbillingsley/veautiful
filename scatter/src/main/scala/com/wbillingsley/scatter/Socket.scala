@@ -1,6 +1,7 @@
 package com.wbillingsley.scatter
 
 import com.wbillingsley.scatter.Tile.{boxAndArc, logger}
+import com.wbillingsley.veautiful.html.<.{VDOMElement, VSVGElement}
 import com.wbillingsley.veautiful.html.{<, DElement, SVG, VHtmlDiffNode, VHtmlNode, ^}
 import com.wbillingsley.veautiful.logging.Logger
 
@@ -57,7 +58,7 @@ class Socket[T](val within:Tile[T], acceptType:Option[String] = None, thin:Boole
     */
   def active:Boolean = tileSpace.activeSocket.contains(this)
 
-  def emptyPath:DElement = {
+  def emptyPath:VSVGElement = {
     if (thin) {
       SVG.g(
         SVG.path(^.attr("d") := "M 0 0 l 20 0")

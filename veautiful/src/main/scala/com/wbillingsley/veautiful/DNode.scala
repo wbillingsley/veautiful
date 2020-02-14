@@ -53,11 +53,7 @@ case class DefaultNodeOps(n:dom.Node) extends NodeOps[dom.Node] {
 /**
   * A DNode has a create and a makeItSo
   */
-trait DNode[N, C] extends VNode[N] {
-
-  def create():N
-
-  var domNode:Option[N]
+trait DNode[+N, C] extends VNode[N] {
 
   /**
     * A DNode can itself have multiple nodes. We need to be able to get a NodeOps that can perform low-level operations
@@ -79,9 +75,15 @@ trait DNode[N, C] extends VNode[N] {
     for { d <- children } d.beforeAttach()
   }
 
+  /**
+    * Creates this node (not its children) and attaches this DNode to it. This is called by the default implementation
+    * of attach - which attaches this node and then recurses down the children.
+    * @return
+    */
+  def attachSelf():N
+
   def attach():N = {
-    val n = create()
-    domNode = Some(n)
+    val n = attachSelf()
 
     for { ch <- children } {
       ch.attach()
@@ -112,7 +114,14 @@ trait DNode[N, C] extends VNode[N] {
     for { d <- children } d.beforeDetach()
   }
 
+  /**
+    * Detaches this node (assuming all its children are already detached). This is called by the default implementation
+    * of detach, which detaches its children and then calls `detachSelf()`
+    */
+  def detachSelf():Unit
+
   def detach() = {
+    // First, we remove the children from being children in the view tree
     for {
       ops <- nodeOps
       d <- children if ops.nodeIsChildOfMine(d)
@@ -120,13 +129,15 @@ trait DNode[N, C] extends VNode[N] {
       ops.removeAttachedChild(d)
     }
 
+    // Then we ask the children to detach themselves
     for {
       d <- children
     } {
       d.detach()
     }
 
-    domNode = None
+    // Then we detach ourself
+    detachSelf()
   }
 
   override def afterDetach(): Unit = {
