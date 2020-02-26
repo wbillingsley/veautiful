@@ -18,8 +18,8 @@ lazy val veautiful = project.in(file("veautiful"))
     scalaJSUseMainModuleInitializer := false,
 
     libraryDependencies ++= Seq(
-      "org.scala-js" %%% "scalajs-dom" % "0.9.7",
-      "org.scalatest" %%% "scalatest" % "3.0.8" % "test"
+      "org.scala-js" %%% "scalajs-dom" % "1.0.0",
+      "org.scalatest" %%% "scalatest" % "3.1.1" % "test"
     )
 )
 
@@ -34,8 +34,8 @@ lazy val templates = project.in(file("templates"))
     scalaVersion := scalaVersionStr,
 
     libraryDependencies ++= Seq(
-      "org.scala-js" %%% "scalajs-dom" % "0.9.7",
-      "org.scalatest" %%% "scalatest" % "3.0.8" % "test"
+      "org.scala-js" %%% "scalajs-dom" % "1.0.0",
+      "org.scalatest" %%% "scalatest" % "3.1.1" % "test"
     )
   )
 
@@ -50,8 +50,8 @@ lazy val scatter = project.in(file("scatter"))
     scalaVersion := scalaVersionStr,
 
     libraryDependencies ++= Seq(
-      "org.scala-js" %%% "scalajs-dom" % "0.9.7",
-      "org.scalatest" %%% "scalatest" % "3.0.8" % "test"
+      "org.scala-js" %%% "scalajs-dom" % "1.0.0",
+      "org.scalatest" %%% "scalatest" % "3.1.1" % "test"
     )
   )
 
@@ -73,8 +73,8 @@ lazy val wren = project.in(file("wren"))
     scalaVersion := scalaVersionStr,
 
     libraryDependencies ++= Seq(
-      "org.scala-js" %%% "scalajs-dom" % "0.9.7",
-      "org.scalatest" %%% "scalatest" % "3.0.8" % "test"
+      "org.scala-js" %%% "scalajs-dom" % "1.0.0",
+      "org.scalatest" %%% "scalatest" % "3.1.1" % "test"
     )
   )
 
@@ -93,8 +93,8 @@ lazy val docs = project.in(file("docs"))
       scalacOptions ++= Seq("-unchecked", "-deprecation"),
 
       libraryDependencies ++= Seq(
-        "org.scala-js" %%% "scalajs-dom" % "0.9.7",
-        "org.scalatest" %%% "scalatest" % "3.0.8" % "test"
+        "org.scala-js" %%% "scalajs-dom" % "1.0.0",
+        "org.scalatest" %%% "scalatest" % "3.1.1" % "test"
       )
   )
 

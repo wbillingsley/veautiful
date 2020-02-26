@@ -254,6 +254,11 @@ object < {
   def h2 = applyT[html.Heading]("h2")
   def h3 = applyT[html.Heading]("h3")
   def h4 = applyT[html.Heading]("h4")
+  def iframe = applyT[html.IFrame]("iframe")
+  def pre = applyT[html.Pre]("pre")
+  def br = applyT[html.BR]("br")
+  def canvas = applyT[html.Canvas]("canvas")
+  def form = applyT[html.Form]("form")
 
   def button = applyT[html.Button]("button")
   def input = applyT[html.Input]("input")
@@ -267,7 +272,7 @@ object < {
   def thead = apply("thead")
   def tbody = apply("tbody")
   def tr = applyT[html.TableRow]("tr")
-  def th = applyT[html.TableHeaderCell]("th")
+  def th = applyT[html.TableCell]("th")
   def td = applyT[html.TableCell]("td")
 
   def svg = SVG.svg
@@ -288,7 +293,11 @@ object SVG {
 
   def circle = <.apply[dom.svg.Circle]("circle", ns=DElement.svgNS)
 
+  def ellipse = <.apply[dom.svg.Ellipse]("ellipse", ns=DElement.svgNS)
+
   def polygon = <.apply[dom.svg.Polygon]("polygon", ns=DElement.svgNS)
+
+  def line = <.apply[dom.svg.Line]("line", ns=DElement.svgNS)
 
   def text = <.apply[dom.svg.Text]("text", ns=DElement.svgNS)
 
