@@ -2,7 +2,7 @@ package com.wbillingsley.veautiful.html
 
 import com.wbillingsley.veautiful.{DefaultNodeOps, DiffNode, NodeOps, VNode}
 import org.scalajs.dom
-import org.scalajs.dom.{Event, Node, html}
+import org.scalajs.dom.{Element, Event, Node, html}
 import html.Div
 
 import scala.scalajs.js
@@ -18,7 +18,7 @@ object DElement {
   val htmlNS = "http://www.w3.org/1999/xhtml"
   val svgNS = "http://www.w3.org/2000/svg"
 }
-case class DElement[+T <: dom.Element](name:String, uniqEl:Any = "", ns:String = DElement.htmlNS) extends DiffNode[T, dom.Node] {
+case class DElement[+T <: dom.Element](name:String, var uniqEl:Option[Any] = None, ns:String = DElement.htmlNS) extends DiffNode[T, dom.Node] {
 
   var attributes:Map[String, AttrVal] = Map.empty
 
@@ -29,6 +29,7 @@ case class DElement[+T <: dom.Element](name:String, uniqEl:Any = "", ns:String =
   var styles:Seq[InlineStyle] = Seq.empty
 
   private[this] var _domNode:Option[T] = None
+
   def domNode = _domNode
 
   override def attachSelf():T = {
@@ -41,8 +42,7 @@ case class DElement[+T <: dom.Element](name:String, uniqEl:Any = "", ns:String =
     _domNode = None
   }
 
-  // TODO: Improve this API
-  override def key: Option[Any] = if (uniqEl == "") None else Some(uniqEl)
+  override def key: Option[Any] = uniqEl
 
   /**
     * In DOM Events, it is very difficult to de-register an anonymous listener.
@@ -57,7 +57,7 @@ case class DElement[+T <: dom.Element](name:String, uniqEl:Any = "", ns:String =
     } h.func.apply(e)
   }
 
-  def updateSelf = {
+  def updateSelf: PartialFunction[DiffNode[_, Node], _] = {
     case el:DElement[T] =>
 
       // Update attributes
@@ -277,11 +277,11 @@ object < {
 
   def svg = SVG.svg
 
-  def apply(n:String):VHTMLElement = DElement[html.Element](n, "", DElement.htmlNS)
+  def apply(n:String):VHTMLElement = DElement[html.Element](n, ns=DElement.htmlNS)
 
-  def applyT[T <: dom.Element](n:String):DElement[T] = DElement[T](n, "", DElement.htmlNS)
+  def applyT[T <: dom.Element](n:String):DElement[T] = DElement[T](n, ns=DElement.htmlNS)
 
-  def apply[T <: dom.Element](n:String, u:String = "", ns:String):DElement[T] = DElement[T](n, u, ns)
+  def apply[T <: dom.Element](n:String, u:String = "", ns:String):DElement[T] = DElement[T](n, if (u.isEmpty) None else Some(u), ns)
 
 }
 
@@ -331,6 +331,16 @@ object ^ {
 
     def ?=(j:Option[String]) = j.map { s => PropVal(n, s) } getOrElse PropVal("", "")
   }
+
+  object Keyable {
+    def :=(k: String): <.DElAppliable[Element] = new <.DElAppliable[dom.Element] {
+      override def applyTo[TT <: Element](d: DElement[TT]): Unit = {
+        d.uniqEl = Some(k)
+      }
+    }
+  }
+
+  def key = Keyable
 
   def attr(x:String) = Attrable(x)
 
