@@ -1,5 +1,7 @@
 package com.wbillingsley.veautiful
 
+import com.wbillingsley.veautiful.logging.Logger
+
 import scala.collection.mutable
 import scala.collection.mutable.ArrayBuffer
 import scala.collection
@@ -10,6 +12,8 @@ trait Keyable {
 }
 
 object Differ {
+
+  val logger:Logger = Logger.getLogger(this.getClass)
 
   sealed trait DiffOp[+K]
   case object Retain extends DiffOp[Nothing]
@@ -79,10 +83,24 @@ object Differ {
 
       do {
         if (leftIt.isEmpty) {
-          ops.append(Append(r))
-          update(index) = r
-          create.append(r)
-          done = true
+          logger.trace("Left empty")
+
+          // If the right element has a key, it's left might have "moved down" (been skipped for us to come across at the end)
+          // If we can find it, "Append" it here.
+          r.key.flatMap(leftKeys.get) match {
+            case Some(k) =>
+              logger.trace(s"Found an item that moved down")
+              ops.append(Append(k))
+              update(index) = k
+              done = true
+
+            case _ =>
+              ops.append(Append(r))
+              update(index) = r
+              create.append(r)
+              done = true
+          }
+
         } else {
           val l = leftIt.next()
           if (l == r) {                 // The common case will be the item will already be there
@@ -100,7 +118,7 @@ object Differ {
 
                 l.key.flatMap(rightKeys.get) match {  // We need to work out what's happening to the left item
                   case Some(k) =>
-                    println(s"item $k moving down")
+                    logger.trace(s"item $k moving down")
                   // Just skip it - it'll be moving down later
                   case _ =>
                     // Remove this element and loop
@@ -111,7 +129,7 @@ object Differ {
               case _ => // Didn't find it.
                 l.key.flatMap(rightKeys.get) match {
                   case Some(k) =>
-                    println(s"item $k moving down")
+                    logger.trace(s"item $k moving down")
                     // Just skip it - it'll be moving down later
                   case _ =>
                     // Remove this element and loop
