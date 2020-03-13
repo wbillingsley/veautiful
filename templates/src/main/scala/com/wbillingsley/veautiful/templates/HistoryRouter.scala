@@ -1,10 +1,13 @@
 package com.wbillingsley.veautiful.templates
 
 import com.wbillingsley.veautiful.html.{<, ElementComponent, VHtmlNode}
+import com.wbillingsley.veautiful.logging.Logger
 import org.scalajs.dom
 import org.scalajs.dom.Event
 
 abstract class HistoryRouter[Route] extends ElementComponent(<.div) {
+
+  private val logger = Logger.getLogger("com.wbillingsley.veautiful.templates.HistoryRouter")
 
   var route:Route
 
@@ -27,7 +30,7 @@ abstract class HistoryRouter[Route] extends ElementComponent(<.div) {
   }
 
   def handleHistoryEvent(event: Event):Unit = {
-    println("Popping state!")
+    logger.debug(s"History event $event")
     route = routeFromLocation()
     renderElements(render)
   }
@@ -46,8 +49,8 @@ abstract class HistoryRouter[Route] extends ElementComponent(<.div) {
   def routeTo(r:Route):Unit = {
     route = r
     val p = path(route)
-    println(p)
-    //dom.window.history.replaceState("State not supported", "Rendered by Veautiful", p)
+    logger.debug(s"routeTo $r with path $p")
+    dom.window.history.replaceState(r.toString, "", p)
     renderElements(render)
   }
 
