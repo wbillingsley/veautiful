@@ -1,5 +1,6 @@
 package com.wbillingsley.veautiful
 
+import com.wbillingsley.veautiful.reconcilers.Reconciler
 import org.scalajs.dom
 
 import scala.collection.mutable
@@ -12,6 +13,9 @@ import scala.collection.mutable
   * This allows React.js-like operation.
   */
 trait DiffNode[+N, C] extends DNode[N, C] with MakeItSo {
+
+  /** How children should be reconciled. This is left undefined, as some child classes may wish to make it settable. */
+  def reconciler:Reconciler
 
   /**
     * The children of a DiffNode has to be mutable, as it mutates itself to become the destination
@@ -26,16 +30,6 @@ trait DiffNode[+N, C] extends DNode[N, C] with MakeItSo {
   }
 
   def updateChildren(to:collection.Seq[VNode[C]]):Unit = {
-
-    val diffReport = Differ.diffs(children, to)
-    Differ.processDiffs(this, diffReport.ops)
-    children = diffReport.update
-
-    // Now we recurse down the list
-    children.iterator.zip(to.iterator) foreach {
-      case (uu:MakeItSo, tt:MakeItSo) => uu.makeItSo(tt)
-      case (u:Update, _) => u.update()
-      case _ => // nothing to do
-    }
+    reconciler.updateChildren(this, to)
   }
 }

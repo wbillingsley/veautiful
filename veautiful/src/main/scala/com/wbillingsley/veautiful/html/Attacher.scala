@@ -1,5 +1,6 @@
 package com.wbillingsley.veautiful.html
 
+import com.wbillingsley.veautiful.reconcilers.Reconciler
 import com.wbillingsley.veautiful.{DefaultNodeOps, DiffNode, NodeOps, VNode}
 import org.scalajs.dom
 import org.scalajs.dom.{Element, Node}
@@ -7,6 +8,8 @@ import org.scalajs.dom.{Element, Node}
 object Attacher {
 
   class RootNode(el:dom.Element) extends VHtmlDiffNode {
+
+    override def reconciler: Reconciler = Reconciler.default
 
     var domNode:Option[dom.Element] = None
 

@@ -2,6 +2,7 @@ package com.wbillingsley.veautiful.templates
 
 import com.wbillingsley.veautiful._
 import com.wbillingsley.veautiful.html.{<, VHtmlComponent, VHtmlDiffNode, VHtmlNode, ^}
+import com.wbillingsley.veautiful.reconcilers.Reconciler
 import com.wbillingsley.veautiful.templates.Sequencer.LayoutFunc
 
 object Sequencer {
@@ -66,7 +67,7 @@ case class Sequencer(override val key:Option[String] = None)(var nodes: Seq[Sequ
     <.div(^.cls := "v-sequencer-inner",
       for {
         (n, i) <- nodes.zipWithIndex
-      } yield <.div(
+      } yield <.div(^.reconciler := Reconciler.onlyIf(index == i),
         ^.cls := (if (index == i) "v-sequencer-slide active" else "v-sequencer-slide inactive"),
         n.layoutOverride match {
           case Some(lo) => lo(this, n, i)

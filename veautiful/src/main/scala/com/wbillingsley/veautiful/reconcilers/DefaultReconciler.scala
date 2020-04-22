@@ -1,17 +1,13 @@
-package com.wbillingsley.veautiful
+package com.wbillingsley.veautiful.reconcilers
 
 import com.wbillingsley.veautiful.logging.Logger
+import com.wbillingsley.veautiful.{DNode, DiffNode, Keyable, MakeItSo, Update, VNode}
 
 import scala.collection.mutable
 import scala.collection.mutable.ArrayBuffer
-import scala.collection
 import scala.scalajs.js
 
-trait Keyable {
-  def key: Option[Any] = None
-}
-
-object Differ {
+class DefaultReconciler(shouldUpdate: => Boolean) extends Reconciler {
 
   val logger:Logger = Logger.getLogger(this.getClass)
 
@@ -21,25 +17,21 @@ object Differ {
   case class Append[K](r: K) extends DiffOp[K]
   case class InsertBefore[K](item:K, before: K) extends DiffOp[K]
 
-  sealed trait Strategy
-  case object InsertBeforeStrat extends Strategy
-  case object RemoveStrat extends Strategy
-
   /**
-    * Report produced by the Differ
-    *
-    * @param exit Nodes that will be removed
-    * @param enter Nodes that will be newly created
-    * @param update Nodes that will be retained or created (matches the intended end result)
-    * @param ops Operations to perform
-    * @tparam K
-    */
+   * Report produced by the Differ
+   *
+   * @param exit Nodes that will be removed
+   * @param enter Nodes that will be newly created
+   * @param update Nodes that will be retained or created (matches the intended end result)
+   * @param ops Operations to perform
+   * @tparam K
+   */
   case class DiffReport[K](exit:collection.Seq[K], enter:collection.Seq[K], update:collection.Seq[K], ops:collection.Seq[DiffOp[K]])
 
   /**
-    * Generates a difference report between the two sets of nodes
-    * @return
-    */
+   * Generates a difference report between the two sets of nodes
+   * @return
+   */
   def diffs[K <: Keyable](left:collection.Seq[K], right:collection.Seq[K]): DiffReport[K] = {
 
     val ops = ArrayBuffer.empty[DiffOp[K]]
@@ -130,7 +122,7 @@ object Differ {
                 l.key.flatMap(rightKeys.get) match {
                   case Some(k) =>
                     logger.trace(s"item $k moving down")
-                    // Just skip it - it'll be moving down later
+                  // Just skip it - it'll be moving down later
                   case _ =>
                     // Remove this element and loop
                     ops.append(Remove(l))
@@ -200,7 +192,21 @@ object Differ {
     }
   }
 
+  override def updateChildren[N, C](node: DiffNode[N, C], to: collection.Seq[VNode[C]]): Unit = {
+    if (shouldUpdate) {
+      if (node.children != to) {
+        val diffReport = diffs(node.children, to)
+        processDiffs(node, diffReport.ops)
+        node.children = diffReport.update
+      }
 
-
+      // Now we recurse down the list
+      node.children.iterator.zip(to.iterator) foreach {
+        case (uu: MakeItSo, tt: MakeItSo) => uu.makeItSo(tt)
+        case (u: Update, _) => u.update()
+        case _ => // nothing to do
+      }
+    }
+  }
 
 }

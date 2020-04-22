@@ -1,5 +1,7 @@
 package com.wbillingsley.veautiful.html
 
+import com.wbillingsley.veautiful.html.<.DEAAction
+import com.wbillingsley.veautiful.reconcilers.Reconciler
 import com.wbillingsley.veautiful.{DefaultNodeOps, DiffNode, NodeOps, VNode}
 import org.scalajs.dom
 import org.scalajs.dom.{Element, Event, Node, html}
@@ -18,6 +20,7 @@ object DElement {
   val htmlNS = "http://www.w3.org/1999/xhtml"
   val svgNS = "http://www.w3.org/2000/svg"
 }
+
 case class DElement[+T <: dom.Element](name:String, var uniqEl:Option[Any] = None, ns:String = DElement.htmlNS) extends DiffNode[T, dom.Node] {
 
   var attributes:Map[String, AttrVal] = Map.empty
@@ -27,6 +30,8 @@ case class DElement[+T <: dom.Element](name:String, var uniqEl:Option[Any] = Non
   var listeners:Map[String, Lstnr] = Map.empty
 
   var styles:Seq[InlineStyle] = Seq.empty
+
+  var reconciler:Reconciler = Reconciler.default
 
   private[this] var _domNode:Option[T] = None
 
@@ -89,6 +94,7 @@ case class DElement[+T <: dom.Element](name:String, var uniqEl:Option[Any] = Non
       }
       listeners = el.listeners
 
+      reconciler = el.reconciler
   }
 
   def applyPropsToNode(props:Iterable[PropVal]):Unit = {
@@ -213,6 +219,8 @@ object < {
     def applyTo[TT <: T](d:DElement[TT]):Unit
   }
 
+
+
   implicit class DEAVNode(val vNode: VNode[dom.Node]) extends DElAppliable[dom.Element] {
     override def applyTo[T <: dom.Element](d: DElement[T]): Unit = d.addChildren(vNode)
   }
@@ -243,6 +251,10 @@ object < {
 
   implicit class DEAOption[T, E <: dom.Element](opt:Option[T])(implicit ev: T => DElAppliable[E]) extends DElAppliable[E] {
     override def applyTo[TT <: E](d: DElement[TT]): Unit = opt.foreach(ev(_).applyTo(d))
+  }
+
+  class DEAAction[T <: dom.Element](f: DElement[T] => Unit) extends DElAppliable[T] {
+    def applyTo[TT <: T](d:DElement[TT]) = f(d)
   }
 
   def p = applyT[html.Paragraph]("p")
@@ -338,6 +350,10 @@ object ^ {
         d.uniqEl = Some(k)
       }
     }
+  }
+
+  object reconciler {
+    def :=(r:Reconciler) = new DEAAction[dom.Element]({ x => x.reconciler = r })
   }
 
   def key = Keyable
