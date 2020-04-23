@@ -3,20 +3,21 @@ package com.wbillingsley.veautiful
 import org.scalatest._
 import scala.util.Random
 
-class DifferTest extends FlatSpec  {
+class DefaultReconcilerTest extends FlatSpec  {
 
-  import Differ._
+  import com.wbillingsley.veautiful.reconcilers.Reconciler
+  import Reconciler.default._
 
   // An item whose equality is determined by i but identity is determined by uid
   case class Item(i:Int) extends Keyable {
     val uid = Random.nextString(5)
   }
 
-  "Differ" should "Detect an appended item" in {
+  "Default reconciler" should "Detect an appended item" in {
     val before = (1 to 5).map(Item)
     val after = (1 to 6).map(Item)
 
-    val report = Differ.diffs(before, after)
+    val report = Reconciler.default.diffs(before, after)
     assert(report.ops == Seq(Append(Item(6))))
   }
 
@@ -24,7 +25,7 @@ class DifferTest extends FlatSpec  {
     val before = (1 to 5).map(Item)
     val after = (1 to 6).map(Item)
 
-    val report = Differ.diffs(before, after)
+    val report = Reconciler.default.diffs(before, after)
     assert(report.update == after)
   }
 
@@ -32,7 +33,7 @@ class DifferTest extends FlatSpec  {
     val before = (1 to 5).map(Item)
     val after = (1 to 6).map(Item)
 
-    val report = Differ.diffs(before, after)
+    val report = Reconciler.default.diffs(before, after)
     assert(report.update.zip(before).forall { case (x, y) => x.uid == y.uid })
   }
 
