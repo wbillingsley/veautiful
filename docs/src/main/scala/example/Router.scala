@@ -35,7 +35,7 @@ object Router extends HistoryRouter[ExampleRoute] {
   }
 
   override def path(route: ExampleRoute): String = {
-    import PathDSL._
+    import PathDSL.Compose._
 
     route match {
       case IntroRoute => (/# / "").stringify

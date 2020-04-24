@@ -1,6 +1,8 @@
 package com.wbillingsley.veautiful
 
+import com.wbillingsley.veautiful.logging.Logger
 import org.scalajs.dom
+
 import scalajs.js
 import org.scalajs.dom.Location
 
@@ -39,10 +41,14 @@ object PathDSL {
     pathname.drop(1).split('/').map(js.URIUtils.decodeURI)
   }
 
+  /** For example in #/foo/bar?who=algernon would return Array("foo", "bar") */
   def hashPathArray():Array[String] = {
     val (path, _) = hashPathAndSearch
     pathArray(path)
   }
+
+  /** For example in #/foo/bar?who=algernon would return List("foo", "bar") */
+  def hashPathList():List[String] = hashPathArray().toList
 
   def hashSearchMap(): Map[String, String] = {
     val (_, search) = hashPathAndSearch
@@ -56,8 +62,7 @@ object PathDSL {
 
   /**
     * Parses the search query into key-value pairs.
-    * @param search
-    * @return
+    * Not that this assumes a key is only given one value.
     */
   def searchMap(search:String = location.search): Map[String, String] = {
     val q = search.drop(1).split('&')
@@ -67,6 +72,9 @@ object PathDSL {
     }).toMap
   }
 
+  /**
+    * Parses the search query into keys paired with an array of values.
+    */
   def searchMapArray(search:String = location.search): Map[String, Array[String]] = {
     val q = search.drop(1).split('&')
     val pairs = q.map { qComponent =>
@@ -76,53 +84,136 @@ object PathDSL {
     pairs.groupBy(_._1).map { case (k, arr) => (k, arr.map(_._2)) }
   }
 
-  case class Loc(path:PathComponent = EmptyPath, search:SearchComponent = EmptySearch, fragment:String = "") {
+  /**
+    * The classes and methods in this section are simple and designed just for constructing paths in a type-safe
+    * manner. E.g., (/# / "courses" / course.id ? "name" -> "joe").stringify
+    *
+    * This can be useful as you can then just use a basic pattern match on the pathList to extract routes
+    * e.g. hashPathList match {
+    *   case "courses" :: id :: _ =>
+    * }
+    */
+  object Compose {
 
-    def ##(s:String):Loc = this.copy(fragment=s)
-    def &(s:SearchComponent):Loc = this.copy(search = new &(search, s))
+    case class Loc(path: PathComponent = EmptyPath, search: SearchComponent = EmptySearch, fragment: String = "") {
+      def ##(s: String): Loc = this.copy(fragment = s)
 
-    def stringify:String = path.stringify + '?' + search.toString + '#' + fragment
+      def &(s: SearchComponent): Loc = this.copy(search = new &(search, s))
 
-  }
-
-  sealed trait PathComponent {
-    def /(elem:PathComponent) = new /(this, elem)
-    def ?(s:SearchComponent) = Loc(this, s)
-
-    def stringify:String
-  }
-
-  case object EmptyPath extends PathComponent {
-    def stringify = ""
-  }
-
-  case object /# extends PathComponent {
-    def stringify = "#"
-  }
-
-  implicit class PathString(val s:String) extends PathComponent {
-    def stringify = js.URIUtils.encodeURIComponent(s)
-  }
-
-  case class /(root:PathComponent, tail:PathComponent) extends PathComponent {
-    def stringify = root.stringify + "/" + tail.stringify
-  }
-
-  sealed trait SearchComponent {
-    def &(elem:SearchComponent) = new &(this, elem)
-    def stringify:String
-  }
-  case object EmptySearch extends SearchComponent {
-    def stringify = ""
-  }
-  case class &(root:SearchComponent, tail:SearchComponent) extends SearchComponent {
-    def stringify = root.stringify + "&" + tail.stringify
-  }
-  implicit class Pair(val kv:(String, String)) extends SearchComponent {
-    def stringify = {
-      val (k, v) = kv
-      js.URIUtils.encodeURIComponent(k) + "=" + js.URIUtils.encodeURIComponent(v)
+      def stringify: String = path.stringify + '?' + search.toString + '#' + fragment
     }
+
+    sealed trait PathComponent {
+      def /(elem: PathComponent) = new /(this, elem)
+
+      def ?(s: SearchComponent) = Loc(this, s)
+
+      def stringify: String
+    }
+
+    case object EmptyPath extends PathComponent {
+      def stringify = ""
+    }
+
+    case object /# extends PathComponent {
+      def stringify = "#"
+    }
+
+    implicit class PathString(val s: String) extends PathComponent {
+      def stringify = js.URIUtils.encodeURIComponent(s)
+    }
+
+    case class /(root: PathComponent, tail: PathComponent) extends PathComponent {
+      def stringify = root.stringify + "/" + tail.stringify
+    }
+
+    sealed trait SearchComponent {
+      def &(elem: SearchComponent) = new &(this, elem)
+
+      def stringify: String
+    }
+
+    case object EmptySearch extends SearchComponent {
+      def stringify = ""
+    }
+
+    case class &(root: SearchComponent, tail: SearchComponent) extends SearchComponent {
+      def stringify = root.stringify + "&" + tail.stringify
+    }
+
+    implicit class Pair(val kv: (String, String)) extends SearchComponent {
+      def stringify = {
+        val (k, v) = kv
+        js.URIUtils.encodeURIComponent(k) + "=" + js.URIUtils.encodeURIComponent(v)
+      }
+    }
+
+  }
+
+  /**
+    * This is an experimental DSL that allows us to create typesafe extractors and composers for paths (searches are
+    * not supported yet).
+    *
+    * There is an oddity that because we compose the tuple types in a fairly simple manner, the path parameters are
+    * reversed in the data tuple.
+    */
+  object Extract {
+
+    sealed trait PathMarkers
+    object stringParam extends PathMarkers
+    object start extends PathMarkers
+
+    sealed trait Path[T] {
+      def unapply(o:Object):Option[(T, List[String])]
+      def mkString(params:T):String
+
+      def /(s:String) = PathString(s, this)
+      def /(x:stringParam.type) = PathStrParam(this)
+    }
+
+    case object /# extends Path[start.type] {
+      protected val logger = Logger.getLogger(this.getClass)
+
+      def mkString(params: start.type) = "#"
+
+      def unapply(o:Object) = {
+        o match {
+          case a:List[String] => Some((start, a))
+          case _ => None
+        }
+      }
+    }
+    case class PathString[T](s:String, tail:Path[T]) extends Path[T] {
+      protected val logger = Logger.getLogger(this.getClass)
+
+      def mkString(params:T) = tail.mkString(params) + "/" + s
+
+      def unapply(o:Object) = {
+        tail.unapply(o) match {
+          case Some((found, remainder)) => remainder match {
+            case h :: t if h == s => Some((found, t))
+            case _ => None
+          }
+        }
+      }
+    }
+    case class PathStrParam[T](tail:Path[T]) extends Path[(String, T)] {
+      protected val logger = Logger.getLogger(this.getClass)
+
+      def mkString(params:(String, T)) = {
+        val (p, remainder) = params
+        tail.mkString(remainder) + "/" + p
+      }
+
+      def unapply(o:Object) = {
+        logger.info(s"Checking on $this, with ${o.toString}")
+        tail.unapply(o) match {
+          case Some((found, h :: t)) => Some(((h, found), t))
+          case _ => None
+        }
+      }
+    }
+
   }
 
 }
