@@ -23,6 +23,7 @@ object Attacher {
 
     override def attachSelf(): Element = {
       domNode = Some(el)
+      el.innerHTML = ""
       el
     }
 
