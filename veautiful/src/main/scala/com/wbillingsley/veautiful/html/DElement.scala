@@ -266,6 +266,9 @@ object < {
   def h2 = applyT[html.Heading]("h2")
   def h3 = applyT[html.Heading]("h3")
   def h4 = applyT[html.Heading]("h4")
+  def h5 = applyT[html.Heading]("h5")
+  def h6 = applyT[html.Heading]("h6")
+
   def iframe = applyT[html.IFrame]("iframe")
   def pre = applyT[html.Pre]("pre")
   def br = applyT[html.BR]("br")

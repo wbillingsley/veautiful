@@ -78,23 +78,32 @@ lazy val wren = project.in(file("wren"))
     )
   )
 
+val deployScript = taskKey[Unit]("Copies the fullOptJS script to deployscripts/")
+
 lazy val docs = project.in(file("docs"))
   .enablePlugins(ScalaJSPlugin)
   .dependsOn(veautiful, templates, scatter, wren)
   .settings(
-      name := "veautiful-docs",
+    name := "veautiful-docs",
 
-      version := versionStr,
+    version := versionStr,
 
-      scalaVersion := scalaVersionStr,
+    scalaVersion := scalaVersionStr,
 
-      scalaJSUseMainModuleInitializer := true,
+    scalaJSUseMainModuleInitializer := true,
 
-      scalacOptions ++= Seq("-unchecked", "-deprecation"),
+    scalacOptions ++= Seq("-unchecked", "-deprecation"),
 
-      libraryDependencies ++= Seq(
-        "org.scala-js" %%% "scalajs-dom" % "1.0.0",
-        "org.scalatest" %%% "scalatest" % "3.1.1" % "test"
-      )
+    libraryDependencies ++= Seq(
+      "org.scala-js" %%% "scalajs-dom" % "1.0.0",
+      "org.scalatest" %%% "scalatest" % "3.1.1" % "test"
+    ),
+
+    // Used by Travis-CI to get the script out from the .gitignored target directory
+    // Don't run it locally, or you'll find the script gets loaded twice in index.html!
+    deployScript := {
+      val opt = (Compile / fullOptJS).value
+      IO.copyFile(opt.data, new java.io.File("docs/deployscripts/compiled.js"))
+    }
   )
 
