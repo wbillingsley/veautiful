@@ -1,6 +1,8 @@
 package example
 
-import com.wbillingsley.veautiful.html.{<, VHtmlNode, ^}
+import com.wbillingsley.veautiful.html.{<, Markup, VHtmlNode, ^}
+
+import scala.scalajs.js
 
 /**
   * Common UI components to all the views
@@ -21,15 +23,15 @@ object Common {
 
   def linkToRoute(r:ExampleRoute, s:String):VHtmlNode = <.a(
     ^.href := Router.path(r),
-    ^.cls := (if (Router.route == r) "nav-link active" else "nav-link"),
+    ^.cls := (if (Router.route == r) "toc-link active" else "toc-link"),
     s
   )
 
-  def leftMenu:VHtmlNode = <("nav")(^.cls := "d-none d-md-block bg-light sidebar",
+  def leftMenu:VHtmlNode = <("nav")(^.cls := "d-none d-md-block",
     <.div(^.cls := "sidebar-sticky",
-      <.ul(^.cls := "nav nav-pills flex-column",
+      <.ul(^.cls := "toc",
         for { (r, t) <- routes } yield <.li(
-          ^.cls := "nav-item",
+          ^.cls := "toc-item",
           linkToRoute(r, t)
         )
       )
@@ -37,11 +39,17 @@ object Common {
   )
 
   def layout(ch:VHtmlNode) = <.div(
-    <.div(^.cls := "row",
-      <.div(^.cls := "col-sm-3", leftMenu),
-      <.div(^.cls := "col-sm-9", ch)
+    <.div(^.cls := "outer",
+      <.div(^.cls := "sidebar", leftMenu),
+      <.div(^.cls := "main",
+        <.div(^.cls := "container", ch)
+      )
     )
   )
+
+  val markdownGenerator = new Markup({ s:String => js.Dynamic.global.marked(s).asInstanceOf[String] })
+
+  def markdown(s:String):VHtmlNode = markdownGenerator.Fixed(s)
 
 
 }

@@ -12,51 +12,21 @@
   <link rel="stylesheet" href="scatter.css" />
   <link rel="stylesheet" href="wren.css" />
   <link rel="stylesheet" href="assembly.css" />
-  <link rel="stylesheet" href="lavamaze.css" />
 
-  <style>
-    #render-here {
-      padding-top: 48px;
-    }
-
-    .sidebar {
-      background: #f9f9ff;
-      padding: 5px;
-    }
-
-    .well {
-      stroke: #fc5858;
-      stroke-width: 2;
-      fill: #f69191;
-    }
-
-    .asteroid {
-      fill: #76addb;
-      stroke: #0275d8;
-      stroke-width: 2;
-    }
-
-    svg {
-      background: #d9e2e7;
-    }
-
-  </style>
 </head>
 <body>
   <nav class="navbar navbar-dark fixed-top bg-dark flex-md-nowrap p-0 shadow">
-    <div class="container">
+    <div class="container-fluid">
       <a class="navbar-brand col-sm-3 col-md-2 mr-0" href="#">Veautiful</a>
     </div>
   </nav>
 
-
-  <div class="container">
-    <div id="render-here">
-      <p>Loading. This site has been tested with Chrome, Safari, and Firefox.</p>
-    </div>
+  <div id="render-here">
+    <p>Loading. This site has been tested with Chrome, Safari, and Firefox.</p>
   </div>
 
-<script type="text/javascript" src="./target/scala-2.13/veautiful-docs-fastopt.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+  <script type="text/javascript" src="./target/scala-2.13/veautiful-docs-fastopt.js"></script>
 
 </body>
 </html>
