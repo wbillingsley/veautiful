@@ -176,6 +176,22 @@ pre {
     margin-bottom: 15px;
 }
 
+.embedded-example svg.particles {
+    margin: 15px;
+    background: white;
+    border: 1px solid #004479;
+}
+
+
+/*
+ * To Do List example
+ */
+.todo-list .item-done {
+    text-decoration: line-through;
+}
+.todo-list input {
+    margin: 5px;
+}
 
 /*
  #render-here {

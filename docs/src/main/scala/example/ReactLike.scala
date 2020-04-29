@@ -27,30 +27,20 @@ object ReactLike {
     ^.attr("height") := "480"
   )
 
+  /** Just defines the shape of an asteroid */
+  val polyPoints:Seq[(Int, Int)] = Seq((-10, -2), (-5, 8), (0, 10), (4, 7), (10, -1), (0, -10))
+
+  /** Useful for turning a point into a string suitable for a polygon's points attribute */
+  def pointToString(p:(Int,Int)) = s"${p._1},${p._2} "
+
+  val polyShape = polyPoints.map(pointToString).mkString
+
   /** Turns an asteroid into an SVG DElement */
   def svgAsteroid(a:Asteroid):VHtmlNode = {
-
-    /** Just defines the shape of an asteroid */
-    def polyPoints:Seq[(Int, Int)] = Seq((-10, -2), (-5, 8), (0, 10), (4, 7), (10, -1), (0, -10))
-
-    /** Useful for turning a point into a string suitable for a polygon's points attribute */
-    def pointToString(p:(Int,Int)) = s"${p._1},${p._2} "
-
-    /** Formats a polygon's SVG point string */
-    def polyString(s:Seq[(Int, Int)]):String = {
-      val sb = new StringBuilder()
-      for { point <- s } sb.append(pointToString(point))
-      sb.mkString
-    }
-
     val (x, y) = a.pos
-    val points = for {
-      p <- polyPoints
-    } yield (p._1 + a.pos._1.toInt, p._2 + a.pos._2.toInt)
 
     // Once we've worked out what to put into it, the asteroid is just a polygon node
-    SVG.polygon.attrs(^.attr("points") := polyString(points), ^.cls := "asteroid")
-
+    SVG.polygon(^.attr("points") := polyShape, ^.cls := "asteroid", ^.attr("transform") := s"translate(${x.toInt},${y.toInt})")
   }
 
   /** Creates an SVG for a gravity well */

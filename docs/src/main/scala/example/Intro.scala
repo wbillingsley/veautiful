@@ -1,8 +1,11 @@
 package example
 
-import com.wbillingsley.veautiful.html.{<, EventMethods, VHtmlComponent, VHtmlNode, ^}
+import java.nio.DoubleBuffer
+
+import com.wbillingsley.veautiful.{DiffNode, MutableArrayComponent}
+import com.wbillingsley.veautiful.html.{<, EventMethods, SVG, VHtmlComponent, VHtmlNode, ^}
 import org.scalajs.dom
-import org.scalajs.dom.{MouseEvent, Node}
+import org.scalajs.dom.{Element, MouseEvent, Node, svg}
 import org.scalajs.dom.html.Canvas
 
 object Intro {
@@ -71,6 +74,55 @@ object Intro {
     }
   }
 
+  object Particles extends VHtmlComponent {
+
+    private val particles = Array.fill(1000)((Math.random() * 100, Math.random() * 100))
+
+    private var animating = false
+
+    def start() = {
+      animating = true
+      rerender()
+      dom.window.requestAnimationFrame(_ => animationLoop())
+    }
+
+    private def animationLoop():Unit = {
+      updateParticles()
+      if (animating) dom.window.requestAnimationFrame(_ => animationLoop())
+    }
+
+    private def updateParticles():Unit = {
+      for { i <- particles.indices } {
+        val (x, y) = particles(i)
+        particles(i) = (x + Math.random() * 2 - 1, y + Math.random() * 2 - 1)
+      }
+      plot.update()
+    }
+
+    val plot = new MutableArrayComponent[dom.Element, dom.Node, svg.Circle, (Double, Double)](
+      <.svg(^.attr("width") := 100, ^.attr("height") := 100, ^.cls := "particles"), particles
+    )(
+      onEnter = { (d:(Double, Double), _) => SVG.circle(^.cls := "particle", ^.attr("r") := "1") },
+      onUpdate = { (d:(Double, Double), i, v) =>
+        for { circle <- v.domNode } {
+          circle.setAttribute("cx", d._1.toInt.toString)
+          circle.setAttribute("cy", d._2.toInt.toString)
+        }
+      }
+    )
+
+    override protected def render: DiffNode[Element, Node] = {
+      <.div(
+        plot,
+        if (animating) {
+          <.button(^.cls := "btn btn-secondary", ^.onClick --> { animating = false; rerender() }, <("i")(^.cls := "fa fa-pause"))
+        } else {
+          <.button(^.cls := "btn btn-secondary", ^.onClick --> start(), <("i")(^.cls := "fa fa-play"))
+        }
+      )
+    }
+  }
+
   def page = Common.layout(<.div(
     <.p(^.cls := "logo",
       <.img(^.src := "veautiful-small.png"),
@@ -93,8 +145,10 @@ object Intro {
         |
         |* [Circuits Up](https://theintelligentbook.com/circuitsup) - embedded circuit simulations in a little course
         |  that teaches computer architecture from electronics up.
-        |* [The Adventures of Will Scala](https://theintelligentbook.com/circuitsup) - a simpler site (mostly video
+        |* [The Adventures of Will Scala](https://theintelligentbook.com/willscala) - a simpler site (mostly video
         |  and text) that goes alongside my undergraduate Scala course.
+        |* [The Coding Escape](http://theintelligentbook.com/fos1_codingescape/) - an hour-of-code style outreach
+        |  exercise that includes a blocks programming language written in Veautiful
         |
         |### What's unique about Veautiful?
         |
@@ -271,6 +325,101 @@ object Intro {
           |      }
           |    }
           |  }
+          |```
+          |""".stripMargin)
+    ),
+    Common.markdown(
+      """
+        |### Example: Mutable Array Components
+        |
+        |To demonstrate how components can be quite different if they need to be, let's show a `MutableArrayComponent`.
+        |This is an experimental little node, designed to work a little more like d3.js. It's not a full implementation (for that, just embed d3 in a
+        |VNode), but it holds a data array, and *enter*, *exit*, and *update* sets for determining what to do with the child nodes.
+        |
+        |There are other ways of doing this reasonably efficiently in Veautiful, but perhaps sometimes the d3 style is clearer.
+        |
+        |In this case, we'll render 1,000 particles moving randomly in a small box.
+        |The full code, including the play-pause button and the changes to the particle array, are in the demo box below,
+        |but our d3-like component (the SVG containing the particles) looks like this:
+        |
+        |```scala
+        |  val plot = new MutableArrayComponent[dom.Element, dom.Node, svg.Circle, (Double, Double)](
+        |    <.svg(^.attr("width") := 100, ^.attr("height") := 100, ^.cls := "particles"), particles
+        |  )(
+        |    onEnter = { (d:(Double, Double), _) => SVG.circle(^.cls := "particle", ^.attr("r") := "1") },
+        |    onUpdate = { (d:(Double, Double), i, v) =>
+        |      for { circle <- v.domNode } {
+        |        circle.setAttribute("cx", d._1.toInt.toString)
+        |        circle.setAttribute("cy", d._2.toInt.toString)
+        |      }
+        |    }
+        |  )
+        |```
+        |
+        |""".stripMargin,
+    ),
+    <.div(^.cls := "embedded-example",
+      Particles,
+      Common.markdown(
+        """
+          |```scala
+          |import com.wbillingsley.veautiful.html.{VHtmlNode, <, ^}
+          |import org.scalajs.dom
+          |import org.scalajs.dom.{MouseEvent, Node}
+          |import org.scalajs.dom.html.Canvas
+          |
+          |object Particles extends VHtmlComponent {
+          |
+          |    private val particles = Array.fill(1000)((Math.random() * 100, Math.random() * 100))
+          |
+          |    private var animating = false
+          |
+          |    def start() = {
+          |      animating = true
+          |      rerender()
+          |      dom.window.requestAnimationFrame(_ => animationLoop())
+          |    }
+          |
+          |    private def animationLoop():Unit = {
+          |      updateParticles()
+          |      if (animating) dom.window.requestAnimationFrame(_ => animationLoop())
+          |    }
+          |
+          |    private def updateParticles():Unit = {
+          |      for { i <- particles.indices } {
+          |        val (x, y) = particles(i)
+          |        particles(i) = (x + Math.random() * 2 - 1, y + Math.random() * 2 - 1)
+          |      }
+          |      plot.update()
+          |    }
+          |
+          |    val plot = new MutableArrayComponent[dom.Element, dom.Node, svg.Circle, (Double, Double)](
+          |      <.svg(), particles
+          |    )(
+          |      onEnter = { (d:(Double, Double), _) => SVG.circle(^.cls := "particle", ^.attr("r") := "1") },
+          |      onUpdate = { (d:(Double, Double), i, v) =>
+          |        for { circle <- v.domNode } {
+          |          circle.setAttribute("cx", d._1.toInt.toString)
+          |          circle.setAttribute("cy", d._2.toInt.toString)
+          |        }
+          |      }
+          |    )
+          |
+          |    override protected def render: DiffNode[Element, Node] = {
+          |      <.div(
+          |        plot,
+          |        <.div(
+          |          if (animating) {
+          |            <.button(^.cls := "btn btn-secondary", ^.onClick --> { animating = false; rerender() }, <("i")(^.cls := "fa fa-pause"))
+          |          } else {
+          |            <.button(^.cls := "btn btn-secondary", ^.onClick --> start(), <("i")(^.cls := "fa fa-play"))
+          |          }
+          |        )
+          |      )
+          |    }
+          |  }
+          |
+          |}
           |```
           |""".stripMargin)
     )

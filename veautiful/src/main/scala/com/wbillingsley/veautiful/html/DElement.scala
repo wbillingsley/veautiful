@@ -7,6 +7,7 @@ import org.scalajs.dom
 import org.scalajs.dom.{Element, Event, Node, html}
 import html.Div
 
+import scala.collection.mutable
 import scala.scalajs.js
 
 case class Lstnr(`type`:String, func:Event => _, usCapture:Boolean=false)
@@ -23,7 +24,7 @@ object DElement {
 
 case class DElement[+T <: dom.Element](name:String, var uniqEl:Option[Any] = None, ns:String = DElement.htmlNS) extends DiffNode[T, dom.Node] {
 
-  var attributes:Map[String, AttrVal] = Map.empty
+  private var attributes:mutable.Map[String, AttrVal] = mutable.Map.empty
 
   var properties:Map[String, PropVal] = Map.empty
 
@@ -150,7 +151,8 @@ case class DElement[+T <: dom.Element](name:String, var uniqEl:Option[Any] = Non
   }
 
   def attrs(attrs:AttrVal*) = {
-    attributes ++= attrs.map({ x => x.name -> x }).toMap
+    //attributes.addAll(attrs.map({ x => x.name -> x }))
+    for { a <- attrs } attributes(a.name) = a
     this
   }
 
