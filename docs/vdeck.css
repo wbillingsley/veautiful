@@ -1,0 +1,203 @@
+@import url('https://fonts.googleapis.com/css2?family=Fira+Sans&display=swap');
+
+
+/*
+    CSS for VDeck, separated so it's easier to copy.
+ */
+
+.resizable {
+    min-height: 480px;
+    resize: both;
+    overflow: hidden;
+    margin-right: 0.25rem;
+    background-clip: border-box;
+    border: 1px solid rgba(0,0,0,0.125);
+    position: relative;
+    left:0;
+    top:0;
+}
+
+.vslides-top {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    background: #d7d8d2;
+    overflow: hidden;
+}
+.vslides-top.unscaled {
+    overflow: inherit;
+}
+
+.vslides-top .vslides-scaler {
+    transform-origin: top left;
+    background: white;
+    position: relative;
+    box-shadow: 0 0 30px #888;
+    overflow: hidden;
+}
+
+.v-slide {
+    padding: 50px;
+    display: flex;
+    height: 100%;
+}
+
+.v-slide > *:first-child {
+    width: 100%;
+}
+
+.v-sequencer {
+    overflow: hidden;
+}
+
+.v-sequencer-slide.inactive {
+    visibility: hidden;
+}
+
+.v-sequencer-slide {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+}
+
+.v-sequencer .v-sequencer-footbox {
+    position: absolute;
+    bottom: 10px;
+    right: 10px;
+}
+
+.v-sequencer .v-sequencer-footbox button {
+    border-color: #6c757d;
+    background-color: #6c757d;
+    border-radius: 0.2rem;
+    color: #fff;
+}
+
+
+/*
+ * Default theme
+ */
+
+.v-slide {
+    font-family: 'Lato', sans-serif;
+    font-weight: normal;
+    font-size: 20px;
+}
+
+.v-slide li {
+    line-height: 200%;
+}
+
+.v-slide li pre {
+    line-height: 125%;
+}
+
+.v-slide h1, .v-slide h2, .v-slide h3 {
+    font-family: 'Fira Sans', sans-serif;
+    color: #7d5177;
+    font-weight: normal;
+    margin-top: 0;
+    margin-block-end: 1em;
+    font-variant-caps: normal;
+}
+
+.v-slide .byline {
+    color: #aaaaaa;
+}
+
+.v-slide img {
+    max-height: 75%;
+    max-width: 100%;
+}
+
+.v-slide .bigquote blockquote {
+    font-family: 'EB Garamond', serif;
+    font-weight: normal;
+    font-size: 42px;
+}
+
+.v-slide blockquote p {
+    padding: 15px;
+    border-left: 10px solid #aaa;
+}
+
+.v-slide .bigquote blockquote p {
+    font-family: 'EB Garamond', serif;
+    font-weight: normal;
+    font-size: 42px;
+    border: none;
+}
+
+
+.v-slide .bigquote .q {
+    font-size: 36px;
+}
+
+.v-slide code { font-family: 'Fira Mono', monospace; }
+
+.v-slide  .notes-only, .no {
+    display: none;
+}
+
+.v-slide .slide-center, .sc {
+    display: block;
+    text-align: center;
+    width: 100%;
+    height: 100%;
+}
+
+.v-slide .slide-center img, .sc img {
+    max-width: 100%;
+    max-height: 100%;
+}
+
+.v-slide .h300 {
+    height: 300px;
+}
+.v-slide .h500 {
+    height: 500px;
+}
+
+.v-slide a {
+    text-decoration: none;
+}
+
+.v-slide table > tbody > tr:nth-of-type(odd) {
+    background-color: #f9f9f9;
+}
+.v-slide table > thead > tr > th {
+    text-align: left;
+    padding: 8px;
+}
+table > tbody > tr > td {
+    padding: 8px;
+}
+
+.v-slide .header{
+    position: fixed;
+    top: 0px;
+    left: 20px;
+}
+
+.v-slide .footnote {
+    position: fixed;
+    text-align: left;
+    bottom: 10px;
+    left: 20px;
+    font-family: 'Lato', sans-serif;
+    font-size: 18px;
+    color: rgb(120, 120, 120);
+    margin-right: auto;
+    margin-left: auto;
+}
+
+.v-slide .center {
+    text-align: center;
+}
+
+.v-slide .center.middle {
+    margin-top: auto;
+    margin-bottom: auto;
+}
