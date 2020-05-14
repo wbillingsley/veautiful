@@ -1,7 +1,7 @@
 package example
 
 import com.wbillingsley.veautiful.html.{<, VHtmlNode, ^}
-import com.wbillingsley.veautiful.templates.VSlides
+import com.wbillingsley.veautiful.templates.{DeckBuilder, VSlides}
 
 object VSlidesExample {
 

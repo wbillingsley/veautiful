@@ -1,7 +1,6 @@
-package example
+package com.wbillingsley.veautiful.templates
 
 import com.wbillingsley.veautiful.html.{<, Attacher, Markup, VHtmlNode, ^}
-import com.wbillingsley.veautiful.templates.VSlides
 import org.scalajs.dom
 
 import scala.collection.mutable
