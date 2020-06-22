@@ -6,14 +6,15 @@ import org.scalajs.dom
 import org.scalajs.dom.raw.{MouseEvent, SVGElement}
 
 import scala.collection.mutable
+import scala.util.Random
 
-case class TileSpace[T](override val key:Option[String] = None, val language:TileLanguage[T])(val prefSize:(Int, Int) = (480, 640)) extends VHtmlComponent {
+case class TileSpace[T](override val key:Option[String] = None, val language:TileLanguage[T])(val canvasSize:(Int, Int) = (480, 640)) extends VHtmlComponent {
 
   import TileSpace._
 
   val tiles:mutable.Buffer[Tile[T]] = mutable.Buffer.empty
 
-  override def render: VHtmlDiffNode = <.svg(^.attr("width") := prefSize._1.toString, ^.attr("height") := prefSize._2.toString, ^.cls := "scatter-area",
+  override def render: VHtmlDiffNode = <.svg(^.attr("width") := canvasSize._1.toString, ^.attr("height") := canvasSize._2.toString, ^.cls := "scatter-area",
     tiles.toSeq
   )
 
@@ -195,12 +196,31 @@ case class TileSpace[T](override val key:Option[String] = None, val language:Til
   }
 
   /**
+    * Adds a tile to the centre of the canvas
+    */
+  def addTileToMiddle(tile:Tile[T]) = {
+    for {
+      s <- domNode
+      t = s.scrollTop
+      l = s.scrollLeft
+      ch = s.clientHeight
+      cw = s.clientWidth
+    } {
+      tile.x = (t + ch / 2 + Random.nextInt(10) - 5).toInt
+      tile.y = (l + cw / 2 + Random.nextInt(10) - 5).toInt
+    }
+    tiles.append(tile)
+    update()
+    layout()
+  }
+
+  /**
     * If this TileSpace is attached (and in the page), determines any scale that has been applied to it through CSS.
     */
   def scale = {
     domNode map { case e:SVGElement =>
       val bcrw = e.getBoundingClientRect().width
-      val cw = prefSize._1
+      val cw = canvasSize._1
       val s = bcrw / cw
       s
     }

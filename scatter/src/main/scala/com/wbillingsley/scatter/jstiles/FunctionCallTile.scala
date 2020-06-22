@@ -8,7 +8,9 @@ class FunctionCallTile(tileSpace:TileSpace[JSExpr], name:String, params:Seq[Stri
 
   val sockets = params.map { n => new Socket[JSExpr](this, Some(n)) }
 
-  val s:Seq[TileComponent[JSExpr]] = sockets.map(Seq(_)).reduce[Seq[TileComponent[JSExpr]]]({ _ ++ Seq(TileText[JSExpr](", ")) ++ _ })
+  val s:Seq[TileComponent[JSExpr]] = {
+    if (sockets.isEmpty) Seq.empty else sockets.map(Seq(_)).reduce[Seq[TileComponent[JSExpr]]]({ _ ++ Seq(TileText[JSExpr](", ")) ++ _ })
+  }
 
   override val tileContent = {
     HBox(
