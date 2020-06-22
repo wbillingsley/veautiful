@@ -35,14 +35,20 @@ object Sequencer {
   * @param nodes
   * @param index
   */
-case class Sequencer(override val key:Option[String] = None)(var nodes: Seq[SequenceItem], var index:Int = 0, var layout:Sequencer.LayoutFunc = Sequencer.defaultLayout) extends VHtmlComponent with MakeItSo {
+case class Sequencer(override val key:Option[String] = None)(
+  var nodes: Seq[SequenceItem], var index:Int = 0, var layout:Sequencer.LayoutFunc = Sequencer.defaultLayout,
+  onIndexChange: Option[Int => Unit] = None
+) extends VHtmlComponent with MakeItSo {
 
   def next():Unit = {
     if (index < nodes.size - 1) {
       nodes(index).active = false
       index = index + 1
       nodes(index).active = true
-      update()
+      onIndexChange match {
+        case Some(f) => f(index)
+        case _ => update()
+      }
     }
   }
 
@@ -51,7 +57,10 @@ case class Sequencer(override val key:Option[String] = None)(var nodes: Seq[Sequ
       nodes(index).active = false
       index = index - 1
       nodes(index).active = true
-      update()
+      onIndexChange match {
+        case Some(f) => f(index)
+        case _ => update()
+      }
     }
   }
 

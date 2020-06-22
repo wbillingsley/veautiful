@@ -20,7 +20,10 @@ object VSlides {
 
 }
 
-case class VSlides(width: Int, height: Int, override val key: Option[String] = None, scaleToWindow:Boolean = true)(var content:Seq[SequenceItem], var index:Int = 0, var layout:Sequencer.LayoutFunc = VSlides.defaultLayout) extends VHtmlComponent with MakeItSo {
+case class VSlides(width: Int, height: Int, override val key: Option[String] = None, scaleToWindow:Boolean = true)(
+  var content:Seq[SequenceItem], var index:Int = 0, var layout:Sequencer.LayoutFunc = VSlides.defaultLayout,
+  onIndexChange: Option[Int => Unit] = None
+) extends VHtmlComponent with MakeItSo {
 
   var scale:Double = 1
   var top:Double = 0
@@ -62,7 +65,7 @@ case class VSlides(width: Int, height: Int, override val key: Option[String] = N
           s"width: ${width}px; height: ${height}px; "
         }),
         Sequencer()(
-          content, index, layout = layout
+          content, index, layout = layout, onIndexChange
         )
       )
     )
