@@ -194,6 +194,7 @@ object PathDSL {
             case h :: t if h == s => Some((found, t))
             case _ => None
           }
+          case None => None
         }
       }
     }

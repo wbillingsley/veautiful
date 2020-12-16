@@ -73,7 +73,7 @@ class DefaultReconciler(shouldUpdate: => Boolean) extends Reconciler {
     } {
       var done = false
 
-      do {
+      while {
         if (leftIt.isEmpty) {
           logger.trace("Left empty")
 
@@ -95,20 +95,20 @@ class DefaultReconciler(shouldUpdate: => Boolean) extends Reconciler {
 
         } else {
           val l = leftIt.next()
-          if (l == r) {                 // The common case will be the item will already be there
+          if (l == r) { // The common case will be the item will already be there
             //ops.append(Retain)
-            update(index) = l           // We retain the old item
+            update(index) = l // We retain the old item
             done = true
-          } else if (!movedUp(l)) {     // If we're looking at a left item that's moved up the list, skip it
+          } else if (!movedUp(l)) { // If we're looking at a left item that's moved up the list, skip it
 
             r.key.flatMap(leftKeys.get) match { // Try to find it in the left keys and move it here
               case Some(item) =>
                 ops.append(InsertBefore(item, l))
-                update(index) = item            // The found item should sit at this point in the update array
+                update(index) = item // The found item should sit at this point in the update array
                 movedUpSet.add(item.key.get)
                 done = true
 
-                l.key.flatMap(rightKeys.get) match {  // We need to work out what's happening to the left item
+                l.key.flatMap(rightKeys.get) match { // We need to work out what's happening to the left item
                   case Some(k) =>
                     logger.trace(s"item $k moving down")
                   // Just skip it - it'll be moving down later
@@ -134,7 +134,8 @@ class DefaultReconciler(shouldUpdate: => Boolean) extends Reconciler {
 
         }
 
-      } while (!done)
+        !done
+      } do { } // Scala 3 do .. while  
 
     }
 

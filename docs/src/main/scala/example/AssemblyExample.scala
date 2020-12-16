@@ -25,7 +25,7 @@ object AssemblyExample {
     )
   ))
 
-  def page() = {
+  def page = {
     Common.layout(<.div(
       <.h1("AVR Assembly simulator"),
       <.div(^.cls := "resizable", deck)))

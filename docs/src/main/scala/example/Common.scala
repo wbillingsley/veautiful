@@ -44,7 +44,7 @@ object Common {
     )
   )
 
-  val markdownGenerator = new Markup({ s:String => js.Dynamic.global.marked(s).asInstanceOf[String] })
+  val markdownGenerator = new Markup({ (s:String) => js.Dynamic.global.marked(s).asInstanceOf[String] })
 
   def markdown(s:String):VHtmlNode = markdownGenerator.Fixed(s)
 

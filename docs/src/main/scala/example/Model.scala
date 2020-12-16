@@ -127,7 +127,7 @@ object Model {
       notifyListeners()
     }
 
-    handle = handle orElse Some(timers.setInterval(14)(handleTick))
+    handle = handle orElse Some(timers.setInterval(14)(handleTick()))
   }
 
   def stopTicking():Unit = {

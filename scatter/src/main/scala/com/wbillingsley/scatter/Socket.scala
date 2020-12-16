@@ -7,7 +7,7 @@ import com.wbillingsley.veautiful.logging.Logger
 
 import scala.annotation.tailrec
 
-class Socket[T](val within:Tile[T], acceptType:Option[String] = None, thin:Boolean = false, onChange: (Socket[T]) => Unit = { x:Socket[T] => }) extends TileComponent[T] {
+class Socket[T](val within:Tile[T], acceptType:Option[String] = None, thin:Boolean = false, onChange: (Socket[T]) => Unit = { (x:Socket[T]) => }) extends TileComponent[T] {
 
   var content:Option[Tile[T]] = None
 

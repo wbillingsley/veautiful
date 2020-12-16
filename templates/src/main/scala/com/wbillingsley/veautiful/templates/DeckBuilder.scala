@@ -67,7 +67,7 @@ class DeckBuilder(width:Int = 1920, height:Int = 1080, slides:List[Seq[() => VHt
 @JSExportTopLevel("DeckBuilderCompanion")
 object DeckBuilder {
 
-  var markdownGenerator = new Markup({ s:String => js.Dynamic.global.marked(s).asInstanceOf[String] })
+  var markdownGenerator = new Markup({ (s:String) => js.Dynamic.global.marked(s).asInstanceOf[String] })
 
   val publishedDecks:mutable.Map[String, VSlides] = mutable.Map.empty
 

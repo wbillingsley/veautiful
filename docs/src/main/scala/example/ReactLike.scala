@@ -189,7 +189,7 @@ object ReactLike {
               ),
               <.span(^.cls := "input-group-append",
                 <("button")(
-                  ^.cls := "btn btn-sm btn-secondary", ^.onClick --> reset, "Reset"
+                  ^.cls := "btn btn-sm btn-secondary", ^.onClick --> reset(), "Reset"
                 )
               )
             )

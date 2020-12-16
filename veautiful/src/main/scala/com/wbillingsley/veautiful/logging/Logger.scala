@@ -16,9 +16,9 @@ class Logger(val name:String) {
 @JSExportTopLevel("Logger")
 object Logger {
 
-  def getLogger[T](c:Class[T]):Logger = new Logger(c.getName)
+  def getLogger(c:Class[_]):Logger = new Logger(c.getName)
 
-  def getLogger[T](name:String):Logger = new Logger(name)
+  def getLogger(name:String):Logger = new Logger(name)
 
   sealed trait Level extends Ordered[Level] {
     val num:Int

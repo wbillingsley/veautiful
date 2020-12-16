@@ -66,9 +66,9 @@ case class Sequencer(override val key:Option[String] = None)(
 
   def footBox:VHtmlNode = {
     <.div(^.cls := "v-sequencer-footbox",
-      <.button(^.onClick --> previous, "<"),
+      <.button(^.onClick --> previous(), "<"),
       <.span(s" ${index+1} / ${nodes.size} "),
-      <.button(^.onClick --> next, ">")
+      <.button(^.onClick --> next(), ">")
     )
   }
 

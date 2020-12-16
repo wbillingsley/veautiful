@@ -18,9 +18,9 @@ object Router extends HistoryRouter[ExampleRoute] {
 
   var route:ExampleRoute = IntroRoute
 
-  def rerender() = renderElements(render())
+  def rerender() = renderElements(render)
 
-  def render() = {
+  def render = {
     route match {
       case IntroRoute => Intro.page
       case ToDoRoute => ToDoList.page

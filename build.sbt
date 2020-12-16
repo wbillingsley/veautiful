@@ -2,7 +2,7 @@
 
 val versionStr = "0.1-SNAPSHOT"
 
-val scalaVersionStr = "2.13.1"
+val scalaVersionStr = "3.0.0-M2"
 
 lazy val veautiful = project.in(file("veautiful"))
   .enablePlugins(ScalaJSPlugin)
@@ -18,8 +18,8 @@ lazy val veautiful = project.in(file("veautiful"))
     scalaJSUseMainModuleInitializer := false,
 
     libraryDependencies ++= Seq(
-      "org.scala-js" %%% "scalajs-dom" % "1.0.0",
-      "org.scalatest" %%% "scalatest" % "3.1.1" % "test"
+      ("org.scala-js" %%% "scalajs-dom" % "1.1.0").withDottyCompat(scalaVersion.value),
+      ("org.scalatest" %%% "scalatest" % "3.2.3" % "test").withDottyCompat(scalaVersion.value)
     )
 )
 
@@ -34,8 +34,8 @@ lazy val templates = project.in(file("templates"))
     scalaVersion := scalaVersionStr,
 
     libraryDependencies ++= Seq(
-      "org.scala-js" %%% "scalajs-dom" % "1.0.0",
-      "org.scalatest" %%% "scalatest" % "3.1.1" % "test"
+      ("org.scala-js" %%% "scalajs-dom" % "1.1.0").withDottyCompat(scalaVersion.value),
+      ("org.scalatest" %%% "scalatest" % "3.2.3" % "test").withDottyCompat(scalaVersion.value)
     )
   )
 
@@ -50,8 +50,8 @@ lazy val scatter = project.in(file("scatter"))
     scalaVersion := scalaVersionStr,
 
     libraryDependencies ++= Seq(
-      "org.scala-js" %%% "scalajs-dom" % "1.0.0",
-      "org.scalatest" %%% "scalatest" % "3.1.1" % "test"
+      ("org.scala-js" %%% "scalajs-dom" % "1.1.0").withDottyCompat(scalaVersion.value),
+      ("org.scalatest" %%% "scalatest" % "3.2.3" % "test").withDottyCompat(scalaVersion.value)
     )
   )
 
@@ -73,8 +73,8 @@ lazy val wren = project.in(file("wren"))
     scalaVersion := scalaVersionStr,
 
     libraryDependencies ++= Seq(
-      "org.scala-js" %%% "scalajs-dom" % "1.0.0",
-      "org.scalatest" %%% "scalatest" % "3.1.1" % "test"
+      ("org.scala-js" %%% "scalajs-dom" % "1.1.0").withDottyCompat(scalaVersion.value),
+      ("org.scalatest" %%% "scalatest" % "3.2.3" % "test").withDottyCompat(scalaVersion.value)
     )
   )
 
@@ -95,8 +95,8 @@ lazy val docs = project.in(file("docs"))
     scalacOptions ++= Seq("-unchecked", "-deprecation"),
 
     libraryDependencies ++= Seq(
-      "org.scala-js" %%% "scalajs-dom" % "1.0.0",
-      "org.scalatest" %%% "scalatest" % "3.1.1" % "test"
+      ("org.scala-js" %%% "scalajs-dom" % "1.1.0").withDottyCompat(scalaVersion.value),
+      ("org.scalatest" %%% "scalatest" % "3.2.3" % "test").withDottyCompat(scalaVersion.value)
     ),
 
     // Used by Travis-CI to get the script out from the .gitignored target directory

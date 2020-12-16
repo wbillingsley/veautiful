@@ -76,16 +76,16 @@ object Challenge {
 
   def defaultHomeIcon:VHTMLElement = <("i")(^.cls := "material-icons", "home")
 
-  def defaultHeader(homePath:HomePath, homeIcon: => VHtmlNode = defaultHomeIcon) = { c:Challenge =>
+  def defaultHeader(homePath:HomePath, homeIcon: => VHtmlNode = defaultHomeIcon) = { (c:Challenge) =>
     <.div(
       <.a(^.cls := "home-link", ^.href := homePath(c), homeIcon),
       <.span(^.cls := "challenge-name", c.levels(c.level).name)
     )
   }
 
-  def defaultTopRight() = { c:Challenge => <.div() }
+  def defaultTopRight() = { (c:Challenge) => <.div() }
 
-  def progressTile(level:Level, i:Int, levelPath: LevelPath, stagePath: StagePath) = { c:Challenge =>
+  def progressTile(level:Level, i:Int, levelPath: LevelPath, stagePath: StagePath) = { (c:Challenge) =>
 
     def levelActive = c.level == i
 
@@ -113,7 +113,7 @@ object Challenge {
     )
   }
 
-  def defaultProgressBlock(levels:Seq[Challenge.Level], levelPath: LevelPath, stagePath: StagePath) = { c:Challenge =>
+  def defaultProgressBlock(levels:Seq[Challenge.Level], levelPath: LevelPath, stagePath: StagePath) = { (c:Challenge) =>
     <.div(^.cls := "progress-block",
       for {
         (l, i) <- levels.zipWithIndex
@@ -121,7 +121,7 @@ object Challenge {
     )
   }
 
-  def defaultPageControls(levels:Seq[Challenge.Level], levelPath: LevelPath, stagePath: StagePath) = { c:Challenge =>
+  def defaultPageControls(levels:Seq[Challenge.Level], levelPath: LevelPath, stagePath: StagePath) = { (c:Challenge) =>
     <.div(^.cls := "btn-group",
       for { (l, s) <- c.previous } yield <.a(^.cls := "btn btn-outline-secondary",
         ^.href := stagePath(c, l, s), s"Previous"

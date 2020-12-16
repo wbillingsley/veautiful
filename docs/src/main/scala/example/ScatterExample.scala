@@ -12,7 +12,7 @@ object ScatterExample {
   @JSExport
   val scatterCanvas = new TileSpace(Some("example"), JSLang)()
 
-  val pt = new ProgramTile(scatterCanvas, <.button(^.cls := "btn btn-sm btn-primary", ^.onClick --> run, "Run"))
+  val pt = new ProgramTile(scatterCanvas, <.button(^.cls := "btn btn-sm btn-primary", ^.onClick --> run(), "Run"))
 
   @JSExport
   val items = Seq(

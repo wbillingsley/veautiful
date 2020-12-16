@@ -233,7 +233,7 @@ object Diffusion {
                 <("i")(^.cls := "fa fa-play")
               ),
               <("button")(
-                ^.cls := "btn btn-sm btn-secondary", ^.onClick --> reset, "Reset"
+                ^.cls := "btn btn-sm btn-secondary", ^.onClick --> reset(), "Reset"
               )
             ),
 
