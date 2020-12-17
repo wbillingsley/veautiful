@@ -1,6 +1,6 @@
 package com.wbillingsley.veautiful.templates
 
-import com.wbillingsley.veautiful.html.<.{DElAppliable, HTMLAppliable, VHTMLElement}
+import com.wbillingsley.veautiful.html.<.{CustomElementChild, HTMLAppliable, VHTMLElement}
 import com.wbillingsley.veautiful.html.{<, DElement, VHtmlComponent, VHtmlNode, ^}
 import com.wbillingsley.veautiful.templates.Challenge.{HomePath, LevelPath, StagePath}
 import com.wbillingsley.veautiful.templates.Sequencer.LayoutFunc

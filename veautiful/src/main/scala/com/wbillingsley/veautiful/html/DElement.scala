@@ -1,6 +1,6 @@
 package com.wbillingsley.veautiful.html
 
-import com.wbillingsley.veautiful.html.<.DEAAction
+import com.wbillingsley.veautiful.html.<.{ElementAction, CustomElementChild}
 import com.wbillingsley.veautiful.reconcilers.Reconciler
 import com.wbillingsley.veautiful.{DefaultNodeOps, DiffNode, NodeOps, VNode}
 import org.scalajs.dom
@@ -18,7 +18,11 @@ case class EvtListener[T](`type`:String, f:Function[T, _], capture:Boolean)
 
 
 object DElement {
+  
+  /** The namespace for HTML nodes */
   val htmlNS = "http://www.w3.org/1999/xhtml"
+  
+  /** The namespace for SVG nodes */
   val svgNS = "http://www.w3.org/2000/svg"
 }
 
@@ -89,7 +93,6 @@ case class DElement[+T <: dom.Element](name:String, var uniqEl:Option[Any] = Non
       applyStylesToNode(styles)
 
       if (listeners.keys != el.listeners.keys) {
-        println("Listeners differ")
         removeLsntrsFromNode(listeners.values)
         applyLsntrsToNode(listeners.values)
       }
@@ -166,8 +169,17 @@ case class DElement[+T <: dom.Element](name:String, var uniqEl:Option[Any] = Non
     this
   }
 
-  def apply(ac: <.DElAppliable[T] *):DElement[T] = {
-    ac.foreach(_.applyTo(this))
+  
+  def apply(ac: <.ElementChild[T] *):DElement[T] = {
+    for child <- ac do child match
+      case n:VNode[dom.Node] => addChildren(n)
+      case s:String => addChildren(Text(s))
+      case a:AttrVal => attrs(a)
+      case p:PropVal => prop(p)
+      case s:InlineStyle => style(s)
+      case l:Lstnr => on(l)
+      case appliable:CustomElementChild[T] => appliable.applyTo(this)
+      case i:Iterable[<.SingleChild[T]] => i.foreach((sc) => apply(sc))
     this
   }
 
@@ -214,48 +226,30 @@ object < {
   type VDOMElement = DElement[dom.Element]
 
 
-  type HTMLAppliable = DElAppliable[html.Element]
-  type SVGAppliable = DElAppliable[dom.svg.Element]
+  type HTMLAppliable = ElementChild[html.Element]
+  type SVGAppliable = ElementChild[dom.svg.Element]
 
-  trait DElAppliable[-T <: dom.Element] {
+  /**
+    * An individual item that can be passed into the `apply` method of a DElement. e.g. in
+    * 
+    * <.button(^.onClick --> println("bang"), "Hello ", <.b("World"))
+    */
+  type SingleChild[-T <: dom.Element] = String | VNode[dom.Node] | AttrVal | PropVal | Lstnr | InlineStyle | CustomElementChild[T]
+  
+  /**
+    * Things that can be arguments to the DElement's apply method. 
+    * This allows Sequences, Options, etc of SingleChild to be included, simplifying the syntax
+    */
+  type ElementChild[-T <: dom.Element] = SingleChild[T] | Iterable[SingleChild[T]]
+
+  /**
+    * Allows libraries to define their own operations that can be passed into the apply method of an element in a DSL
+    */
+  trait CustomElementChild[-T <: dom.Element] {
     def applyTo[TT <: T](d:DElement[TT]):Unit
   }
 
-
-
-  implicit class DEAVNode(val vNode: VNode[dom.Node]) extends DElAppliable[dom.Element] {
-    override def applyTo[T <: dom.Element](d: DElement[T]): Unit = d.addChildren(vNode)
-  }
-
-  implicit class DEAIVNode(val nodes: Iterable[VNode[dom.Node]]) extends DElAppliable[dom.Element] {
-    override def applyTo[T <: dom.Element](d: DElement[T]):Unit = d.addChildren(nodes.toSeq:_*)
-  }
-
-  implicit class DEAAttr(val a: AttrVal) extends DElAppliable[dom.Element] {
-    override def applyTo[T <: dom.Element](d: DElement[T]): Unit = d.attrs(a)
-  }
-
-  implicit class DEAProp(val a: PropVal) extends DElAppliable[dom.Element] {
-    override def applyTo[T <: dom.Element](d: DElement[T]): Unit = d.prop(a)
-  }
-
-  implicit class DEALstnr(val l: Lstnr) extends DElAppliable[dom.Element] {
-    override def applyTo[T <: dom.Element](d: DElement[T]): Unit = d.on(l)
-  }
-
-  implicit class DEAStyle(val s:InlineStyle) extends DElAppliable[html.Element] {
-    override def applyTo[T <: dom.Element](d: DElement[T]): Unit = d.style(s)
-  }
-
-  implicit class DEAText(t: String) extends DElAppliable[dom.Element] {
-    override def applyTo[T <: dom.Element](d: DElement[T]): Unit = d.addChildren(Text(t))
-  }
-
-  implicit class DEAOption[T, E <: dom.Element](opt:Option[T])(implicit ev: T => DElAppliable[E]) extends DElAppliable[E] {
-    override def applyTo[TT <: E](d: DElement[TT]): Unit = opt.foreach(ev(_).applyTo(d))
-  }
-
-  class DEAAction[T <: dom.Element](f: DElement[T] => Unit) extends DElAppliable[T] {
+  class ElementAction[T <: dom.Element](f: DElement[T] => Unit) extends CustomElementChild[T] {
     def applyTo[TT <: T](d:DElement[TT]) = f(d)
   }
 
@@ -304,7 +298,7 @@ object < {
 
 object SVG {
 
-  def apply(ac: <.DElAppliable[dom.svg.Element] *):DElement[dom.svg.Element] = <.apply("svg", ns=DElement.svgNS)(ac:_*)
+  def apply(ac: <.CustomElementChild[dom.svg.Element] *):DElement[dom.svg.Element] = <.apply("svg", ns=DElement.svgNS)(ac:_*)
 
   def svg = <.apply[org.scalajs.dom.svg.SVG]("svg", ns=DElement.svgNS)
 
@@ -350,7 +344,7 @@ object ^ {
   }
 
   object Keyable {
-    def :=(k: String): <.DElAppliable[Element] = new <.DElAppliable[dom.Element] {
+    def :=(k: String): <.CustomElementChild[Element] = new <.CustomElementChild[dom.Element] {
       override def applyTo[TT <: Element](d: DElement[TT]): Unit = {
         d.uniqEl = Some(k)
       }
@@ -358,7 +352,7 @@ object ^ {
   }
 
   object reconciler {
-    def :=(r:Reconciler) = new DEAAction[dom.Element]({ x => x.reconciler = r })
+    def :=(r:Reconciler) = new ElementAction[dom.Element]({ x => x.reconciler = r })
   }
 
   def key = Keyable
