@@ -40,8 +40,13 @@ trait TileComponent[T] extends VHtmlComponent {
     super.detach()
   }
 
+  def size:Option[(Int, Int)]
 
-  def size:Option[(Int, Int)] = {
+  /**
+    * Measures the size of the DOM element. Note that this can cause the browser to have to do a layout pass.
+    * @return
+    */
+  def measuredSize:Option[(Int, Int)] = {
     logger.trace(s"Size: $this $uid domNode $domNode")
     domNode.map(TileComponent.sizeOf)
   }

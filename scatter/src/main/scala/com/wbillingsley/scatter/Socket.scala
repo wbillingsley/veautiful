@@ -85,6 +85,13 @@ class Socket[T](val within:Tile[T], acceptType:Option[String] = None, thin:Boole
     )
   }
 
+  override def size: Option[(Int, Int)] = {
+    content match {
+      case Some(t) => t.size
+      case None => if thin then Some(20, 2) else Some(35, 15)
+    }
+  }
+
   override def layoutChildren(): Unit = {
     super.layoutChildren()
     content.foreach(_.layout())

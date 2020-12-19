@@ -16,6 +16,7 @@ case class TileForeignObject[T](content: VHtmlNode) extends TileComponent[T] {
 
 
   override def size:Option[(Int, Int)] = {
+    // We need the size of the contained object
     for {
       e <- domNode
       c <- {

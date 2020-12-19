@@ -8,4 +8,6 @@ case class TileText[T](text:String) extends TileComponent[T] {
   }
 
   override def emptySockets: Seq[(Int, Int, Socket[T])] = Seq.empty
+  
+  override def size = measuredSize // FIXME: don't do this, it's slow
 }

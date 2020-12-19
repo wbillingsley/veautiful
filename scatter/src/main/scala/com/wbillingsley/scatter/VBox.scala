@@ -27,4 +27,19 @@ case class VBox[T](children:TileComponent[T]*) extends TileComponent[T] {
       (x, y, s) <- c.emptySockets
     } yield (c.x + x, c.y + y, s)
   }
+
+  override def size: Option[(Int, Int)] = {
+    var maxW:Int = 0
+    var totalH:Int = 0
+
+    for {
+      c <- children
+      (w, h) <- c.size
+    } do {
+      maxW = Math.max(w, maxW)
+      totalH += h + HBox.padding
+    }
+
+    Some(maxW, totalH)
+  }
 }

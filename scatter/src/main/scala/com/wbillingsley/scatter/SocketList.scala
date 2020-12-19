@@ -5,7 +5,9 @@ class SocketList[T](val within:Tile[T], acceptType:Option[String] = None) extend
 
   var sockets:Seq[Socket[T]] = Seq(new Socket(within, acceptType, false, refreshSockets))
 
-  var content = VBox(sockets:_*)
+  private var content = VBox(sockets:_*)
+
+  override def size: Option[(Int, Int)] = content.size
 
   def refreshSockets(socket: Socket[T]):Unit = {
     val filled = sockets.filter(_.content.nonEmpty)

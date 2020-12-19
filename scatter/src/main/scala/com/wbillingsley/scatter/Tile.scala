@@ -147,6 +147,13 @@ abstract class Tile[T](val ts:TileSpace[T], val mobile:Boolean = true, val typeL
       )
     }
   }
+  
+  def size:Option[(Int, Int)] = {
+    if (showTypeLoop)
+      for (w, h) <- tileContent.size yield (16 + w, h)
+    else
+      tileContent.size
+  }
 
   /**
     * The elements to render inside the tile. At the moment, this has to be a val, because components will try to
