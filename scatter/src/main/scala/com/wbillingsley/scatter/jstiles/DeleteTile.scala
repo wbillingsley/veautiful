@@ -2,7 +2,7 @@ package com.wbillingsley.scatter.jstiles
 
 import com.wbillingsley.scatter._
 
-class DeleteTile (tileSpace:TileSpace[JSExpr], cls:String = "btn btn-danger") extends Tile(tileSpace, false, false, cssClass = "delete") {
+class DeleteTile (tileSpace:TileSpace[JSExpr], cls:String = "btn btn-danger") extends Tile(tileSpace, false, TypeLoopMode.Never, cssClass = "delete") {
 
   var remembered:Option[Tile[JSExpr]] = None
 

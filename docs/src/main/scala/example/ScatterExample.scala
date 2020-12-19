@@ -16,15 +16,15 @@ object ScatterExample {
 
   @JSExport
   val items = Seq(
-    pt,
-    StringTile(scatterCanvas, "Hello world"),
-    StringTile(scatterCanvas, "Another string"),
-    new FunctionCallTile(scatterCanvas, "console.log", Seq("String")),
-    new NumberInputTile(scatterCanvas),
-    new IfElseTile(scatterCanvas)
+    (0d, 0d) -> pt,
+    (50d, 50d) -> StringTile(scatterCanvas, "Hello world"),
+    (70d, 70d) -> StringTile(scatterCanvas, "Another string"),
+    (100d, 100d) -> new FunctionCallTile(scatterCanvas, "console.log", Seq("String")),
+    (0d, 0d) -> new NumberInputTile(scatterCanvas),
+    (0d, 0d) -> new IfElseTile(scatterCanvas)
   )
 
-  scatterCanvas.tiles.appendAll(items)
+  scatterCanvas.addTiles(items:_*)
 
   val output = <.textarea(^.attr("placeholder") := "Program will appear here")
 

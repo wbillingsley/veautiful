@@ -6,13 +6,47 @@ import com.wbillingsley.veautiful.OnScreen
 import com.wbillingsley.veautiful.html.<.{VDOMElement, VSVGElement}
 import org.scalajs.dom.raw.{MouseEvent, SVGElement}
 
-abstract class Tile[T](val ts:TileSpace[T], val mobile:Boolean = true, val typeLoop:Boolean = true, val cssClass:String = "") extends OnScreen with VHtmlComponent {
+import scala.annotation.tailrec
+
+/**
+  * A tile can be contained in a socket, or it can be being dragged around the canvas as (in) a FreeTile
+  * @tparam T
+  */
+type TileParent[T] = Socket[T] | FreeTile[T]
+
+/**
+  * Whether a tile should display its "type loop"
+  */
+enum TypeLoopMode {
+  case Never, WhenFree, Always
+}
+
+abstract class Tile[T](val ts:TileSpace[T], val mobile:Boolean = true, val typeLoopMode:TypeLoopMode = TypeLoopMode.WhenFree, val cssClass:String = "") extends VHtmlComponent {
 
   import Tile._
+  
+  var within:Option[TileParent[T]] = None
 
-  def free:Boolean = within.isEmpty
+  /** Whether the tile is contained in a FreeTile */
+  def free:Boolean = within match {
+    case Some(_:FreeTile[T]) => true
+    case _ => false
+  }
 
-  var within:Option[Socket[T]] = None
+  def showTypeLoop = typeLoopMode match {
+    case TypeLoopMode.Always => true
+    case TypeLoopMode.Never => false
+    case TypeLoopMode.WhenFree => free
+  }
+
+  @tailrec
+  final def freeTile:Option[FreeTile[T]] = {
+    within match {
+      case Some(ft:FreeTile[T]) => Some(ft)
+      case Some(s:Socket[T]) => s.within.freeTile
+      case None => None
+    }
+  }
 
   def returnType:String
 
@@ -21,11 +55,11 @@ abstract class Tile[T](val ts:TileSpace[T], val mobile:Boolean = true, val typeL
     * @param s the socket it is dropped into
     */
   def onPlacedInSocket(s:Socket[T]):Unit = {
-    setPosition(0,0)
     within = Some(s)
     if (ts.activeTile.contains(this)) {
       ts.activeTile = None
     }
+    rerender()
   }
 
   /**
@@ -35,24 +69,29 @@ abstract class Tile[T](val ts:TileSpace[T], val mobile:Boolean = true, val typeL
     * @param y the y location the tile should move to
     */
   def onRemovedFromSocket(s:Socket[T], x:Int, y:Int):Unit = {
-    setPosition(x, y)
     within = None
   }
+  
+  def onPlacedInFreeTile(ft:FreeTile[T]):Unit = {
+    within = Some(ft)
+  }
 
-  def onMouseDown(e:MouseEvent):Unit = {
+  val onMouseDown: MouseEvent => Unit = { (e) =>
     logger.trace(s"Mousedown on $this")
     e.stopPropagation()
     ts.onMouseDown(this, e)
+    
+    for ft <- freeTile do ts.onMouseDown(ft, e)
   }
 
-  def onMouseOver(e:MouseEvent):Unit = {
+  val onMouseOver: MouseEvent => Unit = { (e) =>
     logger.trace(s"Mouse over $this")
     ts.activeTile = Some(this)
     e.stopPropagation()
     rerender()
   }
 
-  def onMouseOut(e:MouseEvent):Unit = {
+  val onMouseOut: MouseEvent => Unit = { (e) =>
     logger.trace(s"Mouse out $this")
     if (ts.activeTile.contains(this)) ts.activeTile = None
     e.stopPropagation()
@@ -64,7 +103,7 @@ abstract class Tile[T](val ts:TileSpace[T], val mobile:Boolean = true, val typeL
     (x, y, e) <- tileContent.emptySockets
   } yield (contentOffsetX + x, contentOffsetY + y, e)
 
-  def registerDragListeners():Unit = {
+  def registerMouseListeners():Unit = {
     for { n <- domNode } {
       n.addEventListener("pointerdown", onMouseDown)
       n.addEventListener("pointerout", onMouseOut)
@@ -72,8 +111,13 @@ abstract class Tile[T](val ts:TileSpace[T], val mobile:Boolean = true, val typeL
     }
   }
 
+  override def afterAttach(): Unit = {
+    super.afterAttach()
+    if (mobile) registerMouseListeners()
+  }
+
   def contentOffsetX:Int = {
-    if (typeLoop) Tile.boxStartX + Tile.padding else Tile.padding
+    if (showTypeLoop) Tile.boxStartX + Tile.padding else Tile.padding
   }
 
   def contentOffsetY:Int = Tile.padding
@@ -81,8 +125,7 @@ abstract class Tile[T](val ts:TileSpace[T], val mobile:Boolean = true, val typeL
   override def render: VHtmlDiffNode = {
     logger.trace(s"render called on $this")
 
-    val c = tileContent
-    val (w, h) = c.size getOrElse (20,20)
+    val (w, h) = tileContent.size getOrElse (20,20)
 
     def classString: String = {
       var str = "tile " + cssClass
@@ -91,16 +134,16 @@ abstract class Tile[T](val ts:TileSpace[T], val mobile:Boolean = true, val typeL
       str
     }
 
-    if (within.isEmpty) {
-      SVG.g(^.cls := classString, ^.attr("transform") := s"translate($x, $y)",
+    if (free) {
+      SVG.g(^.cls := classString, 
         tileBoundary,
         SVG.g(^.cls := "type-icon", ts.language.nodeIcon(returnType)),
-        SVG.g(^.attr("transform") := s"translate($contentOffsetX, $contentOffsetY)", c)
+        SVG.g(^.attr("transform") := s"translate($contentOffsetX, $contentOffsetY)", tileContent)
       )
     } else {
       SVG.g(^.cls := classString,
         SVG.rect(^.attr("width") := w, ^.attr("height") := h),
-        c
+        tileContent
       )
     }
   }
@@ -114,29 +157,10 @@ abstract class Tile[T](val ts:TileSpace[T], val mobile:Boolean = true, val typeL
 
   val tileBoundary:VSVGElement = SVG.path(^.cls := "tile-path")
 
-  override def afterAttach(): Unit = {
-    super.afterAttach()
-    if (mobile) registerDragListeners()
-  }
-
-  override def size: Option[(Int, Int)] = domNode map {
-    case n:SVGElement =>
-      val r = n.getBoundingClientRect()
-      (r.width.toInt, r.height.toInt)
-  }
-
-  override def setPosition(x: Double, y: Double): Unit = {
-    this.x = x.toInt
-    this.y = y.toInt
-    domNode foreach  { case e:SVGElement =>
-      e.setAttribute("transform", s"translate(${x.toInt.toString}, ${y.toInt.toString})")
-    }
-  }
-
   def layout():Unit = {
     tileContent.layoutChildren()
     for { el <- tileBoundary.domNode } {
-      el.setAttribute("d", Tile.path(tileContent, typeLoop))
+      el.setAttribute("d", Tile.path(tileContent, showTypeLoop))
     }
   }
 

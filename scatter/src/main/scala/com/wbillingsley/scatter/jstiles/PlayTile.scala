@@ -1,9 +1,9 @@
 package com.wbillingsley.scatter.jstiles
 
-import com.wbillingsley.scatter.{Socket, Tile, TileForeignObject, TileSpace, VBox}
+import com.wbillingsley.scatter.{Socket, Tile, TileForeignObject, TileSpace, VBox, TypeLoopMode}
 import com.wbillingsley.veautiful.html.{<, ^}
 
-class PlayTile(tileSpace:TileSpace[JSExpr], cls:String = "btn btn-primary") extends Tile(tileSpace, false, false, cssClass = "play") {
+class PlayTile(tileSpace:TileSpace[JSExpr], cls:String = "btn btn-primary") extends Tile(tileSpace, false, TypeLoopMode.Never, cssClass = "play") {
 
   val socket = new Socket(this)
 

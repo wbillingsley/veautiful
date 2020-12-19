@@ -12,13 +12,14 @@ case class TileSpace[T](override val key:Option[String] = None, val language:Til
 
   import TileSpace._
 
-  val tiles:mutable.Buffer[Tile[T]] = mutable.Buffer.empty
+  /** A tile space contains some set of free tiles */
+  private val freeTiles:mutable.Buffer[FreeTile[T]] = mutable.Buffer.empty
 
   override def render: VHtmlDiffNode = <.svg(^.attr("width") := canvasSize._1.toString, ^.attr("height") := canvasSize._2.toString, ^.cls := "scatter-area",
-    tiles.toSeq
+    freeTiles
   )
 
-  var dragging:Option[DragInfo[Tile[T]]] = None
+  var dragging:Option[DragInfo[FreeTile[T]]] = None
 
   /**
     * The socket that should be highlighted as a target for drop events
@@ -30,8 +31,8 @@ case class TileSpace[T](override val key:Option[String] = None, val language:Til
     */
   var activeTile:Option[Tile[T]] = None
 
+  /** Used to track when a mousedown on a tile should pop the tile out of the socket */
   case class PopTimeOut(t:Tile[T], s:Socket[T], x:Int, y:Int, cx:Int, cy:Int, timeOutId:Int)
-
   var popTimeOut:Option[PopTimeOut] = None
 
   def setPopTimeOut(t:Tile[T], s:Socket[T], x:Int, y:Int, cx:Int, cy:Int):Unit = {
@@ -42,10 +43,10 @@ case class TileSpace[T](override val key:Option[String] = None, val language:Til
     val id = dom.window.setTimeout(
       () => {
         cancelPopTimeOut()
-        pullFromSocket(t, s, x, y)
+        val freeTile = pullFromSocket(t, s, x, y)
+        startDragging(freeTile, cx, cy)
         rerender()
         layout()
-        startDragging(t, cx, cy)
       },
       500
     )
@@ -71,7 +72,8 @@ case class TileSpace[T](override val key:Option[String] = None, val language:Til
     popTimeOut = None
   }
 
-  def startDragging(item:Tile[T], x:Double, y:Double):Unit = {
+  /** Called when the user begins dragging a free tile around the canvas */
+  def startDragging(item:FreeTile[T], x:Double, y:Double):Unit = {
     dragging = Some(DragInfo(item, item.x, item.y, x, y))
   }
 
@@ -86,32 +88,33 @@ case class TileSpace[T](override val key:Option[String] = None, val language:Til
     val (mx, my) = screenLocation(this)
     (((tx - mx) / s).toInt, ((ty - my) / s).toInt)
   }
-
-  def onMouseDown(t:Tile[T], e:MouseEvent):Unit = {
-    def readyDrag(ft:Tile[T]):Unit = {
-      if (ft.mobile && tiles.contains(ft)) {
-        bringToFront(ft);
-        layout()
-        startDragging(ft, e.clientX, e.clientY)
-      }
-    }
-
-    t.within match {
-      case Some(s) =>
-        val (x, y) = relativeLocation(t)
-        setPopTimeOut(t, s, x, y, e.clientX.toInt, e.clientY.toInt)
-        readyDrag(s.freeParent)
-
-      case None =>
-        readyDrag(t)
+  
+  /** What to do when a mousedown event occurs on a FreeTile in this space */
+  def onMouseDown(ft:FreeTile[T], e:MouseEvent):Unit = {
+    if (ft.mobile && freeTiles.contains(ft)) {
+      bringToFront(ft);
+      layout()
+      startDragging(ft, e.clientX, e.clientY)
     }
   }
+  
 
-  def onMouseDrag(e:MouseEvent):Unit = {
+  /** What to do when a mousedown event occurs on a Tile in this space */
+  def onMouseDown(t:Tile[T], e:MouseEvent):Unit = {
+    t.within match {
+      case Some(s:Socket[T]) =>
+        val (x, y) = relativeLocation(t)
+        setPopTimeOut(t, s, x, y, e.clientX.toInt, e.clientY.toInt)
+
+      case _ => // Nothing to do
+    }
+  }
+  
+  val onMouseDrag: MouseEvent => Unit = { (e) =>
     for {
-      DragInfo(tile, ix, iy, mx, my) <- dragging
+      DragInfo(freetile, ix, iy, mx, my) <- dragging
     } {
-      val (tx, ty) = relativeLocation(tile)
+      val (tx, ty) = relativeLocation(freetile)
       resetPopTimeOut(tx, ty, e.clientX.toInt, e.clientY.toInt)
 
       val x = e.clientX
@@ -119,60 +122,66 @@ case class TileSpace[T](override val key:Option[String] = None, val language:Til
       val s = scale getOrElse 1.0
       val newTx = ix + (x - mx) / s
       val newTy = iy + (y - my) / s
-      tile.setPosition(newTx, newTy)
+      freetile.setPosition(newTx, newTy)
 
       def dist(a:Double, b:Double) = Math.sqrt(Math.pow(a, 2) + Math.pow(b, 2))
 
-      val allSockets = tiles.flatMap(_.emptySockets)
-
-      val closestSockets = allSockets
-        .filter({
-          case (_, _, s) => s.freeParent != tile
-        })
-        .map({
-          case (sx, sy, s) =>
-            val t = s.freeParent
-            val d = dist(t.x + sx - newTx, t.y + sy - newTy)
-            d -> s
-        })
-        .filter(_._1 < 50)
+      val closestSockets = for {
+        ft <- freeTiles
+        (sx, sy, socket) <- ft.tile.emptySockets
+        freeParent <- socket.freeParent if freeParent != freetile // a tile can't drop into its own sockets
+        distance = dist(freeParent.x + sx - newTx, freeParent.y + sy - newTy) if distance < 50 // limit to nearby sockets
+      } yield {
+        distance -> socket
+      }
 
       activeSocket = if (closestSockets.isEmpty) None else Some(closestSockets.minBy(_._1)._2)
       rerender()
     }
   }
 
-  def onMouseUp(e:MouseEvent):Unit = {
+  val onMouseUp: MouseEvent => Unit = { (e) =>
     cancelPopTimeOut()
 
     for {
       s <- activeSocket
-      DragInfo(t:Tile[T], _, _, _, _) <- dragging
+      DragInfo(t:FreeTile[T], _, _, _, _) <- dragging
     } dropIntoSocket(t, s)
 
     dragging = None
     activeSocket = None
+    layout()
     rerender()
   }
 
-  private def dropIntoSocket(t:Tile[T], s:Socket[T]):Unit = {
+  /**
+    * Called when a FreeTile joins a Socket
+    * @param t
+    * @param s
+    */
+  private def dropIntoSocket(t:FreeTile[T], s:Socket[T]):Unit = {
     TileSpace.logger.debug(s"Dropped $t into $s")
 
-    s.onFilledWith(t)
-    t.onPlacedInSocket(s)
-    tiles.remove(tiles.indexOf(t))
-    layout()
+    freeTiles.remove(freeTiles.indexOf(t))
+    s.onFilledWith(t.tile)
+    t.tile.onPlacedInSocket(s)
   }
 
-  private def pullFromSocket(t:Tile[T], s:Socket[T], x:Int, y:Int):Unit = {
-    if (t.within.contains(s)) {
-      s.onRemoved(t)
-      t.onRemovedFromSocket(s, x, y)
-      tiles.append(t)
-      layout()
-    } else {
+  /** Removes a tile from a socket, placing it in a new FreeTile */
+  private def pullFromSocket(t:Tile[T], s:Socket[T], x:Int, y:Int):FreeTile[T] = {
+    if (!t.within.contains(s)) {
       logger.warn(s"Tried to pull $t from $s but it wasn't within it")
     }
+
+    s.onRemoved(t)
+    val ft = FreeTile(t)
+    ft.setPosition(x, y)
+    t.onRemovedFromSocket(s, x, y)
+    t.onPlacedInFreeTile(ft)
+    freeTiles.append(ft)
+
+    layout()
+    ft
   }
 
   def registerDragListeners():Unit = {
@@ -189,16 +198,17 @@ case class TileSpace[T](override val key:Option[String] = None, val language:Til
     layout()
   }
 
-  def bringToFront(t:Tile[T]):Unit = {
-    tiles.remove(tiles.indexOf(t))
-    tiles.append(t)
+  /** Moves a Free Tile to the front of the z-order. In SVG, this is done by the order of elements within the SVG. */
+  def bringToFront(t:FreeTile[T]):Unit = {
+    freeTiles.remove(freeTiles.indexOf(t))
+    freeTiles.append(t)
     rerender()
   }
 
   /**
-    * Adds a tile to the centre of the canvas
+    * Adds a free tile to the centre of the canvas
     */
-  def addTileToMiddle(tile:Tile[T]) = {
+  def addTileToMiddle(tile:FreeTile[T]) = {
     for {
       s <- domNode
       t = s.scrollTop
@@ -209,9 +219,23 @@ case class TileSpace[T](override val key:Option[String] = None, val language:Til
       tile.x = (t + ch / 2 + Random.nextInt(10) - 5).toInt
       tile.y = (l + cw / 2 + Random.nextInt(10) - 5).toInt
     }
-    tiles.append(tile)
+    freeTiles.append(tile)
     update()
     layout()
+  }
+  
+  def addTiles(tiles:((Double, Double), Tile[T])*):Unit = {
+    for {
+      ((x, y), tile) <- tiles 
+    } {
+      val ft = FreeTile(tile)
+      ft.setPosition(x, y)
+      tile.onPlacedInFreeTile(ft)
+      freeTiles.append(ft)
+    }
+    
+    update()
+    layout()     
   }
 
   /**
@@ -227,7 +251,7 @@ case class TileSpace[T](override val key:Option[String] = None, val language:Til
   }
 
   def layout(): Unit = {
-    for { t <- tiles } t.layout()
+    for { t <- freeTiles} t.layout()
   }
 }
 

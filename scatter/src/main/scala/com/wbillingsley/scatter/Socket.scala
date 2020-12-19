@@ -36,17 +36,15 @@ class Socket[T](val within:Tile[T], acceptType:Option[String] = None, thin:Boole
     * @return
     */
   @tailrec
-  final def freeParent:Tile[T]  = within.within match {
-    case Some(s) => s.freeParent
-    case _ => within
+  final def freeParent:Option[FreeTile[T]]  = within.within match {
+    case Some(s:Socket[T]) => s.freeParent
+    case Some(ft:FreeTile[T]) => Some(ft)
+    case None => None
   }
 
   def emptySockets:Seq[(Int, Int, Socket[T])] = {
     content match {
-      case Some(t) =>
-        for  {
-          (x, y, e) <- t.emptySockets
-        } yield (t.x + x, t.y + y, e)
+      case Some(t) => t.emptySockets
       case _ =>
         Seq((0, 0, this))
     }
@@ -98,9 +96,9 @@ object Socket {
 
   val logger:Logger = Logger.getLogger(Socket.getClass)
 
-  def path[T](tc:Option[Tile[T]]):VHtmlNode = {
-    logger.trace(s"Calculating tile path for $tc")
-    val (w, h) = tc.flatMap(_.size) getOrElse (15, 15)
+  def path[T](tile:Option[Tile[T]]):VHtmlNode = {
+    logger.trace(s"Calculating tile path for $tile")
+    val (w, h) = tile.flatMap(_.tileContent.size) getOrElse (15, 15)
     <("path", ns=DElement.svgNS)(^.attr("d") := boxAndArc(w, h))
   }
 
