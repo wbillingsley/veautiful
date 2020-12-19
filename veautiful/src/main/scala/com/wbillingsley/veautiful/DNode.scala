@@ -124,15 +124,15 @@ trait DNode[+N, C] extends VNode[N] {
     // First, we remove the children from being children in the view tree
     for {
       ops <- nodeOps
-      d <- children if ops.nodeIsChildOfMine(d)
+      
+      // We must filter based on whether the real node is a child - 
+      // This is because a single rerender might remove our node but add one of our children to another node
+      // (The adopting parent may be processed first, in which case the node has already moved and must not be detached)
+      d <- children if ops.nodeIsChildOfMine(d) 
     } {
       ops.removeAttachedChild(d)
-    }
 
-    // Then we ask the children to detach themselves
-    for {
-      d <- children
-    } {
+      // Then we ask the children to detach itself
       d.detach()
     }
 
