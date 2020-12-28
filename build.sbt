@@ -2,7 +2,7 @@
 
 val versionStr = "0.1-SNAPSHOT"
 
-val scalaVersionStr = "3.0.0-M2"
+val scalaVersionStr = "3.0.0-M3"
 
 lazy val veautiful = project.in(file("veautiful"))
   .enablePlugins(ScalaJSPlugin)
