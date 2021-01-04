@@ -1,13 +1,11 @@
 package com.wbillingsley.veautiful
 
-import org.scalatest.flatspec.AnyFlatSpec
 import PathDSL._
 import Extract._
 
+class PathDSLSuite extends munit.FunSuite {
 
-class PathDSLTest extends AnyFlatSpec  {
-
-  "Path DSL" should "match a lone string" in {
+  test("Path DSL should match a lone string") {
     val location = "/hello"
     val pl = pathArray(location).toList
     val path = /# / "hello"
@@ -16,10 +14,10 @@ class PathDSLTest extends AnyFlatSpec  {
       case path((start, remainder)) => "Matched"
     }
 
-    assert(result == "Matched")
+    assertEquals(result, "Matched")
   }
 
-  it should "extract a single string parameter after a path" in {
+  test("PashDSL should extract a single string parameter after a path") {
     val pathList = pathArray("/hello/world").toList
 
     val path = (/# / "hello" / stringParam)
@@ -28,13 +26,12 @@ class PathDSLTest extends AnyFlatSpec  {
       case path(((name, start), remainder)) => name
     }
 
-    assert(result == "world")
-
+    assertEquals(result, "world")
   }
 
-  it should "make a path using a single string parameter" in {
+  test ("PathDSL should make a path using a single string parameter") {
     val path = (/# / "hello" / stringParam)
-    assert(path.mkString(("world", start)) == "#/hello/world")
+    assertEquals(path.mkString(("world", start)), "#/hello/world")
   }
 
 }

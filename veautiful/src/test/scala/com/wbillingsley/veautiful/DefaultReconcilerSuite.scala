@@ -1,9 +1,9 @@
 package com.wbillingsley.veautiful
 
-import org.scalatest._
+import munit.FunSuite
 import scala.util.Random
 
-class DefaultReconcilerTest extends FlatSpec  {
+class DefaultReconcilerSuite extends FunSuite  {
 
   import com.wbillingsley.veautiful.reconcilers.Reconciler
   import Reconciler.default._
@@ -13,7 +13,7 @@ class DefaultReconcilerTest extends FlatSpec  {
     val uid = Random.nextString(5)
   }
 
-  "Default reconciler" should "Detect an appended item" in {
+  test("Default reconciler should detect an appended item") {
     val before = (1 to 5).map(Item)
     val after = (1 to 6).map(Item)
 
@@ -21,7 +21,7 @@ class DefaultReconcilerTest extends FlatSpec  {
     assert(report.ops == Seq(Append(Item(6))))
   }
 
-  it should "result in an update set that matches (equality) the right list" in {
+  test("Default reconciler should result in an update set that matches (equality) the right list") {
     val before = (1 to 5).map(Item)
     val after = (1 to 6).map(Item)
 
@@ -29,15 +29,12 @@ class DefaultReconcilerTest extends FlatSpec  {
     assert(report.update == after)
   }
 
-  it should "result in an update set that retains (identity) the left list" in {
+  test("Default reconciler should result in an update set that retains (identity) the left list") {
     val before = (1 to 5).map(Item)
     val after = (1 to 6).map(Item)
 
     val report = Reconciler.default.diffs(before, after)
     assert(report.update.zip(before).forall { case (x, y) => x.uid == y.uid })
   }
-
-
-
 
 }
