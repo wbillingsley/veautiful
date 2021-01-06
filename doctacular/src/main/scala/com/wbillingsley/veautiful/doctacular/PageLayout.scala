@@ -54,7 +54,7 @@ class PageLayout(site:Site) {
     "@media (min-width: 1292px)" -> "max-width: 960px;",
     "@media (min-width: 1500px)" -> "max-width: 1140px;",
   ).register()
-  
+
   val tocStyles = Map[Int, Styling](
     0 -> Styling(
       """list-style: none;
@@ -79,7 +79,7 @@ class PageLayout(site:Site) {
       """margin: 5px 0 0 0;
         |""".stripMargin).register()
   )
-  
+
   val sideBarToggleStyle = Styling(
     """border-radius: 3px;
       |border: 1px solid rgba(0,0,0,0.7);
@@ -91,7 +91,7 @@ class PageLayout(site:Site) {
       |""".stripMargin).modifiedBy(
     ":hover" -> "filter: brightness(85%);"
   ).register()
-  
+
   val sideBarSymbolStyle = Styling(
     """display: flex;
       |width: 20px;
@@ -104,13 +104,13 @@ class PageLayout(site:Site) {
 
   /** A stateful component allowing us to open and close the sidebar */
   class SideBarAndLayout(var left: () => VHtmlNode, var right: () => VHtmlNode, var open:Boolean = true) extends VHtmlComponent with MakeItSo {
-    
+
     def sideBarToggle = <.button(^.cls := sideBarToggleStyle.className, ^.onClick ==> { (_) =>
         open = !open
         rerender()
       }, <.div(^.cls := sideBarSymbolStyle.className)
     )
-    
+
     override def render = {
       <.div(^.cls := (if open then leftSideBarAndContentStyle.className else s"${leftSideBarAndContentStyle.className} closed"),
         <("aside")(^.cls := (if open then leftSidebarStyle.className else s"${leftSidebarStyle.className} closed"),
@@ -124,7 +124,7 @@ class PageLayout(site:Site) {
         )
       )
     }
-    
+
     def makeItSo = {
       case other:SideBarAndLayout =>
         open = other.open
@@ -135,19 +135,20 @@ class PageLayout(site:Site) {
   }
 
   private val slideToggle = SideBarAndLayout(() => <.div(), () => <.div())
-  
+
   def renderPage(site:Site, contentFunction: => VHtmlNode):VHtmlNode = {
     slideToggle.left = () => leftSideBar(site)
     slideToggle.right = () => contentFunction
+    slideToggle.update()
     slideToggle
   }
-  
+
   def leftSideBar(site:Site) = renderToc(site, site.toc)
-  
+
   def renderToc(site:Site, toc:Toc, depth:Int = 0):VHtmlNode = {
     println(toc.entries.toList)
-    
-    <.ul(^.cls := tocStyles.getOrElse(depth, tocStyles(-1)).className, 
+
+    <.ul(^.cls := tocStyles.getOrElse(depth, tocStyles(-1)).className,
       for {
         (title, entry) <- toc.entries
       } yield entry match {
@@ -165,8 +166,8 @@ class PageLayout(site:Site) {
       }
     )
   }
-  
+
   styleSet.install()
-  
+
 }
 
