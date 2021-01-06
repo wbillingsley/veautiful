@@ -37,7 +37,7 @@ class Site() {
   var home:() => VHtmlNode = () => <.div("No home page has been set yet")
   var toc = Toc()
   
-  var pageLayout = PageLayout()
+  var pageLayout = PageLayout(this)
   def renderPage(f: => VHtmlNode):VHtmlNode = pageLayout.renderPage(this, f)
   
   def addPage(name:String, content: => VHtmlNode):PageRoute = {
