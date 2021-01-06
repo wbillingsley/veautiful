@@ -26,9 +26,9 @@ object AssemblyExample {
   ))
 
   def page = {
-    Common.layout(<.div(
+    <.div(
       <.h1("AVR Assembly simulator"),
-      <.div(^.cls := "resizable", deck)))
+      <.div(^.cls := "resizable", deck))
   }
 
   def oneZero(b:Boolean):String = if (b) "1" else "0"

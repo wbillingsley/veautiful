@@ -77,7 +77,7 @@ val deployScript = taskKey[Unit]("Copies the fullOptJS script to deployscripts/"
 
 lazy val docs = project.in(file("docs"))
   .enablePlugins(ScalaJSPlugin)
-  .dependsOn(veautiful, templates, scatter, wren)
+  .dependsOn(veautiful, templates, scatter, wren, doctacular)
   .settings(commonSettings:_*)
   .settings(
     name := "veautiful-docs",

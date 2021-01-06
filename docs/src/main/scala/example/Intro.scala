@@ -123,7 +123,7 @@ object Intro {
     }
   }
 
-  def page = Common.layout(<.div(
+  def page = <.div(
     <.p(^.cls := "logo",
       <.img(^.src := "veautiful-small.png"),
       <.p(^.cls := "logo-text", "Veautiful"),
@@ -423,6 +423,6 @@ object Intro {
           |```
           |""".stripMargin)
     )
-  ))
+  )
 
 }

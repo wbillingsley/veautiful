@@ -91,7 +91,7 @@ object ToDoList {
   }
 
 
-  def page:VHtmlNode = Common.layout(<.div(
+  def page:VHtmlNode = <.div(
     Common.markdown(
       """
         |# Example: To Do List
@@ -194,6 +194,6 @@ object ToDoList {
           |```
           |""".stripMargin)
     )
-  ))
+  )
 
 }

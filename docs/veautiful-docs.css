@@ -1,48 +1,4 @@
 
-#render-here {
-    padding-top: 40px;
-}
-
-/*
- * Table of contents sidebar
- */
-
-.outer {
-    display: grid;
-    grid-template-columns: 250px auto;
-}
-
-.sidebar {
-    padding: 20px;
-    background: #f9f9ff;
-    border-right: 1px solid #6c757d;
-    position: sticky;
-    height: calc(100vh - 40px);
-    width: 250px;
-    top: 40px;
-}
-
-
-.sidebar ul.toc {
-    list-style: none;
-    padding-inline-start: 0;
-    margin-top: 20px;
-    font-size: 16px;
-}
-ul.toc .toc-item {
-    line-height: 32px;
-    font-weight: 400;
-}
-ul.toc .toc-item.active {
-    line-height: 2.5rem;
-    font-weight: 600;
-}
-
-ul.toc .toc-item .toc-link {
-    color: rgba(0,0,0, 0.85);
-}
-
-
 /*
  * Logo stuff
  */
@@ -127,31 +83,3 @@ pre {
 .todo-list input {
     margin: 5px;
 }
-
-/*
- #render-here {
-      padding-top: 48px;
-    }
-
-    .sidebar {
-      background: #f9f9ff;
-      padding: 5px;
-    }
-
-    .well {
-      stroke: #fc5858;
-      stroke-width: 2;
-      fill: #f69191;
-    }
-
-    .asteroid {
-      fill: #76addb;
-      stroke: #0275d8;
-      stroke-width: 2;
-    }
-
-    svg {
-      background: #d9e2e7;
-    }
-
- */

@@ -50,9 +50,9 @@ object WrenExample {
     circuit.rerender()
   }
 
-  def page:VHtmlNode =  Common.layout(<.div(^.cls := "row",
+  def page:VHtmlNode = <.div(^.cls := "row",
     <.div(^.cls := "col", circuit)
-  ))
+  )
 
 
 }

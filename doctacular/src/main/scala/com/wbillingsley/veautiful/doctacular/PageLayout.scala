@@ -16,6 +16,8 @@ class PageLayout {
     """border-right: 1px solid rgba(0,0,0,0.7);
       |background: #f9f9ff;
       |position: sticky;
+      |top: 0;
+      |height: 100vh;
       |overflow-y: auto;
       |padding: 5px;
       |""".stripMargin).register()
@@ -61,20 +63,20 @@ class PageLayout {
   
   def renderPage(site:Site, contentFunction: => VHtmlNode):VHtmlNode = {
     <.div(^.cls := leftSideBarAndContentStyle.className,
-      leftSideBar,
+      leftSideBar(site),
       <.div(^.cls := contentContainerStyle.className, 
-        //<.div(^.cls := contentWrapperStyle.className,
-          contentFunction
-        //)
+        contentFunction
       )
     )
   }
   
-  def leftSideBar = <("aside")(^.cls := leftSidebarStyle.className,
+  def leftSideBar(site:Site) = <("aside")(^.cls := leftSidebarStyle.className,
     renderToc(site, site.toc)
   )
   
   def renderToc(site:Site, toc:Toc, depth:Int = 0):VHtmlNode = {
+    println(toc.entries.toList)
+    
     <.ul(^.cls := tocStyles.getOrElse(depth, tocStyles(-1)).className, 
       for {
         (title, entry) <- toc.entries

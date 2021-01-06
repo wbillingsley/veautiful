@@ -5,7 +5,7 @@ import com.wbillingsley.veautiful.templates.{DeckBuilder, VSlides}
 
 object VSlidesExample {
 
-  def pageO(i:Int) = Common.layout(<.div(
+  def pageO(i:Int) = <.div(
     <.h1("V-Deck"),
     <.div(^.cls := "resizable",
       VSlides(width=1280, height=720)(Seq(
@@ -30,7 +30,7 @@ object VSlidesExample {
 
     ))
 
-  ))
+  )
 
   val deck = new DeckBuilder(1280, 720)
     .markdownSlide(
@@ -96,7 +96,6 @@ object VSlidesExample {
   }
 
   def page(i:Int):VHtmlNode = {
-    Common.layout(
       <.div(
         Common.markdown(
           """
@@ -130,7 +129,6 @@ object VSlidesExample {
           deck
         )
       )
-    )
   }
 
 }

@@ -58,8 +58,7 @@ object ReactLike {
     * The is is the view code that the router directs to (puts into the page) when
     * you click on this page of the docs.
     */
-  def page:VHtmlNode = Common.layout(
-    <.div(
+  def page:VHtmlNode = <.div(
       <.h1("Example -- asteroids rendering into an SVG"),
       <.p(
         <.a(^.href := "https://github.com/wbillingsley/veautiful/blob/master/docs/src/main/scala/example/ReactLike.scala",
@@ -108,7 +107,6 @@ object ReactLike {
       <.p(
         "etc"
       )
-    )
   )
 
   /**
