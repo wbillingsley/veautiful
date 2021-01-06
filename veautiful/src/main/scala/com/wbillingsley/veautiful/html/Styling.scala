@@ -1,12 +1,14 @@
 package com.wbillingsley.veautiful.html
 
-class Styling(val modifiers: Map[String, String] = Map.empty)(using ss:StyleSuite) {
+class Styling(val modifiers: Map[String, String] = Map.empty, val atRules: Seq[(String, String)] = Seq.empty)(using ss:StyleSuite) {
   
   def this(just:String)(using ss:StyleSuite) = this(Map("" -> just))
   
   val className = ss.randomName
   
-  def modifiedBy(pairs:(String, String)*) = Styling(modifiers ++ pairs)
+  def modifiedBy(pairs:(String, String)*) = Styling(modifiers ++ pairs, atRules)
+  
+  def withAtRules(pairs:(String, String)*) = Styling(modifiers, atRules ++ pairs)
   
   def register() = ss.register(this)
 }
@@ -20,7 +22,19 @@ class StyleSuite() {
 
   private val stylings:mutable.Map[String, Styling] = mutable.Map.empty
   
-  def randomName = Random.nextString(8)
+  def randomName = {
+    def nextChar():Char = (Random.nextInt(0xefff) + 0x1000).toChar
+
+    val length = 8
+    
+    val arr = new Array[Char](length)
+    var i = 0
+    while (i < length) {
+      arr(i) = nextChar()
+      i += 1
+    }
+    new String(arr)
+  }
   
   val name = randomName
   
@@ -44,7 +58,19 @@ class StyleSuite() {
          |.$c$m {
          |  ${stylings(c).modifiers(m)}
          |}
-         |""".stripMargin).mkString("\n\n")
+         |""".stripMargin + generateAtRules(stylings(c))).mkString("\n")
+  }
+  
+  private def generateAtRules(s:Styling):String = {
+    (for {
+      (atRule, rules) <- s.atRules
+    } yield
+      s"""$atRule {
+         |  .${s.className} {
+         |    $rules
+         |  }
+         |}
+         |""".stripMargin).mkString("\n")
   }
   
   def register(s:Styling):Styling = { 

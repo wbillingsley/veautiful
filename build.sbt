@@ -61,6 +61,18 @@ lazy val wren = project.in(file("wren"))
     name := "wren",
   )
 
+/**
+  * Doctacular is a set of routes and templates to make it easy to set up documentation sites
+  */
+lazy val doctacular = project.in(file("doctacular"))
+  .enablePlugins(ScalaJSPlugin)
+  .dependsOn(veautiful, templates)
+  .settings(commonSettings:_*)
+  .settings(
+    name := "doctacular",
+  )
+
+
 val deployScript = taskKey[Unit]("Copies the fullOptJS script to deployscripts/")
 
 lazy val docs = project.in(file("docs"))
