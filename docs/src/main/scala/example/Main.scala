@@ -1,7 +1,7 @@
 package example
 
 import com.wbillingsley.veautiful.html.Attacher
-import com.wbillingsley.veautiful.doctacular.{Site, Toc, HomeRoute}
+import com.wbillingsley.veautiful.doctacular.Site
 
 import org.scalajs.dom
 
@@ -14,9 +14,10 @@ object Main {
   def main(args:Array[String]): Unit = {
     val site = Site()
     
-    site.toc = Toc(
-      "Veautiful" -> HomeRoute,
-      "Examples" -> Toc(
+    site.toc = site.Toc(
+      site.TocNodeLink(Common.logoWithTitle(150, 150), site.HomeRoute),
+      site.TocLine,
+      "Examples" -> site.Toc(
         "To-Do List" -> site.addPage("to-do-list", ToDoList.page),
         "Orbiting asteroids" -> site.addPage("orbiting-asteroids", ReactLike.page),
         "Diffusion" -> site.addPage("diffusion-experiment", Diffusion.SimulationView),

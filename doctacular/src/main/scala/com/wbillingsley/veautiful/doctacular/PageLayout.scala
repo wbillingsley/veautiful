@@ -100,6 +100,10 @@ class PageLayout(site:Site) {
       |  0deg, rgba(0,0,0,0) 0px, rgb(0,0,0,0) 5px, #aaa 5px, #aaa 9px, rgba(0,0,0,0) 9px, rgb(0,0,0,0) 13px, #aaa 13px, #aaa 17px, rgba(0,0,0,0) 17px, rgb(0,0,0,0) 21px, #aaa 21px, #aaa 25px
       |)
       |""".stripMargin).register()
+  
+  val tocLogoContainerStyling = Styling(
+    """text-align: center
+      |""".stripMargin).register()
 
 
   /** A stateful component allowing us to open and close the sidebar */
@@ -145,24 +149,27 @@ class PageLayout(site:Site) {
 
   def leftSideBar(site:Site) = renderToc(site, site.toc)
 
-  def renderToc(site:Site, toc:Toc, depth:Int = 0):VHtmlNode = {
+  def renderToc(site:Site, toc:site.Toc, depth:Int = 0):VHtmlNode = {
     println(toc.entries.toList)
 
     <.ul(^.cls := tocStyles.getOrElse(depth, tocStyles(-1)).className,
       for {
-        (title, entry) <- toc.entries
+        entry <- toc.entries
       } yield entry match {
-        case r:Route =>
+        case (title:String, r:site.Route) =>
           val path = site.router.path(r)
           <.li(^.cls := tocItemStyles.getOrElse(depth, tocItemStyles(-1)).className,
             <.a(^.href := path, title)
           )
-        case t:Toc =>
+        case (title:String, t:site.Toc) =>
           <.div(
             <.p(^.cls := tocItemStyles.getOrElse(depth, tocItemStyles(-1)).className,
               title
             ), renderToc(site, t, depth + 1)
           )
+        case n:site.TocNodeLink => 
+          <.div(^.cls := tocLogoContainerStyling.className, n.render)
+        case c:site.CustomTocElement => c.render
       }
     )
   }

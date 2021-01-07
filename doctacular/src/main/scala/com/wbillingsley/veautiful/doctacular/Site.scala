@@ -2,28 +2,11 @@ package com.wbillingsley.veautiful.doctacular
 
 import com.wbillingsley.veautiful.PathDSL
 import PathDSL.Compose._
-import com.wbillingsley.veautiful.html.{<, Attacher, VHtmlNode}
+import com.wbillingsley.veautiful.html.{<, Attacher, VHtmlNode, ^}
 import com.wbillingsley.veautiful.templates.{HistoryRouter, VSlides}
 
 import scala.collection.mutable
 import scala.util.Try
-
-sealed trait Route
-case object HomeRoute extends Route
-case class PageRoute(name:String) extends Route
-case class DeckRoute(name:String, slide:Int) extends Route
-trait CustomRoute extends Route {
-  def render():VHtmlNode
-  
-  def path:String
-}
-
-
-case class Toc(entries: TocEntry*) {
-  export entries.isEmpty
-}
-
-type TocEntry = (String, Route) | (String, Toc)
 
 /**
   * A Doctacular site. 
@@ -31,6 +14,36 @@ type TocEntry = (String, Route) | (String, Toc)
   * At the moment, pages, decks, and home are done mutably. This is because sites are generally so simple (just set up
   */
 class Site() {
+
+  sealed trait Route
+  case object HomeRoute extends Route
+  case class PageRoute(name:String) extends Route
+  case class DeckRoute(name:String, slide:Int) extends Route
+  trait CustomRoute extends Route {
+    def render():VHtmlNode
+
+    def path:String
+  }
+
+  case class Toc(entries: TocEntry*) {
+    export entries.isEmpty
+  }
+
+  trait CustomTocElement {
+    def render:VHtmlNode
+  }
+  
+  class TocNodeLink(node: => VHtmlNode, val route: Route) extends CustomTocElement {
+    def render = <.a(^.href := router.path(route), node)
+  }
+  
+  object TocLine extends CustomTocElement {
+    def render = <("hr")
+  }
+
+  type TocEntry = (String, Route) | (String, Toc) | CustomTocElement
+
+
   
   private var pages:mutable.Map[String, () => VHtmlNode] = mutable.Map.empty
   private var decks:mutable.Map[String, () => VSlides] = mutable.Map.empty
