@@ -1,4 +1,4 @@
-package example
+package docs
 
 import com.wbillingsley.veautiful.html.{<, Markup, SVG, VHtmlNode, ^}
 

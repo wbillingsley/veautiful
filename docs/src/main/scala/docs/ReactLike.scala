@@ -1,9 +1,9 @@
-package example
+package docs
 
 import com.wbillingsley.veautiful._
 import com.wbillingsley.veautiful.html.<.VSVGElement
 import com.wbillingsley.veautiful.html.{<, DElement, ElementComponent, SVG, VHtmlNode, ^}
-import example.Model.Asteroid
+import docs.Model.Asteroid
 import org.scalajs.dom.raw.HTMLInputElement
 
 /**

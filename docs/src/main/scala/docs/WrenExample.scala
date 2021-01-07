@@ -1,4 +1,4 @@
-package example
+package docs
 
 import com.wbillingsley.veautiful.html.{<, VHtmlNode, ^}
 import com.wbillingsley.wren._

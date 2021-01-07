@@ -1,4 +1,4 @@
-package example
+package docs
 
 import com.wbillingsley.veautiful._
 import com.wbillingsley.veautiful.html.<.{VHTMLElement, VSVGElement}

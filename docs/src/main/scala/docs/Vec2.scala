@@ -1,4 +1,4 @@
-package example
+package docs
 
 import scala.util.Random
 

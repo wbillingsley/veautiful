@@ -362,6 +362,7 @@ object ^ {
   def prop(n:String) = Propable(n)
 
   def alt = Attrable("alt")
+  def style = Attrable("style")
   def src = Attrable("src")
   def `class` = Attrable("class")
   def cls = `class`

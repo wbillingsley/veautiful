@@ -1,4 +1,4 @@
-package example
+package docs
 
 import com.wbillingsley.scatter.TileSpace
 import com.wbillingsley.scatter.jstiles._
@@ -10,7 +10,7 @@ import scala.scalajs.js.annotation.{JSExport, JSExportTopLevel}
 object ScatterExample {
 
   @JSExport
-  val scatterCanvas = new TileSpace(Some("example"), JSLang)()
+  val scatterCanvas = new TileSpace(Some("docs"), JSLang)()
 
   val pt = new ProgramTile(scatterCanvas, <.button(^.cls := "btn btn-sm btn-primary", ^.onClick --> run(), "Run"))
 

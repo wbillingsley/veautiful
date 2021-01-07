@@ -1,4 +1,4 @@
-package example
+package docs
 
 import com.wbillingsley.veautiful.html._
 import org.scalajs.dom.raw.HTMLTextAreaElement

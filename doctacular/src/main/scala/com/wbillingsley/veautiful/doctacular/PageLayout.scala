@@ -16,7 +16,7 @@ class PageLayout(site:Site) {
     ".closed" -> "grid-template-columns: 0px auto;"
   ).register()
 
-  val leftSidebarStyle = Styling(
+  val leftSideBarStyle = Styling(
     """border-right: 1px solid rgba(0,0,0,0.7);
       |background: #f9f9ff;
       |position: sticky;
@@ -59,7 +59,6 @@ class PageLayout(site:Site) {
     0 -> Styling(
       """list-style: none;
         |padding-inline-start: 0;
-        |margin: 20px 0 0 15px;
         |font-size: 16px;
         |""".stripMargin).register(),
     -1 -> Styling(
@@ -72,12 +71,17 @@ class PageLayout(site:Site) {
 
   val tocItemStyles = Map[Int, Styling](
     0 -> Styling(
-      """margin: 15px 0 0 0;
+      """margin: 15px 0 0 15px;
         |font-weight: bold;
         |""".stripMargin).register(),
     -1 -> Styling(
       """margin: 5px 0 0 0;
-        |""".stripMargin).register()
+        |""".stripMargin).modifiedBy(
+      ".active" ->
+        """border-right: 3px solid orange;
+          |background: #ffffff80;
+          |""".stripMargin
+    ).register()
   )
 
   val sideBarToggleStyle = Styling(
@@ -117,7 +121,7 @@ class PageLayout(site:Site) {
 
     override def render = {
       <.div(^.cls := (if open then leftSideBarAndContentStyle.className else s"${leftSideBarAndContentStyle.className} closed"),
-        <("aside")(^.cls := (if open then leftSidebarStyle.className else s"${leftSidebarStyle.className} closed"),
+        <("aside")(^.cls := (if open then leftSideBarStyle.className else s"${leftSideBarStyle.className} closed"),
           left(),
         ),
         <.div(
@@ -150,26 +154,29 @@ class PageLayout(site:Site) {
   def leftSideBar(site:Site) = renderToc(site, site.toc)
 
   def renderToc(site:Site, toc:site.Toc, depth:Int = 0):VHtmlNode = {
-    println(toc.entries.toList)
-
     <.ul(^.cls := tocStyles.getOrElse(depth, tocStyles(-1)).className,
       for {
         entry <- toc.entries
-      } yield entry match {
-        case (title:String, r:site.Route) =>
-          val path = site.router.path(r)
-          <.li(^.cls := tocItemStyles.getOrElse(depth, tocItemStyles(-1)).className,
-            <.a(^.href := path, title)
-          )
-        case (title:String, t:site.Toc) =>
-          <.div(
-            <.p(^.cls := tocItemStyles.getOrElse(depth, tocItemStyles(-1)).className,
-              title
-            ), renderToc(site, t, depth + 1)
-          )
-        case n:site.TocNodeLink => 
-          <.div(^.cls := tocLogoContainerStyling.className, n.render)
-        case c:site.CustomTocElement => c.render
+      } yield {
+        val itemStyle = tocItemStyles.getOrElse(depth, tocItemStyles(-1))
+        
+        entry match {
+          case (title:String, r:site.Route) =>
+            val path = site.router.path(r)
+            <.li(
+              ^.cls := (if (site.router.route == r) then s"${itemStyle.className} active" else itemStyle.className),
+              <.a(^.href := path, title)
+            )
+          case (title:String, t:site.Toc) =>
+            <.div(
+              <.p(^.cls := itemStyle.className,
+                title
+              ), renderToc(site, t, depth + 1)
+            )
+          case n:site.TocNodeLink =>
+            <.div(^.cls := tocLogoContainerStyling.className, n.render)
+          case c:site.CustomTocElement => c.render
+        }
       }
     )
   }

@@ -1,4 +1,4 @@
-package example
+package docs
 
 import com.wbillingsley.veautiful.html.<.VHTMLElement
 import com.wbillingsley.veautiful.html.{<, EventMethods, VHtmlComponent, VHtmlNode, ^}
