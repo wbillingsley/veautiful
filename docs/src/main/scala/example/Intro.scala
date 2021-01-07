@@ -125,8 +125,7 @@ object Intro {
 
   def page = <.div(
     <.p(^.cls := "logo",
-      <.img(^.src := "veautiful-small.png"),
-      <.p(^.cls := "logo-text", "Veautiful"),
+      Common.logoWithTitle(200, 200),
       <.p(^.cls := "logo-slogan", "A devastatingly simple Scala.js front end")
     ),
     Common.markdown(
