@@ -1,6 +1,6 @@
 package com.wbillingsley.veautiful.doctacular
 
-import com.wbillingsley.veautiful.MakeItSo
+import com.wbillingsley.veautiful.{MakeItSo, Morphing}
 import com.wbillingsley.veautiful.html.{<, StyleSuite, Styling, VHtmlComponent, VHtmlNode, ^}
 
 class PageLayout(site:Site) {
@@ -109,10 +109,12 @@ class PageLayout(site:Site) {
     """text-align: center
       |""".stripMargin).register()
 
-
+  
   /** A stateful component allowing us to open and close the sidebar */
-  class SideBarAndLayout(var left: () => VHtmlNode, var right: () => VHtmlNode, var open:Boolean = true) extends VHtmlComponent with MakeItSo {
+  case class SideBarAndLayout()(name:String, left: () => VHtmlNode, right: () => VHtmlNode, var open:Boolean = true) extends VHtmlComponent with Morphing((name, left, right)) {
 
+    val morpher = createMorpher(this)
+    
     def sideBarToggle = <.button(^.cls := sideBarToggleStyle.className, ^.onClick ==> { (_) =>
         open = !open
         rerender()
@@ -120,35 +122,27 @@ class PageLayout(site:Site) {
     )
 
     override def render = {
+      val (name, l, r) = prop
+      
       <.div(^.cls := (if open then leftSideBarAndContentStyle.className else s"${leftSideBarAndContentStyle.className} closed"),
         <("aside")(^.cls := (if open then leftSideBarStyle.className else s"${leftSideBarStyle.className} closed"),
-          left(),
+          l(),
         ),
         <.div(
           sideBarToggle,
           <.div(^.cls := (if open then contentContainerSidebarOpenStyle.className else contentContainerStyle.className),
-            right()
+            r()
           )
         )
       )
     }
 
-    def makeItSo = {
-      case other:SideBarAndLayout =>
-        open = other.open
-        left = other.left
-        right = other.right
-    }
-
   }
 
-  private val slideToggle = SideBarAndLayout(() => <.div(), () => <.div())
+  //private val slideToggle = SideBarAndLayout()(() => <.div(), () => <.div())
 
   def renderPage(site:Site, contentFunction: => VHtmlNode):VHtmlNode = {
-    slideToggle.left = () => leftSideBar(site)
-    slideToggle.right = () => contentFunction
-    slideToggle.update()
-    slideToggle
+    SideBarAndLayout()(scala.util.Random.nextString(4), () => leftSideBar(site), () => contentFunction)
   }
 
   def leftSideBar(site:Site) = renderToc(site, site.toc)

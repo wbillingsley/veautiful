@@ -7,6 +7,8 @@ import org.scalajs.dom
 
 /** This is our own set of styles for widgets that we define */
 given siteStyles:StyleSuite = StyleSuite()
+val site = Site()
+
 
 /** A style class for embedded examples */
 val embeddedExampleStyle = Styling(
@@ -19,7 +21,6 @@ val embeddedExampleStyle = Styling(
 object Main {
 
   def main(args:Array[String]): Unit = {
-    val site = Site()
     
     // To set the theme colours, we're rudely adding rules to the CSS that the Site's layout engine produces
     site.pageLayout.leftSideBarStyle.addRules(
@@ -45,6 +46,7 @@ object Main {
         "Hello world" -> site.addPage("hello-world", helloWorld),
         "Function components" -> site.addPage("pure-functions", pureFunctions),
         "Stateful components" -> site.addPage("stateful-components", statefulComponents),
+        "Morphing components" -> site.addPage("morphing-components", morphingComponents),
         "Advanced components" -> site.addPage("advanced-components", advancedComponents),
         "CSS in JS" -> site.addPage("style-suites", styleSuites)
       ),
