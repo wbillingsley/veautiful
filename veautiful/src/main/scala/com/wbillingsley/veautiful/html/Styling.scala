@@ -46,6 +46,8 @@ class StyleSuite() {
 
   private val stylings:mutable.Map[String, Styling] = mutable.Map.empty
   
+  private val globalRules:mutable.Buffer[String] = mutable.Buffer.empty
+  
   def randomName = {
     def nextChar():Char = (Random.nextInt(0xefff) + 0x1000).toChar
 
@@ -72,6 +74,13 @@ class StyleSuite() {
   
   def update():Unit =
     if installed then styleElement.makeItSo(render)
+
+  /**
+    * Not recommended generally, but useful for final sites - a place to put "global rules" that are not attached to
+    * classes, such as your font-family, body background, etc.
+    */
+  def addGlobalRules(s:String):Unit =
+    globalRules.append(s)
   
   private def generateCss:String = {
     (for {
@@ -104,6 +113,7 @@ class StyleSuite() {
   }
 
   def render = <("style")(^.attr("id") := name, ^.attr("type") := "text/css",
+    globalRules.mkString("\n"), "\n", 
     generateCss
   )
 
