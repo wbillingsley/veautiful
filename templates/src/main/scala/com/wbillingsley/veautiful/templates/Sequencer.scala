@@ -1,9 +1,9 @@
 package com.wbillingsley.veautiful.templates
 
 import com.wbillingsley.veautiful._
-import com.wbillingsley.veautiful.html.{<, VHtmlComponent, VHtmlDiffNode, VHtmlNode, ^}
+import com.wbillingsley.veautiful.html.{<, Styling, VHtmlComponent, VHtmlDiffNode, VHtmlNode, ^}
 import com.wbillingsley.veautiful.reconcilers.Reconciler
-import com.wbillingsley.veautiful.templates.Sequencer.LayoutFunc
+import com.wbillingsley.veautiful.templates.Sequencer.{LayoutFunc, defaultFootBoxStyle, sequencerSlideStyle}
 
 object Sequencer {
 
@@ -13,6 +13,31 @@ object Sequencer {
     <.div(item, sequencer.footBox)
   }
 
+
+  /** The surround, that contains the slide deck */
+  val sequencerSlideStyle = Styling(
+    """position: absolute;
+      |top: 0;
+      |left: 0;
+      |width: 100%;
+      |height: 100%;
+      |""".stripMargin).modifiedBy(
+    ".inactive" -> "visibility: hidden;"
+  ).register()
+  
+  val defaultFootBoxStyle = Styling(
+    """position: absolute;
+      |bottom: 10px;
+      |right: 10px;
+      |""".stripMargin).modifiedBy(
+    " button" ->
+      """border-color: #6c757d;
+        |background-color: #6c757d;
+        |border-radius: 0.2rem;
+        |color: #fff;
+        |""".stripMargin
+  ).register()
+  
 }
 
 case class SequencerConfig(
@@ -57,7 +82,7 @@ case class Sequencer(override val key:Option[String] = None)(
   }
 
   def footBox:VHtmlNode = {
-    <.div(^.cls := "v-sequencer-footbox",
+    <.div(^.cls := s"v-sequencer-footbox ${defaultFootBoxStyle.className} ",
       <.button(^.onClick --> previous(), "<"),
       <.span(s" ${prop.index+1} / ${nodes.size} "),
       <.button(^.onClick --> next(), ">")
@@ -76,11 +101,18 @@ case class Sequencer(override val key:Option[String] = None)(
       for {
         (item, i) <- prop.nodes.zipWithIndex
       } yield <.div(^.reconciler := Reconciler.onlyIf(prop.index == i),
-        ^.cls := (if (prop.index == i) "v-sequencer-slide active" else "v-sequencer-slide inactive"),
+        ^.cls := (if (prop.index == i) s"${sequencerSlideStyle.className} v-sequencer-slide active" else s"${sequencerSlideStyle.className} v-sequencer-slide inactive"),
         layoutItem(item, i)
       )
     )
   )
+
+  override def beforeAttach(): Unit = {
+    super.beforeAttach()
+    
+    // Ensure the template styles are installed in the page
+    templateStyleSuite.install()
+  }
 
 }
 
