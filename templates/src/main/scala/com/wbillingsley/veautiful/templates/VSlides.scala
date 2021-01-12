@@ -1,7 +1,7 @@
 package com.wbillingsley.veautiful.templates
 
 import com.wbillingsley.veautiful.html.{<, VHtmlComponent, VHtmlDiffNode, VHtmlNode, ^}
-import com.wbillingsley.veautiful.MakeItSo
+import com.wbillingsley.veautiful.Morphing
 import com.wbillingsley.veautiful.logging.Logger
 import com.wbillingsley.veautiful.templates.Sequencer.LayoutFunc
 import org.scalajs.dom
@@ -10,20 +10,29 @@ import org.scalajs.dom.raw.{Event, HTMLElement}
 object VSlides {
   val logger = Logger.getLogger(VSlides.getClass)
 
-  def defaultLayout:LayoutFunc = { case (sequencer, s, _) =>
+  def defaultLayout:LayoutFunc = { (sequencer, s, _) =>
     <.div(
-      ^.cls := "v-slide",
-      s.content,
-      sequencer.footBox
+      ^.cls := "v-slide", s, sequencer.footBox
     )
   }
 
 }
 
+case class VSlidesConfig(
+  content: Seq[SequenceItem],
+  index: Int = 0,
+  layout:Sequencer.LayoutFunc = VSlides.defaultLayout,
+  onIndexChange: Option[Int => Unit] = None,
+)
+
 case class VSlides(width: Int, height: Int, override val key: Option[String] = None, scaleToWindow:Boolean = true)(
-  var content:Seq[SequenceItem], var index:Int = 0, var layout:Sequencer.LayoutFunc = VSlides.defaultLayout,
+  content: Seq[SequenceItem],
+  index: Int = 0,
+  layout:Sequencer.LayoutFunc = VSlides.defaultLayout,
   onIndexChange: Option[Int => Unit] = None
-) extends VHtmlComponent with MakeItSo {
+) extends VHtmlComponent with Morphing(VSlidesConfig(content, index, layout, onIndexChange)) {
+  
+  val morpher = createMorpher(this)
 
   var scale:Double = 1
   var top:Double = 0
@@ -39,7 +48,7 @@ case class VSlides(width: Int, height: Int, override val key: Option[String] = N
     VSlides.logger.debug(s"Scale is now $scale")
   }
 
-  def rescaleEventListener(e:Event):Unit = {
+  val rescaleEventListener: (e:Event) => Unit = { (_) => 
     rerender()
   }
 
@@ -53,9 +62,18 @@ case class VSlides(width: Int, height: Int, override val key: Option[String] = N
     super.beforeDetach()
     dom.window.removeEventListener("resize", rescaleEventListener)
   }
+  
+  private val internalOnIndexChange: Int => Unit = { i =>
+    prop.onIndexChange match {
+      case Some(f) => f(i)
+      case None => updateProp(prop.copy(index = i))
+    }
+  }
 
   override def render: VHtmlDiffNode = {
     rescale()
+    
+    val config = prop
 
     <.div(^.cls := (if (scaleToWindow) "vslides-top scaled" else "vslides-top unscaled"),
       <.div(^.cls := (if (scaleToWindow) "vslides-scaler scaled" else "vslides-scaler unscaled"),
@@ -65,22 +83,11 @@ case class VSlides(width: Int, height: Int, override val key: Option[String] = N
           s"width: ${width}px; height: ${height}px; "
         }),
         Sequencer()(
-          content, index, layout = layout, onIndexChange
+          config.content, config.index, layout = config.layout, Some(internalOnIndexChange)
         )
       )
     )
   }
-
-  override def makeItSo: PartialFunction[MakeItSo, _] = {
-    case v:VSlides =>
-      content = v.content
-      index = v.index
-      layout = v.layout
-      rerender()
-  }
-
-  def atSlide(i:Int):VSlides = {
-    index = i
-    this
-  }
+  
+  def atSlide(i:Int):VSlides = VSlides(width, height, key)(prop.content, i, prop.layout, prop.onIndexChange)
 }

@@ -3,7 +3,7 @@
 /*
  * An example of using VDeck from JavaScript
  */
-console.log("Loaded!");
+console.debug("Loaded vdeckExample.js!");
 
 (function() {
 

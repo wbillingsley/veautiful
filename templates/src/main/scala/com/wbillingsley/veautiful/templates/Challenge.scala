@@ -176,10 +176,10 @@ class Challenge(val levels: Seq[Challenge.Level],
     levels(level).stages
   }
 
-  def layout(s:Sequencer, si:SequenceItem, i:Int):VHtmlNode = {
+  def layout(s:Sequencer, node:VHtmlNode, i:Int):VHtmlNode = {
     <.div(^.cls := "challenge-wrapper",
       <.div(^.cls := "challenge-header", header(this)),
-      <.div(^.cls := "challenge", si.content),
+      <.div(^.cls := "challenge", node),
       <.div(^.cls := "countdown-box", tr(this)),
       <.div(^.cls := "stage-progress", progressBlock(this)),
       <.div(^.cls := "page-controls", pageControls(this))

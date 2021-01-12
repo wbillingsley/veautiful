@@ -7,24 +7,20 @@ import com.wbillingsley.veautiful.templates.Sequencer.LayoutFunc
 
 object Sequencer {
 
-  type LayoutFunc = (Sequencer, SequenceItem, Int) => VHtmlNode
+  type LayoutFunc = (Sequencer, VHtmlNode, Int) => VHtmlNode
 
-  def page = {
-    VSlides(width=1024, height=680)(Seq(
-      <.div("Page One"),
-      <.div("Page Two")
-    ))
-  }
-
-
-  def defaultLayout:LayoutFunc = { case (sequencer, s, _) =>
-    <.div(
-      s.content,
-      sequencer.footBox
-    )
+  def defaultLayout:LayoutFunc = { (sequencer, item, i) =>
+    <.div(item, sequencer.footBox)
   }
 
 }
+
+case class SequencerConfig(
+  nodes: Seq[SequenceItem], 
+  index:Int = 0, 
+  layout:Sequencer.LayoutFunc = Sequencer.defaultLayout,
+  onIndexChange: Option[Int => Unit] = None
+)
 
 /**
   * A Sequencer renders a series of nodes into the page, styling one of them to be active.
@@ -36,30 +32,26 @@ object Sequencer {
   * @param index
   */
 case class Sequencer(override val key:Option[String] = None)(
-  var nodes: Seq[SequenceItem], var index:Int = 0, var layout:Sequencer.LayoutFunc = Sequencer.defaultLayout,
+  nodes: Seq[SequenceItem], index:Int = 0, layout:Sequencer.LayoutFunc = Sequencer.defaultLayout,
   onIndexChange: Option[Int => Unit] = None
-) extends VHtmlComponent with MakeItSo {
+) extends VHtmlComponent with Morphing(SequencerConfig(nodes, index, layout, onIndexChange)) {
+  
+  val morpher = createMorpher(this)
 
   def next():Unit = {
-    if (index < nodes.size - 1) {
-      nodes(index).active = false
-      index = index + 1
-      nodes(index).active = true
-      onIndexChange match {
-        case Some(f) => f(index)
-        case _ => update()
+    if (prop.index < nodes.size - 1) {
+      prop.onIndexChange match {
+        case Some(f) => f(prop.index + 1)
+        case None => updateProp(prop.copy(index = prop.index + 1)); rerender()
       }
     }
   }
 
   def previous():Unit = {
-    if (index > 0) {
-      nodes(index).active = false
-      index = index - 1
-      nodes(index).active = true
-      onIndexChange match {
-        case Some(f) => f(index)
-        case _ => update()
+    if (prop.index > 0) {
+      prop.onIndexChange match {
+        case Some(f) => f(prop.index - 1)
+        case None => updateProp(prop.copy(index = prop.index - 1)); rerender()
       }
     }
   }
@@ -67,46 +59,34 @@ case class Sequencer(override val key:Option[String] = None)(
   def footBox:VHtmlNode = {
     <.div(^.cls := "v-sequencer-footbox",
       <.button(^.onClick --> previous(), "<"),
-      <.span(s" ${index+1} / ${nodes.size} "),
+      <.span(s" ${prop.index+1} / ${nodes.size} "),
       <.button(^.onClick --> next(), ">")
     )
+  }
+  
+  private def layoutItem(item:SequenceItem, i:Int):VHtmlNode = {
+    item match {
+      case csi:CustomSequenceItem => csi.layout(this, i)
+      case n:VHtmlNode => layout(this, n, i)
+    }
   }
 
   override def render: VHtmlDiffNode = <.div(^.cls := "v-sequencer",
     <.div(^.cls := "v-sequencer-inner",
       for {
-        (n, i) <- nodes.zipWithIndex
-      } yield <.div(^.reconciler := Reconciler.onlyIf(index == i),
-        ^.cls := (if (index == i) "v-sequencer-slide active" else "v-sequencer-slide inactive"),
-        n.layoutOverride match {
-          case Some(lo) => lo(this, n, i)
-          case _ => layout(this, n, i)
-        }
+        (item, i) <- prop.nodes.zipWithIndex
+      } yield <.div(^.reconciler := Reconciler.onlyIf(prop.index == i),
+        ^.cls := (if (prop.index == i) "v-sequencer-slide active" else "v-sequencer-slide inactive"),
+        layoutItem(item, i)
       )
     )
   )
 
-  override def makeItSo: PartialFunction[MakeItSo, _] = {
-    case s:Sequencer =>
-      nodes = s.nodes
-      index = s.index
-      layout = s.layout
-      rerender()
-  }
 }
 
+type SequenceItem = VHtmlNode | CustomSequenceItem
 
-class SequenceItem(
-  var content:VHtmlNode,
-  val layoutOverride: Option[LayoutFunc] = None
-) {
-  var active:Boolean = false
+trait CustomSequenceItem {
+  def layout(sequencer:Sequencer, index:Int):VHtmlNode
 }
 
-object SequenceItem {
-
-  implicit def lift(v:VHtmlNode):SequenceItem = new SequenceItem(v)
-
-  implicit def lift(vs:Seq[VHtmlNode]):Seq[SequenceItem] = vs.map(v => lift(v))
-
-}

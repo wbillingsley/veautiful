@@ -38,7 +38,6 @@ class DeckBuilder(width:Int = 1920, height:Int = 1080, slides:List[Seq[() => VHt
   @JSExport
   def markdownSlides(m:String):DeckBuilder = {
     val lines = stripIndent(m).split("\n---\n")
-    lines.foreach(println)
     new DeckBuilder(width, height, lines.toSeq.map(l => () => markdownGenerator.Fixed(l)) :: slides)
   }
 
