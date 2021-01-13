@@ -58,7 +58,7 @@ object Main {
         
       ),
       "Doctacular" -> site.Toc(
-        
+        "Intro" -> site.addPage("doctacular-intro", doctacular.introPage)
       ),
       "Examples" -> site.Toc(
         "To-Do List" -> site.addPage("to-do-list", ToDoList.page),

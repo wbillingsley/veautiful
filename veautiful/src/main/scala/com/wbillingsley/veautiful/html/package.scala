@@ -28,5 +28,9 @@ package object html {
     }
 
   }
+  
+ 
+  /** This is so that later we can do some type programming to work out whether the result should have update */
+  inline def unique[N](n:VNode[N]):Unique[N] = Unique(n)
 
 }

@@ -24,7 +24,7 @@ trait VNode[+N] extends Keyable {
     * Note that if a VNode uses more than one real node to implement itself, parent.get.domNode.get might not be
     * the same as domNode.get.getParent(), even if the gets were to succeed.
     */
-  var parent:Option[VNode[_]] = None
+  //var parent:Option[VNode[_]] = None
 
   /**
     * Called before a detach operation
