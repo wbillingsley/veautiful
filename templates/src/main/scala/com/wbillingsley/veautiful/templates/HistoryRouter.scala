@@ -46,7 +46,17 @@ abstract class HistoryRouter[Route] extends ElementComponent(<.div) {
 
   }
 
+  /** Goes to the specified route, pushing a new history item */
   def routeTo(r:Route):Unit = {
+    route = r
+    val p = path(route)
+    logger.debug(s"routeTo $r with path $p")
+    dom.window.history.pushState(r.toString, "", p)
+    renderElements(render)
+  }
+
+  /** Goes to the specified route, replacing the current history item */
+  def silentlyRouteTo(r:Route):Unit = {
     route = r
     val p = path(route)
     logger.debug(s"routeTo $r with path $p")
