@@ -53,6 +53,9 @@ class Site() {
   var pageLayout = PageLayout(this)
   def renderPage(f: => VHtmlNode):VHtmlNode = pageLayout.renderPage(this, f)
   
+  var deckLayout = DeckLayout(this)
+  def renderDeck(name:String, page:Int) = deckLayout.renderDeck(this, name, decks(name)(), page)
+  
   def addPage(name:String, content: => VHtmlNode):PageRoute = {
     pages.put(name, () => content)
     PageRoute(name)
@@ -89,7 +92,7 @@ class Site() {
       route match {
         case HomeRoute => home()
         case PageRoute(name) if pages.contains(name) => renderPage(pages(name)())
-        case DeckRoute(name, slide) if decks.contains(name) => <.div("fixme")
+        case DeckRoute(name, slide) if decks.contains(name) => renderDeck(name, slide)
         case custom:CustomRoute => custom.render()
         case _ => home()
       }
