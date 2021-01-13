@@ -47,15 +47,15 @@ class DeckBuilder(width:Int = 1920, height:Int = 1080, slides:List[Seq[() => VHt
     case h :: t => new DeckBuilder(width, height, (for { s <- h } yield () => <.div(^.cls := c, s())) :: t)
   }
 
-  def renderNode:VSlides = {
-    new VSlides(width, height)(
-      slides.reverse.flatten.map(_.apply)
-    )
+  def renderSlides:VSlides = {
+    VSlides(width, height, slides.reverse.flatten.map(_.apply))
   }
+  
+  def renderNode(using player:VSlidesPlayer = { (slides, index) => DefaultVSlidesPlayer(width, height)(slides, index=index)}) = player.apply(renderSlides, 0)
 
   @JSExport
   def render(selector:String) = {
-    val slides = renderNode
+    val slides = renderNode(using { (slides, index) => DefaultVSlidesPlayer(width, height)(slides, index=index)})
     DeckBuilder.publishedDecks(selector) = slides
     val a = Attacher.newRoot(dom.document.querySelector(selector))
     a.render(slides)
@@ -68,6 +68,6 @@ object DeckBuilder {
 
   var markdownGenerator = new Markup({ (s:String) => js.Dynamic.global.marked(s).asInstanceOf[String] })
 
-  val publishedDecks:mutable.Map[String, VSlides] = mutable.Map.empty
+  val publishedDecks:mutable.Map[String, VHtmlNode] = mutable.Map.empty
 
 }

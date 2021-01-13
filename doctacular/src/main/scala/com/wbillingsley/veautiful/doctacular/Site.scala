@@ -89,7 +89,7 @@ class Site() {
       route match {
         case HomeRoute => home()
         case PageRoute(name) if pages.contains(name) => renderPage(pages(name)())
-        case DeckRoute(name, slide) if decks.contains(name) => decks(name)().atSlide(slide)
+        case DeckRoute(name, slide) if decks.contains(name) => <.div("fixme")
         case custom:CustomRoute => custom.render()
         case _ => home()
       }

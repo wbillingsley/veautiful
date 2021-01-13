@@ -1,36 +1,9 @@
 package docs
 
 import com.wbillingsley.veautiful.html.{<, VHtmlNode, ^}
-import com.wbillingsley.veautiful.templates.{DeckBuilder, VSlides}
+import com.wbillingsley.veautiful.templates.{DeckBuilder, DefaultVSlidesPlayer, VSlides}
 
 object VSlidesExample {
-
-  def pageO(i:Int) = <.div(
-    <.h1("V-Deck"),
-    <.div(^.cls := "resizable",
-      VSlides(width=1280, height=720)(Seq(
-        <.div(
-          <.h2("Slide 1"),
-          <.p("Here's some text on slide 1")
-        ),
-        <.div(
-          <.h2("Slide 2"),
-          <.p("Here's some text on slide 2")
-        ),
-        Diffusion.SimulationView,
-        ScatterExample.scatterCanvas,
-        <.div(
-          <("iframe")(
-            ^.attr("width") :="1280", ^.attr("height") := "720", ^.src := "https://www.youtube.com/embed/0bcvcJwUE-8",
-            ^.attr("frameborder") := "0", ^.attr("allow") :="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture",
-            ^.attr("allowfullscreen") := "allowfullscreen")
-        )
-
-      ), i
-
-    ))
-
-  )
 
   val deck = new DeckBuilder(1280, 720)
     .markdownSlide(
@@ -89,10 +62,12 @@ object VSlidesExample {
       <.h1("Diffusion simulator"),
       Diffusion.SimulationView
     ))
-    .renderNode
+    .renderSlides
 
   def page1(i:Int):VHtmlNode = {
-    <.div(^.cls := "resizable", deck.atSlide(i))
+    <.div(^.cls := "resizable",
+      DefaultVSlidesPlayer(1280, 720)(deck, i)
+    )
   }
 
   def page(i:Int):VHtmlNode = {
@@ -126,7 +101,7 @@ object VSlidesExample {
             |
             |""".stripMargin),
         <.div(^.key := "vslide-example2", ^.cls := "resizable",
-          deck
+          DefaultVSlidesPlayer(1280, 720)(deck, i)
         )
       )
   }

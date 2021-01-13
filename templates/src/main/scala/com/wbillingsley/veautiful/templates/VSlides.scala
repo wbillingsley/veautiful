@@ -13,7 +13,7 @@ object VSlides {
 
   def defaultLayout:LayoutFunc = { (sequencer, s, _) =>
     <.div(
-      ^.cls := s"v-slide ${defaultTheme.className}", s, sequencer.footBox
+      ^.cls := s"v-slide ${defaultTheme.className}", s
     )
   }
 
@@ -102,18 +102,25 @@ object VSlides {
 }
 
 case class VSlidesConfig(
-  content: Seq[SequenceItem],
+  deck: VSlides,
   index: Int = 0,
-  layout:Sequencer.LayoutFunc = VSlides.defaultLayout,
   onIndexChange: Option[Int => Unit] = None,
 )
 
-case class VSlides(width: Int, height: Int, override val key: Option[String] = None, scaleToWindow:Boolean = true)(
-  content: Seq[SequenceItem],
+
+/** VSlides just defines the deck. The layout within the page is part of the definition. */
+case class VSlides(
+  width: Int, height: Int, content: Seq[SequenceItem], layout:Sequencer.LayoutFunc = VSlides.defaultLayout
+)
+
+/** Something that can take a deck, and a page number, and render it to a VHtmlNode */
+type VSlidesPlayer = (VSlides, Int) => VHtmlNode
+
+case class DefaultVSlidesPlayer(width: Int, height: Int, override val key: Option[String] = None, scaleToWindow:Boolean = true)(
+  deck: VSlides,
   index: Int = 0,
-  layout:Sequencer.LayoutFunc = VSlides.defaultLayout,
   onIndexChange: Option[Int => Unit] = None
-) extends VHtmlComponent with Morphing(VSlidesConfig(content, index, layout, onIndexChange)) {
+) extends VHtmlComponent with Morphing(VSlidesConfig(deck, index, onIndexChange)) {
   
   val morpher = createMorpher(this)
 
@@ -158,6 +165,10 @@ case class VSlides(width: Int, height: Int, override val key: Option[String] = N
     rescale()
     
     val config = prop
+    
+    val sequencer = Sequencer()(
+      config.deck.content, config.index, layout = config.deck.layout, Some(internalOnIndexChange)
+    )
 
     <.div(^.cls := (if (scaleToWindow) s"${vslidesTopStyle.className} vslides-top scaled" else s"${vslidesTopStyle.className} vslides-top unscaled"),
       <.div(^.cls := (if (scaleToWindow) s"${slidesScalerStyle.className} vslides-scaler scaled" else s"${slidesScalerStyle.className} vslides-scaler unscaled"),
@@ -166,12 +177,10 @@ case class VSlides(width: Int, height: Int, override val key: Option[String] = N
         } else {
           s"width: ${width}px; height: ${height}px; "
         }),
-        Sequencer()(
-          config.content, config.index, layout = config.layout, Some(internalOnIndexChange)
-        )
+        sequencer, sequencer.footBox
       )
     )
   }
   
-  def atSlide(i:Int):VSlides = VSlides(width, height, key)(prop.content, i, prop.layout, prop.onIndexChange)
+  def atSlide(i:Int):DefaultVSlidesPlayer = DefaultVSlidesPlayer(width, height, key)(prop.deck, i, prop.onIndexChange)
 }

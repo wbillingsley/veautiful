@@ -176,6 +176,10 @@ class Challenge(val levels: Seq[Challenge.Level],
     levels(level).stages
   }
 
+  def levelSlides:VSlides = {
+    VSlides(1920, 1080, elements, layout=layout)
+  }
+  
   def layout(s:Sequencer, node:VHtmlNode, i:Int):VHtmlNode = {
     <.div(^.cls := "challenge-wrapper",
       <.div(^.cls := "challenge-header", header(this)),
@@ -188,7 +192,7 @@ class Challenge(val levels: Seq[Challenge.Level],
 
   def render = {
     <.div(
-      VSlides(1920, 1080, scaleToWindow=scaleToWindow)(elements, layout=layout).atSlide(stage)
+      DefaultVSlidesPlayer(1920, 1080, scaleToWindow=scaleToWindow)(levelSlides, stage)
     )
   }
 
