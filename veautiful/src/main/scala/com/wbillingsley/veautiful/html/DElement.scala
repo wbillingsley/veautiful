@@ -94,7 +94,7 @@ case class DElement[+T <: dom.Element](name:String, var uniqEl:Option[Any] = Non
 
       if (listeners.keys != el.listeners.keys) {
         removeLsntrsFromNode(listeners.values)
-        applyLsntrsToNode(listeners.values)
+        applyLsntrsToNode(el.listeners.values)
       }
       listeners = el.listeners
 
