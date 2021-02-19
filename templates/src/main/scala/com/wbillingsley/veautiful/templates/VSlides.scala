@@ -3,16 +3,17 @@ package com.wbillingsley.veautiful.templates
 import com.wbillingsley.veautiful.html.{<, Styling, VHtmlComponent, VHtmlDiffNode, VHtmlNode, ^}
 import com.wbillingsley.veautiful.Morphing
 import com.wbillingsley.veautiful.logging.Logger
-import com.wbillingsley.veautiful.templates.Sequencer.LayoutFunc
 import org.scalajs.dom
 import org.scalajs.dom.raw.{Event, HTMLElement}
 
 object VSlides {
   val logger = Logger.getLogger(VSlides.getClass)
+  
+  type LayoutFunc = (VSlides, VHtmlNode, Int) => VHtmlNode
 
-  def defaultLayout:LayoutFunc = { (sequencer, s, _) =>
+  def defaultLayout:LayoutFunc = { (vs, s, _) =>
     <.div(
-      ^.cls := s"v-slide ${defaultTheme.className}", s
+      ^.cls := s"v-slide ${defaultTheme.className}", ^.attr("style") := s"height: ${vs.height}px", s
     )
   }
 
@@ -91,8 +92,10 @@ case class VSlidesConfig(
 
 /** VSlides just defines the deck. The layout within the page is part of the definition. */
 case class VSlides(
-  width: Int, height: Int, content: Seq[SequenceItem], layout:Sequencer.LayoutFunc = VSlides.defaultLayout
-)
+  width: Int, height: Int, content: Seq[SequenceItem], layout:VSlides.LayoutFunc = VSlides.defaultLayout
+) {
+  def laidOut = content.zipWithIndex.map { (item, idx)  => layout(this, item, idx) }
+}
 
 /** Something that can take a deck, and a page number, and render it to a VHtmlNode */
 type VSlidesPlayer = (VSlides, Int) => VHtmlNode
@@ -119,12 +122,12 @@ case class DefaultVSlidesPlayer(width: Int, height: Int, override val key: Optio
     val config = prop
     
     val sequencer = Sequencer()(
-      config.deck.content, config.index, layout = config.deck.layout, Some(internalOnIndexChange)
+      config.deck.laidOut, config.index, layout = Sequencer.defaultLayout, Some(internalOnIndexChange)
     )
     
     <.div(
       WindowScaler(width, height)(
-        <.div(sequencer, sequencer.footBox), scaleToWindow
+        sequencer, scaleToWindow
       )
     )
   }

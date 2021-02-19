@@ -180,7 +180,7 @@ class Challenge(val levels: Seq[Challenge.Level],
     VSlides(1920, 1080, elements, layout=layout)
   }
   
-  def layout(s:Sequencer, node:VHtmlNode, i:Int):VHtmlNode = {
+  def layout(s:VSlides, node:VHtmlNode, i:Int):VHtmlNode = {
     <.div(^.cls := "challenge-wrapper",
       <.div(^.cls := "challenge-header", header(this)),
       <.div(^.cls := "challenge", node),

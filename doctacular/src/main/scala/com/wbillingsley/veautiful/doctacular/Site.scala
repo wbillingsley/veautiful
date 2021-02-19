@@ -19,6 +19,7 @@ class Site() {
   case object HomeRoute extends Route
   case class PageRoute(name:String) extends Route
   case class DeckRoute(name:String, slide:Int) extends Route
+  case class FullScreenDeckRoute(name:String, slide:Int) extends Route
   trait CustomRoute extends Route {
     def render():VHtmlNode
 
@@ -54,7 +55,8 @@ class Site() {
   def renderPage(f: => VHtmlNode):VHtmlNode = pageLayout.renderPage(this, f)
   
   var deckLayout = DeckLayout(this)
-  def renderDeck(name:String, page:Int) = deckLayout.renderDeck(this, name, decks(name)(), page)
+  def renderDeck(name:String, page:Int) = deckLayout.renderDeckGallery(this, name, decks(name)(), page)
+  def renderDeckFS(name:String, page:Int) = deckLayout.renderDeckFS(this, name, decks(name)(), page)
   
   def addPage(name:String, content: => VHtmlNode):PageRoute = {
     pages.put(name, () => content)
@@ -78,10 +80,12 @@ class Site() {
       case HomeRoute => /#.stringify
       case PageRoute(name) => (/# / "pages" / name).stringify
       case DeckRoute(name, page) => (/# / "decks" / name / page.toString).stringify
+      case FullScreenDeckRoute(name, page) => (/# / "decks" / name / page.toString / "fullscreen").stringify
       case c:CustomRoute => c.path
     }
 
     override def routeFromLocation(): Route = PathDSL.hashPathList() match {
+      case "decks" :: name :: intParam(page) :: "fullscreen" :: _ => FullScreenDeckRoute(name, page)
       case "decks" :: name :: intParam(page) :: _ => DeckRoute(name, page)
       case "decks" :: name :: _ => DeckRoute(name, 0)
       case "pages" :: name :: _ => PageRoute(name)
@@ -93,6 +97,7 @@ class Site() {
         case HomeRoute => home()
         case PageRoute(name) if pages.contains(name) => renderPage(pages(name)())
         case DeckRoute(name, slide) if decks.contains(name) => renderDeck(name, slide)
+        case FullScreenDeckRoute(name, slide) if decks.contains(name) => renderDeckFS(name, slide)
         case custom:CustomRoute => custom.render()
         case _ => home()
       }
