@@ -9,11 +9,18 @@ object Sequencer {
 
   type LayoutFunc = (Sequencer, VHtmlNode, Int) => VHtmlNode
 
-  def defaultLayout:LayoutFunc = { (sequencer, item, i) =>
-    <.div(item, sequencer.footBox)
+  def footBoxLayout(additionalItems:Seq[VHtmlNode]):LayoutFunc = { (sequencer, item, i) =>
+    <.div(^.cls := inheritWrapper.className, item, sequencer.footBoxWithInsert(additionalItems))
   }
 
+  def defaultLayout:LayoutFunc = { (sequencer, item, i) =>
+    <.div(^.cls := inheritWrapper.className, item, sequencer.footBox)
+  }
 
+  def bareLayout:LayoutFunc = { (sequencer, item, i) =>
+    <.div(^.cls := inheritWrapper.className, item)
+  }
+  
   /** The surround, that contains the slide deck */
   val sequencerSlideStyle = Styling(
     """position: absolute;
@@ -25,6 +32,18 @@ object Sequencer {
     ".inactive" -> "visibility: hidden;"
   ).register()
   
+  val inheritWrapper = Styling("height: inherit;").register()
+
+  val sequencerGallerySlideStyle = Styling(
+    """position: relative;
+      |top: 0;
+      |left: 0;
+      |width: 100%;
+      |height: 100%;
+      |""".stripMargin).modifiedBy(
+  ).register()
+  
+  
   val defaultFootBoxStyle = Styling(
     """position: absolute;
       |bottom: 10px;
@@ -35,7 +54,8 @@ object Sequencer {
         |background-color: #6c757d;
         |border-radius: 0.2rem;
         |color: #fff;
-        |""".stripMargin
+        |""".stripMargin,
+    " button:disabled" -> "opacity: 0.7"
   ).register()
   
 }
@@ -81,11 +101,32 @@ case class Sequencer(override val key:Option[String] = None)(
     }
   }
 
+  private def prevButton():VHtmlNode =
+    if (prop.index > 0) then
+      <.button(^.onClick --> previous(), "<")
+    else
+      <.button(^.attr("disabled") := "disabled", "<")
+
+  private def nextButton():VHtmlNode =
+    if (prop.index + 1 < nodes.length) then
+      <.button(^.onClick --> next(), ">")
+    else
+      <.button(^.attr("disabled") := "disabled", ">")
+
+  def footBoxWithInsert(additional:Seq[VHtmlNode]):VHtmlNode = {
+    <.div(^.cls := s"v-sequencer-footbox ${defaultFootBoxStyle.className} ",
+      additional,
+      prevButton(),
+      <.span(s" ${prop.index+1} / ${nodes.size} "),
+      nextButton()
+    )
+  }
+  
   def footBox:VHtmlNode = {
     <.div(^.cls := s"v-sequencer-footbox ${defaultFootBoxStyle.className} ",
-      <.button(^.onClick --> previous(), "<"),
+      prevButton(),
       <.span(s" ${prop.index+1} / ${nodes.size} "),
-      <.button(^.onClick --> next(), ">")
+      nextButton()
     )
   }
   
@@ -116,7 +157,7 @@ case class Sequencer(override val key:Option[String] = None)(
 
 }
 
-type SequenceItem = VHtmlNode | CustomSequenceItem
+type SequenceItem = VHtmlNode // | CustomSequenceItem
 
 trait CustomSequenceItem {
   def layout(sequencer:Sequencer, index:Int):VHtmlNode

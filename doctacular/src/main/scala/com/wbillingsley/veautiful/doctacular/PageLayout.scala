@@ -109,12 +109,12 @@ class PageLayout(site:Site) {
     """text-align: center
       |""".stripMargin).register()
 
-  
+
   /** A stateful component allowing us to open and close the sidebar */
   case class SideBarAndLayout()(name:String, left: () => VHtmlNode, right: () => VHtmlNode, var open:Boolean = true) extends VHtmlComponent with Morphing((name, left, right)) {
 
     val morpher = createMorpher(this)
-    
+
     def sideBarToggle = <.button(^.cls := sideBarToggleStyle.className, ^.onClick ==> { (_) =>
         open = !open
         rerender()
@@ -123,7 +123,7 @@ class PageLayout(site:Site) {
 
     override def render = {
       val (name, l, r) = prop
-      
+
       <.div(^.cls := (if open then leftSideBarAndContentStyle.className else s"${leftSideBarAndContentStyle.className} closed"),
         <("aside")(^.cls := (if open then leftSideBarStyle.className else s"${leftSideBarStyle.className} closed"),
           l(),
