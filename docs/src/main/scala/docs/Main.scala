@@ -60,6 +60,7 @@ object Main {
       "Doctacular" -> site.Toc(
         "Intro" -> site.addPage("doctacular-intro", doctacular.introPage),
         "Slides: Tutorial" -> site.addDeck("doctacular-tutorial-deck", doctacular.tutorialDeck),
+        "Videos" -> site.addPage("doctacular-videos", doctacular.videoIntro)
       ),
       "Examples" -> site.Toc(
         "To-Do List" -> site.addPage("to-do-list", ToDoList.page),

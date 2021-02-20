@@ -45,8 +45,6 @@ class Site() {
   }
 
   type TocEntry = (String, Route) | (String, Toc) | CustomTocElement
-
-
   
   private var pages:mutable.Map[String, () => VHtmlNode] = mutable.Map.empty
   private var decks:mutable.Map[String, () => VSlides] = mutable.Map.empty
@@ -61,6 +59,9 @@ class Site() {
   var deckLayout = DeckLayout(this)
   def renderDeck(name:String, page:Int) = deckLayout.renderDeckGallery(this, name, decks(name)(), page)
   def renderDeckFS(name:String, page:Int) = deckLayout.renderDeckFS(this, name, decks(name)(), page)
+  
+  var videoLayout = VideoLayout(this)
+  def renderVideo(name:String) = videoLayout.renderVideo(this, name, videos(name)())
   
   def addPage(name:String, content: => VHtmlNode):PageRoute = {
     pages.put(name, () => content)
@@ -109,7 +110,7 @@ class Site() {
         case PageRoute(name) if pages.contains(name) => renderPage(pages(name)())
         case DeckRoute(name, slide) if decks.contains(name) => renderDeck(name, slide)
         case FullScreenDeckRoute(name, slide) if decks.contains(name) => renderDeckFS(name, slide)
-        case VideoRoute(name) if videos.contains(name) => renderPage(videos(name)().embeddedPlayer)
+        case VideoRoute(name) if videos.contains(name) => renderVideo(name)
         case custom:CustomRoute => custom.render()
         case _ => home()
       }
