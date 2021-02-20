@@ -66,7 +66,7 @@ object VSlidesExample {
 
   def page1(i:Int):VHtmlNode = {
     <.div(^.cls := "resizable",
-      DefaultVSlidesPlayer(1280, 720)(deck, i)
+      DefaultVSlidesPlayer(deck)(i)
     )
   }
 
@@ -101,7 +101,7 @@ object VSlidesExample {
             |
             |""".stripMargin),
         <.div(^.key := "vslide-example2", ^.cls := "resizable",
-          DefaultVSlidesPlayer(1280, 720)(deck, i)
+          DefaultVSlidesPlayer(deck)(i)
         )
       )
   }

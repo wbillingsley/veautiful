@@ -84,7 +84,6 @@ object VSlides {
 }
 
 case class VSlidesConfig(
-  deck: VSlides,
   index: Int = 0,
   onIndexChange: Option[Int => Unit] = None,
 )
@@ -100,11 +99,10 @@ class VSlides(
 /** Something that can take a deck, and a page number, and render it to a VHtmlNode */
 type VSlidesPlayer = (VSlides, Int) => VHtmlNode
 
-case class DefaultVSlidesPlayer(width: Int, height: Int, override val key: Option[String] = None, scaleToWindow:Boolean = true)(
-  deck: VSlides,
+case class DefaultVSlidesPlayer(deck: VSlides, override val key: Option[String] = None, scaleToWindow:Boolean = true)(
   index: Int = 0,
   onIndexChange: Option[Int => Unit] = None
-) extends VHtmlComponent with Morphing(VSlidesConfig(deck, index, onIndexChange)) {
+) extends VHtmlComponent with Morphing(VSlidesConfig(index, onIndexChange)) {
   
   val morpher = createMorpher(this)
 
@@ -122,15 +120,15 @@ case class DefaultVSlidesPlayer(width: Int, height: Int, override val key: Optio
     val config = prop
     
     val sequencer = Sequencer()(
-      config.deck.laidOut, config.index, layout = Sequencer.defaultLayout, Some(internalOnIndexChange)
+      deck.laidOut, config.index, layout = Sequencer.defaultLayout, Some(internalOnIndexChange)
     )
     
     <.div(
-      WindowScaler(width, height)(
+      WindowScaler(deck.width, deck.height)(
         sequencer, scaleToWindow
       )
     )
   }
   
-  def atSlide(i:Int):DefaultVSlidesPlayer = DefaultVSlidesPlayer(width, height, key)(prop.deck, i, prop.onIndexChange)
+  def atSlide(i:Int):DefaultVSlidesPlayer = DefaultVSlidesPlayer(deck, key)(i, prop.onIndexChange)
 }

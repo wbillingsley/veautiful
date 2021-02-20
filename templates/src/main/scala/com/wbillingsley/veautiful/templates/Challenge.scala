@@ -192,7 +192,7 @@ class Challenge(val levels: Seq[Challenge.Level],
 
   def render = {
     <.div(
-      DefaultVSlidesPlayer(1920, 1080, scaleToWindow=scaleToWindow)(levelSlides, stage)
+      DefaultVSlidesPlayer(levelSlides, scaleToWindow=scaleToWindow)(stage)
     )
   }
 

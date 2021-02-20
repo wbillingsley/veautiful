@@ -51,11 +51,11 @@ class DeckBuilder(width:Int = 1920, height:Int = 1080, slides:List[Seq[() => VHt
     VSlides(width, height, slides.reverse.flatten.map(_.apply))
   }
   
-  def renderNode(using player:VSlidesPlayer = { (slides, index) => DefaultVSlidesPlayer(width, height)(slides, index=index)}) = player.apply(renderSlides, 0)
+  def renderNode(using player:VSlidesPlayer = { (slides, index) => DefaultVSlidesPlayer(slides)(index=index)}) = player.apply(renderSlides, 0)
 
   @JSExport
   def render(selector:String) = {
-    val slides = renderNode(using { (slides, index) => DefaultVSlidesPlayer(width, height)(slides, index=index)})
+    val slides = renderNode(using { (slides, index) => DefaultVSlidesPlayer(slides)(index=index)})
     DeckBuilder.publishedDecks(selector) = slides
     val a = Attacher.newRoot(dom.document.querySelector(selector))
     a.render(slides)
