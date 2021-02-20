@@ -20,6 +20,8 @@ class Site() {
   case class PageRoute(name:String) extends Route
   case class DeckRoute(name:String, slide:Int) extends Route
   case class FullScreenDeckRoute(name:String, slide:Int) extends Route
+  case class VideoRoute(name:String) extends Route
+  
   trait CustomRoute extends Route {
     def render():VHtmlNode
 
@@ -48,6 +50,8 @@ class Site() {
   
   private var pages:mutable.Map[String, () => VHtmlNode] = mutable.Map.empty
   private var decks:mutable.Map[String, () => VSlides] = mutable.Map.empty
+  private var videos:mutable.Map[String, () => VideoResource] = mutable.Map.empty
+  
   var home:() => VHtmlNode = () => <.div("No home page has been set yet")
   var toc = Toc()
   
@@ -67,6 +71,11 @@ class Site() {
     decks.put(name, () => content)
     DeckRoute(name, 0)
   }
+  
+  def addVideo[T : VideoPlayer](name: String, video:T):VideoRoute = {
+    videos.put(name, () => PlayableVideo(video))
+    VideoRoute(name)
+  }
 
   object intParam {
     def unapply(s:String):Option[Int] = (Try { s.toInt }).toOption
@@ -81,6 +90,7 @@ class Site() {
       case PageRoute(name) => (/# / "pages" / name).stringify
       case DeckRoute(name, page) => (/# / "decks" / name / page.toString).stringify
       case FullScreenDeckRoute(name, page) => (/# / "decks" / name / page.toString / "fullscreen").stringify
+      case VideoRoute(name) => (/# / "videos" / name).stringify
       case c:CustomRoute => c.path
     }
 
@@ -89,6 +99,7 @@ class Site() {
       case "decks" :: name :: intParam(page) :: _ => DeckRoute(name, page)
       case "decks" :: name :: _ => DeckRoute(name, 0)
       case "pages" :: name :: _ => PageRoute(name)
+      case "videos" :: name :: _ => VideoRoute(name)
       case _ => HomeRoute
     }
     
@@ -98,6 +109,7 @@ class Site() {
         case PageRoute(name) if pages.contains(name) => renderPage(pages(name)())
         case DeckRoute(name, slide) if decks.contains(name) => renderDeck(name, slide)
         case FullScreenDeckRoute(name, slide) if decks.contains(name) => renderDeckFS(name, slide)
+        case VideoRoute(name) if videos.contains(name) => renderPage(videos(name)().embeddedPlayer)
         case custom:CustomRoute => custom.render()
         case _ => home()
       }

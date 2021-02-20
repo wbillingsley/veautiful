@@ -91,8 +91,8 @@ case class VSlidesConfig(
 
 
 /** VSlides just defines the deck. The layout within the page is part of the definition. */
-case class VSlides(
-  width: Int, height: Int, content: Seq[SequenceItem], layout:VSlides.LayoutFunc = VSlides.defaultLayout
+class VSlides(
+  val width: Int, val height: Int, val content: Seq[SequenceItem], val layout:VSlides.LayoutFunc = VSlides.defaultLayout
 ) {
   def laidOut = content.zipWithIndex.map { (item, idx)  => layout(this, item, idx) }
 }
