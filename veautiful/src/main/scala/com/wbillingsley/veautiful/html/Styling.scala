@@ -49,10 +49,13 @@ class StyleSuite() {
   private val globalRules:mutable.Buffer[String] = mutable.Buffer.empty
   
   def randomName = {
-    def nextChar():Char = (Random.nextInt(0xefff) + 0x1000).toChar
+    // This should generate a character within 0x1000 and 0xD7FF. 0xD7FF is the upper limit of the Basic Multilingual Plane
+    // Stopping here avoids the issue of running into the range where "surrogate pairs" (two characters) are used to 
+    // represent a higher character, for instance, that could make a generated name invalid.
+    def nextChar():Char = (Random.nextInt(0xc7ff) + 0x1000).toChar
 
     val length = 8
-    
+
     val arr = new Array[Char](length)
     var i = 0
     while (i < length) {
