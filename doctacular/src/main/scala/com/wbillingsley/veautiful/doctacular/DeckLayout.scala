@@ -76,6 +76,7 @@ class DeckLayout(site:Site) {
       |background-color: antiquewhite;
       |text-align: center;
       |border: 1px solid #aaa;
+      |margin-right: 1rem;
       |""".stripMargin).modifiedBy(
     ":hover" -> "filter: brightness(115%);"
   ).register()
@@ -84,20 +85,30 @@ class DeckLayout(site:Site) {
     DoctacularFSVSlidesPlayer(site, name, deck)(page)
   }
 
-  def fullScreenButton(site:Site, name:String, deck:VSlides, page:Int):VHtmlNode = {
+  def fullScreenButton(site:Site, name:String, deck:VSlides, page:Int):VHtmlNode = <.p(
     <.button(^.cls := fsButtonStyle.className,
       ^.onClick --> site.router.routeTo(site.FullScreenDeckRoute(name, page)),
       "⛶ Play this deck fullscreen"
-    )
-  }
+    ), 
+    
+    // This is a bit of a hack, as it needs to move more generally into an alternatives display
+    for (r, alt) <- site.alternativesTo(site.DeckRoute(name, 0)) yield
+      <.button(^.cls := fsButtonStyle.className,
+        ^.onClick --> site.router.routeTo(r),
+          alt.item match {
+            case Medium.Video(_) => s"⏵ ${alt.descriptor}"
+            case Medium.Page(_) => s"🗎 ${alt.descriptor}"
+            case Medium.Deck(_) => s"⧉ ${alt.descriptor}"
+          }
+      )
+  )
 
   def renderDeckGallery(site:Site, name:String, deck:VSlides, page:Int):VHtmlNode = {
     site.pageLayout.renderPage(
       site,
       <.div(
-        <.p(
-          fullScreenButton(site, name, deck, page)
-        ),
+       
+        fullScreenButton(site, name, deck, page),
 
         <.div(^.cls := slideGalleryBorder.className,
           DoctacularVSlidesGallery(site, name, deck)(page)

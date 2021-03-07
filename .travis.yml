@@ -1,6 +1,6 @@
 language: scala
 scala:
-  - 3.0.0-M3
+  - 3.0.0-RC1
 before_deploy:
   - sbt "docs / deployScript"
 deploy:

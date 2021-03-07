@@ -50,6 +50,9 @@ class Site() {
   private var decks:mutable.Map[String, () => VSlides] = mutable.Map.empty
   private var videos:mutable.Map[String, () => VideoResource] = mutable.Map.empty
   
+  private var alternativeMap:mutable.Map[Route, Seq[(Route, Alternative)]] = mutable.Map.empty
+  def alternativesTo(r:Route):Seq[(Route, Alternative)] = alternativeMap.getOrElse(r, Seq.empty)
+  
   var home:() => VHtmlNode = () => <.div("No home page has been set yet")
   var toc = Toc()
   
@@ -72,10 +75,41 @@ class Site() {
     decks.put(name, () => content)
     DeckRoute(name, 0)
   }
+
+  def addVideoResource(name: String, videoResource:VideoResource):VideoRoute = {
+    videos.put(name, () => videoResource)
+    VideoRoute(name)
+  }
+
   
   def addVideo[T : VideoPlayer](name: String, video:T):VideoRoute = {
-    videos.put(name, () => PlayableVideo(video))
-    VideoRoute(name)
+    addVideoResource(name, PlayableVideo(video))
+  }
+  
+  /** Adds an item along with several "alternatives". For instance, a slide deck and a video of the presentation. */
+  def add(name:String, first:Alternative, alternatives:Alternative*):Route = {
+    
+    def register(name:String, item:Medium):Route = item match {
+      case Medium.Page(f) => addPage(name, f())
+      case Medium.Deck(f) => addDeck(name, f())
+      case Medium.Video(f) => addVideoResource(name, f())
+    }
+    
+    val firstRoute = register(name, first.item)
+    
+    val remainder = for
+      (alt, i) <- alternatives.zipWithIndex
+      route = register(name + s"-alt$i", alt.item)
+    yield (route, alt)
+    
+    // Map every route to a sequence of the alternatives
+    val all = (firstRoute, first) +: remainder
+    for (r, a) <- all do
+      val rest = all.filter(_ != (r, a))
+      alternativeMap(r) = rest
+    
+    // return the primary route
+    firstRoute
   }
 
   object intParam {
