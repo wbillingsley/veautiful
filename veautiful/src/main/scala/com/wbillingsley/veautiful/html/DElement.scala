@@ -40,7 +40,7 @@ case class DElement[+T <: dom.Element](name:String, var uniqEl:Option[Any] = Non
 
   private[this] var _domNode:Option[T] = None
 
-  def domNode = _domNode
+  def domNode:Option[T] = _domNode
 
   override def attachSelf():T = {
     val n = create()
