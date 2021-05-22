@@ -3,7 +3,7 @@ import sbt.Keys.testFrameworks
 
 val versionStr = "0.1-SNAPSHOT"
 
-val scalaVersionStr = "3.0.0-RC1"
+val scalaVersionStr = "3.0.0"
 
 lazy val commonSettings = Seq(
   version := versionStr,
@@ -13,8 +13,8 @@ lazy val commonSettings = Seq(
   scalaVersion := scalaVersionStr,
 
   libraryDependencies ++= Seq(
-    ("org.scala-js" %%% "scalajs-dom" % "1.1.0").withDottyCompat(scalaVersion.value),
-    "org.scalameta" %%% "munit" % "0.7.22" % Test
+    ("org.scala-js" %%% "scalajs-dom" % "1.1.0").cross(CrossVersion.for3Use2_13),
+    "org.scalameta" %%% "munit" % "0.7.26" % Test
   ),
 
   testFrameworks += new TestFramework("munit.Framework"),
