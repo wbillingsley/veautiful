@@ -28,7 +28,10 @@ lazy val veautiful = project.in(file("veautiful"))
   .settings(
     name := "veautiful",
     scalaJSUseMainModuleInitializer := false,
-)
+
+    // Temporarily disable doc generation until https://github.com/sbt/sbt/pull/6499 is merged into sbt
+    Compile / doc / sources := Seq()
+  )
 
 lazy val templates = project.in(file("templates"))
   .enablePlugins(ScalaJSPlugin)
@@ -44,6 +47,9 @@ lazy val scatter = project.in(file("scatter"))
   .settings(commonSettings:_*)
   .settings(
     name := "scatter",
+
+    // Temporarily disable doc generation until https://github.com/sbt/sbt/pull/6499 is merged into sbt
+    Compile / doc / sources := Seq()
   )
 
 /**
