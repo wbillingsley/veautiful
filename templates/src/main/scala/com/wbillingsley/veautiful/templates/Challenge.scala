@@ -1,7 +1,7 @@
 package com.wbillingsley.veautiful.templates
 
 import com.wbillingsley.veautiful.html.<.{CustomElementChild, HTMLAppliable, VHTMLElement}
-import com.wbillingsley.veautiful.html.{<, DElement, VHtmlComponent, VHtmlNode, ^}
+import com.wbillingsley.veautiful.html.{<, Styling, DElement, VHtmlComponent, VHtmlNode, ^}
 import com.wbillingsley.veautiful.templates.Challenge.{HomePath, LevelPath, StagePath}
 import com.wbillingsley.veautiful.templates.Sequencer.LayoutFunc
 
@@ -9,6 +9,40 @@ import com.wbillingsley.veautiful.templates.Sequencer.LayoutFunc
   * Layout based on the one that is used for Escape the Lava Maze
   */
 object Challenge {
+
+  val challengeHeaderHeight = "50px"
+  val challengeHeaderBackground = "#444"
+  val challengeHeaderColour = "white"
+
+  val defaultTheme:Styling = Styling(
+    s"""display: grid;
+      |grid-template-columns: 1fr 320px;
+      |grid-template-rows: $challengeHeaderHeight 1fr 70px;
+      |height: 100%;
+      |""".stripMargin).modifiedBy(
+    " .challenge-header" ->
+      s"""grid-column-start: 1;
+        |grid-column-end: 2;
+        |grid-row-start: 1;
+        |border-bottom: 1px solid lightgrey;
+        |background: $challengeHeaderBackground;
+        |color: $challengeHeaderColour;""".stripMargin,
+    " .challenge" -> "grid-column-start: 1; grid-row-start: 2;",
+    " .countdown-box" ->
+      s"""border-left: 1px solid lightgrey;
+       |border-bottom: 1px solid lightgrey;
+       |grid-column-start: 2;
+       |grid-row-start: 1;
+       |background: $challengeHeaderBackground;""".stripMargin,
+    " .page-controls" ->
+      """grid-column-start: 2;
+        |grid-row-start: 3;
+        |text-align: center;
+        |padding: 10px;
+        |border-left: 1px solid lightgray;""".stripMargin
+  ).register()
+
+
 
   def hgutter = <.div(^.cls := "row hgutter")
 
@@ -181,7 +215,7 @@ class Challenge(val levels: Seq[Challenge.Level],
   }
   
   def layout(s:VSlides, node:VHtmlNode, i:Int):VHtmlNode = {
-    <.div(^.cls := "challenge-wrapper",
+    <.div(^.cls := s"challenge-wrapper ${Challenge.defaultTheme.className}",
       <.div(^.cls := "challenge-header", header(this)),
       <.div(^.cls := "challenge", node),
       <.div(^.cls := "countdown-box", tr(this)),
@@ -192,7 +226,7 @@ class Challenge(val levels: Seq[Challenge.Level],
 
   def render = {
     <.div(
-      DefaultVSlidesPlayer(levelSlides, scaleToWindow=scaleToWindow)(stage)
+      DefaultVSlidesPlayer(levelSlides, scaleToWindow=scaleToWindow)(stage, sequencerLayout = Sequencer.bareLayout)
     )
   }
 

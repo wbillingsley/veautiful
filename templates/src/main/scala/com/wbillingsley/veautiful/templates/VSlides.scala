@@ -86,6 +86,7 @@ object VSlides {
 case class VSlidesConfig(
   index: Int = 0,
   onIndexChange: Option[Int => Unit] = None,
+  sequencerLayout: Sequencer.LayoutFunc = Sequencer.defaultLayout
 )
 
 
@@ -101,8 +102,9 @@ type VSlidesPlayer = (VSlides, Int) => VHtmlNode
 
 case class DefaultVSlidesPlayer(deck: VSlides, override val key: Option[String] = None, scaleToWindow:Boolean = true)(
   index: Int = 0,
-  onIndexChange: Option[Int => Unit] = None
-) extends VHtmlComponent with Morphing(VSlidesConfig(index, onIndexChange)) {
+  onIndexChange: Option[Int => Unit] = None,
+  sequencerLayout: Sequencer.LayoutFunc = Sequencer.defaultLayout
+) extends VHtmlComponent with Morphing(VSlidesConfig(index, onIndexChange, sequencerLayout)) {
   
   val morpher = createMorpher(this)
 
@@ -120,7 +122,7 @@ case class DefaultVSlidesPlayer(deck: VSlides, override val key: Option[String] 
     val config = prop
     
     val sequencer = Sequencer()(
-      deck.laidOut, config.index, layout = Sequencer.defaultLayout, Some(internalOnIndexChange)
+      deck.laidOut, config.index, layout = config.sequencerLayout, Some(internalOnIndexChange)
     )
     
     <.div(

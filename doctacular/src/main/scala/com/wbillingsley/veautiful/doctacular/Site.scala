@@ -3,7 +3,7 @@ package com.wbillingsley.veautiful.doctacular
 import com.wbillingsley.veautiful.PathDSL
 import PathDSL.Compose._
 import com.wbillingsley.veautiful.html.{<, Attacher, VHtmlNode, ^}
-import com.wbillingsley.veautiful.templates.{HistoryRouter, VSlides}
+import com.wbillingsley.veautiful.templates.{HistoryRouter, VSlides, Challenge}
 
 import scala.collection.mutable
 import scala.util.Try
@@ -21,6 +21,7 @@ class Site() {
   case class DeckRoute(name:String, slide:Int) extends Route
   case class FullScreenDeckRoute(name:String, slide:Int) extends Route
   case class VideoRoute(name:String) extends Route
+  case class ChallengeRoute(name:String, level:Int, stage:Int) extends Route
   
   trait CustomRoute extends Route {
     def render():VHtmlNode
@@ -49,7 +50,8 @@ class Site() {
   private var pages:mutable.Map[String, () => VHtmlNode] = mutable.Map.empty
   private var decks:mutable.Map[String, () => VSlides] = mutable.Map.empty
   private var videos:mutable.Map[String, () => VideoResource] = mutable.Map.empty
-  
+  private var challenges:mutable.Map[String, () => Seq[Challenge.Level]] = mutable.Map.empty
+
   private var alternativeMap:mutable.Map[Route, Seq[(Route, Alternative)]] = mutable.Map.empty
   def alternativesTo(r:Route):Seq[(Route, Alternative)] = alternativeMap.getOrElse(r, Seq.empty)
   
@@ -65,7 +67,17 @@ class Site() {
   
   var videoLayout = VideoLayout(this)
   def renderVideo(name:String) = videoLayout.renderVideo(this, name, videos(name)())
-  
+
+  def renderChallenge(name: String, level: Int, stage: Int) = {
+    val levels = challenges(name)()
+    Challenge.apply(
+      levels = levels,
+      homePath = (_:Challenge) => router.path(HomeRoute),
+      levelPath = (c:Challenge, l:Int) => router.path(ChallengeRoute(name, l, 0)),
+      stagePath = (c:Challenge, l:Int, s:Int) => router.path(ChallengeRoute(name, l, s)),
+    ).show(level, stage)
+  }
+
   def addPage(name:String, content: => VHtmlNode):PageRoute = {
     pages.put(name, () => content)
     PageRoute(name)
@@ -81,6 +93,10 @@ class Site() {
     VideoRoute(name)
   }
 
+  def addChallenge(name:String, content: => Seq[Challenge.Level]):ChallengeRoute = {
+    challenges.put(name, () => content)
+    ChallengeRoute(name, 0, 0)
+  }
   
   def addVideo[T : VideoPlayer](name: String, video:T):VideoRoute = {
     addVideoResource(name, PlayableVideo(video))
@@ -126,6 +142,7 @@ class Site() {
       case DeckRoute(name, page) => (/# / "decks" / name / page.toString).stringify
       case FullScreenDeckRoute(name, page) => (/# / "decks" / name / page.toString / "fullscreen").stringify
       case VideoRoute(name) => (/# / "videos" / name).stringify
+      case ChallengeRoute(name, level, stage) => (/# / "challenges" / name / level.toString / stage.toString ).stringify
       case c:CustomRoute => c.path
     }
 
@@ -135,6 +152,9 @@ class Site() {
       case "decks" :: name :: _ => DeckRoute(name, 0)
       case "pages" :: name :: _ => PageRoute(name)
       case "videos" :: name :: _ => VideoRoute(name)
+      case "challenges" :: name :: intParam(level) :: intParam(stage) :: _ => ChallengeRoute(name, level, stage)
+      case "challenges" :: name :: intParam(level) ::  _ => ChallengeRoute(name, level, 0)
+      case "challenges" :: name :: _ => ChallengeRoute(name, 0, 0)
       case _ => HomeRoute
     }
     
@@ -145,6 +165,7 @@ class Site() {
         case DeckRoute(name, slide) if decks.contains(name) => renderDeck(name, slide)
         case FullScreenDeckRoute(name, slide) if decks.contains(name) => renderDeckFS(name, slide)
         case VideoRoute(name) if videos.contains(name) => renderVideo(name)
+        case ChallengeRoute(name, level, stage) if challenges.contains(name) => renderChallenge(name, level, stage)
         case custom:CustomRoute => custom.render()
         case _ => home()
       }

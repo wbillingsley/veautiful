@@ -55,12 +55,12 @@ object Main {
       ),
       "Extras" -> site.Toc(
         "VSlides" -> site.addPage("vslides", VSlidesExample.page(0)),
-        
+        "Challenges" -> site.addChallenge("challenges", ChallengeExample.levels)
       ),
       "Doctacular" -> site.Toc(
         "Intro" -> site.addPage("doctacular-intro", doctacular.introPage),
         "Slides: Tutorial" -> site.addDeck("doctacular-tutorial-deck", doctacular.tutorialDeck),
-        "Videos" -> site.addPage("doctacular-videos", doctacular.videoIntro)
+        "Videos" -> site.addPage("doctacular-videos", doctacular.videoIntro),
       ),
       "Examples" -> site.Toc(
         "To-Do List" -> site.addPage("to-do-list", ToDoList.page),
