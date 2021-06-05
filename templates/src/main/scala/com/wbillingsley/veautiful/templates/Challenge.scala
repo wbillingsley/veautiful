@@ -27,20 +27,37 @@ object Challenge {
         |border-bottom: 1px solid lightgrey;
         |background: $challengeHeaderBackground;
         |color: $challengeHeaderColour;""".stripMargin,
-    " .challenge" -> "grid-column-start: 1; grid-row-start: 2;",
+    " .challenge-header .home-link" ->
+      """width: 60px;
+        |border-right: 2px solid white;
+        |float: left;
+        |margin-right: 25px;
+        |line-height: 50px;
+        |color: white;
+        |font-size: 26px;
+        |text-align: center;""".stripMargin,
+    " .challenge-header .challenge-name" -> s"font-size: 26px; line-height: $challengeHeaderHeight;",
+    " .challenge" -> "grid-column-start: 1; grid-row-start: 2; grid-row-end: 4; background: white;",
     " .countdown-box" ->
       s"""border-left: 1px solid lightgrey;
        |border-bottom: 1px solid lightgrey;
        |grid-column-start: 2;
        |grid-row-start: 1;
        |background: $challengeHeaderBackground;""".stripMargin,
+    " .stage-progress " -> "grid-column-start: 2; grid-row-start: 2; grid-row-end: 4; border-left: 1px solid lightgrey; height: 100%; background: white;",
+    " .stage-progress .progress-level" -> "padding: 10px; border-bottom: 1px solid lightgray;",
+    " .stage-progress .progress-level.level-active" -> "color: white; background-color: #7d5177;",
+    " .stage-progress .progress-level.level-active a" -> "color: white;",
+    " .stage-progress .progress-level.level-active a.stage-link.stage-active" -> "color: cadetblue;",
+    " .stage-progress .progress-level a" -> "color: inherit;",
     " .page-controls" ->
       """grid-column-start: 2;
         |grid-row-start: 3;
         |text-align: center;
         |padding: 10px;
-        |border-left: 1px solid lightgray;""".stripMargin
+        |border-left: 1px solid lightgray; background: white;""".stripMargin
   ).register()
+
 
 
 
@@ -61,13 +78,15 @@ object Challenge {
 
   def cardText(ac: HTMLAppliable *) = <.div(^.cls := "card-text", <.div(ac:_*))
 
-  def textColumn(ac: HTMLAppliable *) = <.div(^.cls := "text-column", <.div(ac:_*))
+  val textColumnStyling = Styling("margin-top: 50px; margin-left: 50px; margin-right: 50px;").register()
+  def textColumn(ac: HTMLAppliable *) = <.div(^.cls := s"text-column ${textColumnStyling.className}", <.div(ac:_*))
 
   def textAndEx(left: HTMLAppliable *)(right: HTMLAppliable *):VHtmlNode = {
     split(textColumn(left:_*))(right:_*)
   }
 
-  def split(l:HTMLAppliable*)(r:HTMLAppliable*) = <.div(^.cls := "split2",
+  val split2Styling = Styling("display: grid; grid-template-columns: 1fr 1fr;").register()
+  def split(l:HTMLAppliable*)(r:HTMLAppliable*) = <.div(^.cls := s"split2 ${split2Styling.className}",
     <.div(l:_*),
     <.div(r:_*)
   )
