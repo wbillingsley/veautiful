@@ -1,0 +1,25 @@
+[0m[[0m[0minfo[0m] [0m[0mFast optimizing /home/travis/build/wbillingsley/veautiful/docs/target/scala-3.0.0/veautiful-docs-test-fastopt[0m
+[0m[[0m[0mdebug[0m] [0m[0mLinker: Compute reachability: 623992 us[0m
+[0m[[0m[0mdebug[0m] [0m[0mLinker: Assemble LinkedClasses: 56410 us[0m
+[0m[[0m[0mdebug[0m] [0m[0mLinker: 704332 us[0m
+[0m[[0m[0mdebug[0m] [0m[0mOptimizer: Batch mode: true[0m
+[0m[[0m[0mdebug[0m] [0m[0mOptimizer: Incremental part: 234764 us[0m
+[0m[[0m[0mdebug[0m] [0m[0mOptimizer: Optimizing 8932 methods.[0m
+[0m[[0m[0mdebug[0m] [0m[0mOptimizer: Optimizer part: 2940784 us[0m
+[0m[[0m[0mdebug[0m] [0m[0mOptimizer: 3182546 us[0m
+[0m[[0m[0mdebug[0m] [0m[0mRefiner: Compute reachability: 211500 us[0m
+[0m[[0m[0mdebug[0m] [0m[0mRefiner: Assemble LinkedClasses: 8030 us[0m
+[0m[[0m[0mdebug[0m] [0m[0mRefiner: 227993 us[0m
+[0m[[0m[0mdebug[0m] [0m[0mModule Splitter: Calculate Dependency Info: 765 us[0m
+[0m[[0m[0mdebug[0m] [0m[0mModule Splitter: Analyze Modules: 174 us[0m
+[0m[[0m[0mdebug[0m] [0m[0mModule Splitter: Assemble Modules: 1613 us[0m
+[0m[[0m[0mdebug[0m] [0m[0mModule Splitter: 2706 us[0m
+[0m[[0m[0mdebug[0m] [0m[0mEmitter: Generate Classes: 743940 us[0m
+[0m[[0m[0mdebug[0m] [0m[0mEmitter: Write trees: 9375 us[0m
+[0m[[0m[0mdebug[0m] [0m[0mEmitter: The set of dangerous global refs has changed. Going to re-generate the world.[0m
+[0m[[0m[0mdebug[0m] [0m[0mEmitter: Generate Classes: 533042 us[0m
+[0m[[0m[0mdebug[0m] [0m[0mEmitter: Write trees: 6803 us[0m
+[0m[[0m[0mdebug[0m] [0m[0mEmitter: Class tree cache stats: reused: 0 -- invalidated: 2134[0m
+[0m[[0m[0mdebug[0m] [0m[0mEmitter: Method tree cache stats: reused: 0 -- invalidated: 10182[0m
+[0m[[0m[0mdebug[0m] [0m[0mEmitter: 1304554 us[0m
+[0m[[0m[0mdebug[0m] [0m[0mBasicBackend: Write result: 476034 us[0m

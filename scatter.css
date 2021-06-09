@@ -1,0 +1,69 @@
+@import url('https://fonts.googleapis.com/css?family=Fira+Code&display=swap');
+
+.scatter-area {
+    background: whitesmoke;
+    touch-action: none;
+}
+
+.scatter-area text {
+    touch-action: none;
+    user-select: none;
+    cursor: default;
+}
+
+.scatter-area .tile text {
+    dominant-baseline: text-before-edge;
+    stroke: none;
+    fill: black;
+    font-family: "Fira Code", monospace;
+    white-space: pre;
+    touch-action: none;
+    cursor: default;
+}
+
+.tile {
+    stroke: darkslategray;
+    fill: white;
+    stroke-width: 2;
+    stroke-linejoin: round;
+}
+
+.scatter-area .tile.contained > rect {
+    stroke: none;
+}
+
+.scatter-area .tile .type-icon > text {
+    dominant-baseline: middle;
+    text-anchor: middle;
+    transform: translate(7px, 10px);
+    fill: dodgerblue;
+}
+
+.scatter-area .tile .socket-type-icon > text {
+    dominant-baseline: middle;
+    text-anchor: middle;
+    transform: translate(7px, 10px);
+    fill: gray;
+}
+
+.scatter-area .tile.contained.mouseover > rect {
+    stroke: #ffc65c;
+}
+
+.scatter-area .tile.play {
+    stroke: green;
+}
+
+.scatter-area .socket {
+    stroke: slategray;
+    fill: whitesmoke;
+}
+
+.scatter-area .socket.active {
+    stroke: darkorange;
+    fill: whitesmoke;
+}
+
+.scatter-number-input {
+    width: 3em;
+}
