@@ -48,6 +48,7 @@ object Challenge {
     " .stage-progress .progress-level" -> "padding: 10px; border-bottom: 1px solid lightgray;",
     " .stage-progress .progress-level.level-active" -> "color: white; background-color: #7d5177;",
     " .stage-progress .progress-level.level-active a" -> "color: white;",
+    " .stage-progress .progress-level .stage-link" -> "font-size: 36px; line-height: 36px;",
     " .stage-progress .progress-level.level-active a.stage-link.stage-active" -> "color: cadetblue;",
     " .stage-progress .progress-level a" -> "color: inherit;",
     " .page-controls" ->
@@ -127,7 +128,7 @@ object Challenge {
   type LevelPath = (Challenge, Int) => String
   type StagePath = (Challenge, Int, Int) => String
 
-  def defaultHomeIcon:VHTMLElement = <("i")(^.cls := "material-icons", "home")
+  def defaultHomeIcon:VHTMLElement = <.span(^.cls := "home-icon", "⌂")
 
   def defaultHeader(homePath:HomePath, homeIcon: => VHtmlNode = defaultHomeIcon) = { (c:Challenge) =>
     <.div(
@@ -154,12 +155,10 @@ object Challenge {
         } yield {
           <.a(^.cls :=
             s"stage-link ${if (stageActive(j)) "stage-active" else ""} ${s.completion.cssClass}", ^.href := stagePath(c, i, j),
-            <("i")(^.cls := "material-icons",
               s.kind match {
-                case "video" => "videocam"
-                case _ => "lens"
+                case "video" => <.span(^.cls := "video-stage", "▶")
+                case _ => <.span(^.cls := "default-stage", "●")
               }
-            )
           )
         }
       )
@@ -230,18 +229,19 @@ class Challenge(val levels: Seq[Challenge.Level],
   }
 
   def levelSlides:VSlides = {
-    VSlides(1920, 1080, elements, layout=layout)
+    VSlides(1920, 1080, elements, layout=Layout)
   }
-  
-  def layout(s:VSlides, node:VHtmlNode, i:Int):VHtmlNode = {
-    <.div(^.cls := s"challenge-wrapper ${Challenge.defaultTheme.className}",
-      <.div(^.cls := "challenge-header", header(this)),
-      <.div(^.cls := "challenge", node),
-      <.div(^.cls := "countdown-box", tr(this)),
-      <.div(^.cls := "stage-progress", progressBlock(this)),
-      <.div(^.cls := "page-controls", pageControls(this))
-    )
-  }
+
+  object Layout extends VSlides.Layout:
+    def apply(s:VSlides, node:VHtmlNode, i:Int):VHtmlNode = {
+      <.div(^.cls := s"challenge-wrapper ${Challenge.defaultTheme.className}",
+        <.div(^.cls := "challenge-header", header(Challenge.this)),
+        <.div(^.cls := "challenge", node),
+        <.div(^.cls := "countdown-box", tr(Challenge.this)),
+        <.div(^.cls := "stage-progress", progressBlock(Challenge.this)),
+        <.div(^.cls := "page-controls", pageControls(Challenge.this))
+      )
+    }
 
   def render = {
     <.div(

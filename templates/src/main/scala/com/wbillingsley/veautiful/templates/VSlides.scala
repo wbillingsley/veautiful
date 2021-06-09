@@ -8,14 +8,15 @@ import org.scalajs.dom.raw.{Event, HTMLElement}
 
 object VSlides {
   val logger = Logger.getLogger(VSlides.getClass)
-  
-  type LayoutFunc = (VSlides, VHtmlNode, Int) => VHtmlNode
 
-  def defaultLayout:LayoutFunc = { (vs, s, _) =>
-    <.div(
-      ^.cls := s"v-slide ${defaultTheme.className}", ^.attr("style") := s"height: ${vs.height}px", s
-    )
-  }
+  trait Layout:
+    def apply(slides:VSlides, slide:VHtmlNode, index:Int):VHtmlNode
+
+  object DefaultLayout extends Layout:
+    def apply(slides:VSlides, slide:VHtmlNode, index:Int):VHtmlNode =
+      <.div(
+        ^.cls := s"v-slide ${defaultTheme.className}", ^.attr("style") := s"height: ${slides.height}px", slide
+      )
 
   /*
    * Functional styles, e.g. for rescaling
@@ -91,8 +92,8 @@ case class VSlidesConfig(
 
 
 /** VSlides just defines the deck. The layout within the page is part of the definition. */
-class VSlides(
-  val width: Int, val height: Int, val content: Seq[SequenceItem], val layout:VSlides.LayoutFunc = VSlides.defaultLayout
+case class VSlides(
+  val width: Int, val height: Int, val content: Seq[SequenceItem], val layout:VSlides.Layout = VSlides.DefaultLayout
 ) {
   def laidOut = content.zipWithIndex.map { (item, idx)  => layout(this, item, idx) }
 }
