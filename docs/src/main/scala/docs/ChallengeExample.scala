@@ -7,6 +7,15 @@ import org.scalajs.dom.{Element, Node}
 
 object ChallengeExample {
 
+  case class YouTubeStage(content:String) extends Challenge.Stage:
+    val kind = "video"
+    var rendered = false
+    override def render: DiffNode[Element, Node] = {
+      rendered = true
+      <.div(Challenge.textColumn(Common.markdown(content)))
+    }
+    override def completion: Challenge.Completion = if rendered then Challenge.Open else Challenge.Incomplete
+
   class MarkdownStage(content:String) extends Challenge.Stage:
     val kind = "text"
     var rendered = false
@@ -44,6 +53,7 @@ object ChallengeExample {
       )
     )),
     Challenge.Level("Level two", Seq(
+      YouTubeStage("asdf"),
       MarkdownStage(
         """## Goodbye world
           |

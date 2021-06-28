@@ -27,6 +27,8 @@ def intro = <.div(
       |To see examples of the sorts of things that have been built with it, try one of the online course sites that have
       |various kinds of embedded models:
       |
+      |* [Thinking About Programming](https://theintelligentbook.com/thinkingaboutprogramming) - embedded robot simulations
+      |  in a little course that teaches computational thinking.
       |* [Circuits Up](https://theintelligentbook.com/circuitsup) - embedded circuit simulations in a little course
       |  that teaches computer architecture from electronics up.
       |* [The Adventures of Will Scala](https://theintelligentbook.com/willscala) - a simpler site (mostly video

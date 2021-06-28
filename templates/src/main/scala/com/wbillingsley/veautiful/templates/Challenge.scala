@@ -1,7 +1,7 @@
 package com.wbillingsley.veautiful.templates
 
 import com.wbillingsley.veautiful.html.<.{CustomElementChild, HTMLAppliable, VHTMLElement}
-import com.wbillingsley.veautiful.html.{<, Styling, DElement, VHtmlComponent, VHtmlNode, ^}
+import com.wbillingsley.veautiful.html.{<, DElement, SVG, Styling, VHtmlComponent, VHtmlNode, ^}
 import com.wbillingsley.veautiful.templates.Challenge.{HomePath, LevelPath, StagePath}
 import com.wbillingsley.veautiful.templates.Sequencer.LayoutFunc
 
@@ -101,14 +101,6 @@ object Challenge {
 
   }
 
-  case class VideoStage(yt:String) extends Stage {
-    var completion = Open
-
-    val kind = "video"
-
-    def render = <.div(yt)
-  }
-
   case class Level(name:String, stages:Seq[Stage])
 
   sealed trait Completion {
@@ -156,7 +148,9 @@ object Challenge {
           <.a(^.cls :=
             s"stage-link ${if (stageActive(j)) "stage-active" else ""} ${s.completion.cssClass}", ^.href := stagePath(c, i, j),
               s.kind match {
-                case "video" => <.span(^.cls := "video-stage", "▶")
+                case "video" =>
+//                  <.svg(^.attr("width") := 25, ^.attr("height") := 25, SVG.polygon(^.attr("points") := "5,5 5,20 20,12"))
+                  <.span(^.cls := "video-stage", "▸")
                 case _ => <.span(^.cls := "default-stage", "●")
               }
           )
