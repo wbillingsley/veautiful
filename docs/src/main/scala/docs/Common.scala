@@ -4,14 +4,14 @@ import com.wbillingsley.veautiful.html.{<, Markup, SVG, VHtmlNode, ^}
 
 import scala.scalajs.js
 
+given marked:Markup = Markup({ (s:String) => js.Dynamic.global.marked.parse(s).asInstanceOf[String] })
+
 /**
   * Common UI components to all the views
   */
 object Common {
 
-  val markdownGenerator = new Markup({ (s:String) => js.Dynamic.global.marked(s).asInstanceOf[String] })
-
-  def markdown(s:String):VHtmlNode = markdownGenerator.Fixed(s)
+  def markdown(s:String):VHtmlNode = marked.Fixed(s)
   
   def logoPaths = SVG.g(
     SVG.path(

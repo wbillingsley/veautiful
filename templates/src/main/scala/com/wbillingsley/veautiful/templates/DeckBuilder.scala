@@ -9,13 +9,8 @@ import scala.scalajs.js.annotation.{JSExport, JSExportTopLevel}
 
 sealed trait Slide
 
-/**
-  *
-  */
 @JSExportTopLevel("DeckBuilder")
-class DeckBuilder(width:Int = 1920, height:Int = 1080, slides:List[Seq[() => VHtmlNode]] = Nil) {
-
-  import DeckBuilder.markdownGenerator
+class DeckBuilder(width:Int = 1920, height:Int = 1080, slides:List[Seq[() => VHtmlNode]] = Nil)(using markup:Markup = Markup((s) => js.Dynamic.global.marked.parse(s).asInstanceOf[String])) {
 
   def stripIndent(s:String):String = {
     val lines = s.split('\n')
@@ -30,15 +25,15 @@ class DeckBuilder(width:Int = 1920, height:Int = 1080, slides:List[Seq[() => VHt
   }
 
   @JSExport
-  def markdownSlide(m:String):DeckBuilder = new DeckBuilder(width, height, Seq(() => markdownGenerator.Fixed(stripIndent(m))) :: slides)
+  def markdownSlide(m:String):DeckBuilder = new DeckBuilder(width, height, Seq(() => markup.Fixed(stripIndent(m))) :: slides)
 
   def veautifulSlide(vnode:VHtmlNode):DeckBuilder = new DeckBuilder(width, height, Seq(() => vnode) :: slides)
 
-
   @JSExport
   def markdownSlides(m:String):DeckBuilder = {
-    val lines = stripIndent(m).split("\n---\n")
-    new DeckBuilder(width, height, lines.toSeq.map(l => () => markdownGenerator.Fixed(l)) :: slides)
+    val pattern = """(?:^|[\n\r\u0085\u2028\u2029])(---)(?=[\n\r\u0085\u2028\u2029]|$)""".r
+    val lines = pattern.split(stripIndent(m))
+    new DeckBuilder(width, height, lines.toSeq.map(l => () => markup.Fixed(l)) :: slides)
   }
 
   @JSExport
@@ -65,8 +60,6 @@ class DeckBuilder(width:Int = 1920, height:Int = 1080, slides:List[Seq[() => VHt
 
 @JSExportTopLevel("DeckBuilderCompanion")
 object DeckBuilder {
-
-  var markdownGenerator = new Markup({ (s:String) => js.Dynamic.global.marked(s).asInstanceOf[String] })
 
   val publishedDecks:mutable.Map[String, VHtmlNode] = mutable.Map.empty
 

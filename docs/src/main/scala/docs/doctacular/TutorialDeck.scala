@@ -2,6 +2,8 @@ package docs.doctacular
 
 import com.wbillingsley.veautiful.templates.DeckBuilder
 
+import docs.given
+
 val tutorialDeck = DeckBuilder()
   .markdownSlide(
     """# Doctacular tutorial
@@ -13,4 +15,16 @@ val tutorialDeck = DeckBuilder()
       |
       |... Need to write the content, just using the deck to show how decks display at the moment.
       |""".stripMargin
-  ).renderSlides
+  ).markdownSlides(
+  """## Another slide
+    |
+    |Here's some text, just testing the splitting in markdownSlides
+    |
+    |---
+    |
+    |## Yet another slide
+    |
+    |Bla bla bla
+    |
+    |""".stripMargin)
+  .renderSlides
