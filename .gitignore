@@ -8,3 +8,7 @@ target/
 .bloop/
 .metals/
 .bsp/
+.vscode/
+
+project/project/
+project/metals.sbt

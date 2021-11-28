@@ -3,7 +3,7 @@ import sbt.Keys.testFrameworks
 
 val versionStr = "0.1-SNAPSHOT"
 
-val scalaVersionStr = "3.0.0"
+val scalaVersionStr = "3.1.0"
 
 lazy val commonSettings = Seq(
   version := versionStr,

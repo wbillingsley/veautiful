@@ -1,7 +1,7 @@
 package docs
 
 import com.wbillingsley.veautiful.html.{Attacher, StyleSuite, Styling}
-import com.wbillingsley.veautiful.doctacular.Site
+import com.wbillingsley.veautiful.doctacular.*
 
 import org.scalajs.dom
 
@@ -21,6 +21,8 @@ val embeddedExampleStyle = Styling(
 object Main {
 
   def main(args:Array[String]): Unit = {
+    import site.given
+    import doctacular.{*, given}
     
     // To set the theme colours, we're rudely adding rules to the CSS that the Site's layout engine produces
     site.pageLayout.leftSideBarStyle.addRules(
@@ -61,6 +63,10 @@ object Main {
         "Intro" -> site.addPage("doctacular-intro", doctacular.introPage),
         "Slides: Tutorial" -> site.addDeck("doctacular-tutorial-deck", doctacular.tutorialDeck),
         "Videos" -> site.addPage("doctacular-videos", doctacular.videoIntro),
+        "Alternatives" -> site.add("alternatives", 
+          Alternative("Play a slide deck", Medium.Deck(() => GoogleSlides("2PACX-1vQ8ZlyoV6f1g1-AWiKiqJ886n6O9sK8XymUirDVUbHYZaTalHE4Cty1BMbZLm0t0SBywAZkmGAOEb0Q"))),
+          Alternative("Play a video", Medium.Video(() => YouTube("YE7VzlLtp-4")))
+        )
       ),
       "Examples" -> site.Toc(
         "To-Do List" -> site.addPage("to-do-list", ToDoList.page),

@@ -81,14 +81,19 @@ class DeckLayout(site:Site) {
     ":hover" -> "filter: brightness(115%);"
   ).register()
   
-  def renderDeckFS(site:Site, name:String, deck:VSlides, page:Int):VHtmlNode = {
-    DoctacularFSVSlidesPlayer(site, name, deck)(page)
+  def renderDeckFS(site:Site, name:String, deck:DeckResource, page:Int):VHtmlNode = {
+    deck.fullScreenPlayer match {
+      case Some(player) => player(name, page)
+      case None => deck.defaultView(name)
+    }
   }
 
-  def fullScreenButton(site:Site, name:String, deck:VSlides, page:Int):VHtmlNode = <.p(
-    <.button(^.cls := fsButtonStyle.className,
-      ^.onClick --> site.router.routeTo(site.FullScreenDeckRoute(name, page)),
-      "⛶ Play this deck fullscreen"
+  def alternativesButtons(site:Site, name:String, deck:DeckResource, page:Int):VHtmlNode = <.p(
+    (for fsSupperted <- deck.fullScreenPlayer yield 
+      <.button(^.cls := fsButtonStyle.className,
+        ^.onClick --> site.router.routeTo(site.FullScreenDeckRoute(name, page)),
+        "⛶ Play this deck fullscreen"
+      )
     ), 
     
     // This is a bit of a hack, as it needs to move more generally into an alternatives display
@@ -103,25 +108,26 @@ class DeckLayout(site:Site) {
       )
   )
 
-  def renderDeckGallery(site:Site, name:String, deck:VSlides, page:Int):VHtmlNode = {
+  def renderDeckGallery(site:Site, name:String, deck:DeckResource, page:Int):VHtmlNode = {
     site.pageLayout.renderPage(
       site,
       <.div(
        
-        fullScreenButton(site, name, deck, page),
+        alternativesButtons(site, name, deck, page),
 
         <.div(^.cls := slideGalleryBorder.className,
-          DoctacularVSlidesGallery(site, name, deck)(page)
+          deck.defaultView(name)
         )
       )
     )
   }
 
-  def renderDeckNFS(site:Site, name:String, deck:VSlides, page:Int):VHtmlNode = {
-    site.pageLayout.renderPage(
-      site, <.div(^.key := "vslide-example2", ^.cls := "resizable",
-        DoctacularFSVSlidesPlayer(site, name, deck)(page)
-      )
+  def renderDeckNFS(site:Site, name:String, deck:DeckResource, page:Int):VHtmlNode = {
+    site.pageLayout.renderPage(site, 
+      deck.fullScreenPlayer match {
+        case Some(player) => <.div(^.key := "vslide-example2", ^.cls := "resizable", player(name, page))
+        case None => deck.defaultView(name)
+      }
     )
   }
 

@@ -48,7 +48,7 @@ class Site() {
   type TocEntry = (String, Route) | (String, Toc) | CustomTocElement
   
   private var pages:mutable.Map[String, () => VHtmlNode] = mutable.Map.empty
-  private var decks:mutable.Map[String, () => VSlides] = mutable.Map.empty
+  private var decks:mutable.Map[String, () => DeckResource] = mutable.Map.empty
   private var videos:mutable.Map[String, () => VideoResource] = mutable.Map.empty
   private var challenges:mutable.Map[String, () => Seq[Challenge.Level]] = mutable.Map.empty
 
@@ -82,10 +82,25 @@ class Site() {
     pages.put(name, () => content)
     PageRoute(name)
   }
+
+  // Built-in support for VSlides
+  given DeckPlayer[VSlides] with 
+    extension (v:VSlides) {
+      // We need to at least be able to put the deck on the screen
+      def defaultView(name:String):VHtmlNode = <.div(DoctacularVSlidesGallery(site=Site.this, deckName=name, deck=v)(0))
+
+      // Optionally, we might be able to directly play the deck full-screen
+      def fullScreenPlayer = Some((name:String, slide:Int) => <.div(DoctacularFSVSlidesPlayer(site=Site.this, deckName=name, deck=v)(slide)))
+    } 
+
   
-  def addDeck(name:String, content: => VSlides):DeckRoute = {
-    decks.put(name, () => content)
+  def addDeckResource(name:String, deckResource:DeckResource):DeckRoute = {
+    decks.put(name, () => deckResource)
     DeckRoute(name, 0)
+  }
+
+  def addDeck[T : DeckPlayer](name:String, content: => T):DeckRoute = {
+    addDeckResource(name, PlayableDeck(content))
   }
 
   def addVideoResource(name: String, videoResource:VideoResource):VideoRoute = {
@@ -107,8 +122,8 @@ class Site() {
     
     def register(name:String, item:Medium):Route = item match {
       case Medium.Page(f) => addPage(name, f())
-      case Medium.Deck(f) => addDeck(name, f())
-      case Medium.Video(f) => addVideoResource(name, f())
+      case d:Medium.Deck[_] => addDeckResource(name, PlayableDeck(d.deck())(using d.player))
+      case v:Medium.Video[_] => addVideoResource(name, PlayableVideo(v.video())(using v.player))
     }
     
     val firstRoute = register(name, first.item)
@@ -123,7 +138,7 @@ class Site() {
     for (r, a) <- all do
       val rest = all.filter(_ != (r, a))
       alternativeMap(r) = rest
-    
+
     // return the primary route
     firstRoute
   }
