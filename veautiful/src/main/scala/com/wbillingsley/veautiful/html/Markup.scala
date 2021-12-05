@@ -150,7 +150,10 @@ class Markup(transform:(String) => String) {
       * and then remove it from domNode so we know it's gone.
       */
     override def detach(): Unit = {
-      // do nothing
+      // Forget the data that we contained. 
+      // This fixes a bug where if we removed and then re-attached an Updatable, the innerHTML
+      // would be gone, but would not be regenerated on re-attach because the data hadn't changed.
+      lastData = None
     }
 
     override def update(): Unit = {

@@ -50,6 +50,7 @@ object Main {
         "Stateful components" -> site.addPage("stateful-components", statefulComponents),
         "Morphing components" -> site.addPage("morphing-components", morphingComponents),
         "Advanced components" -> site.addPage("advanced-components", advancedComponents),
+        "Markup components" -> site.addPage("markup-components", markupComponents),
         "CSS in JS" -> site.addPage("style-suites", styleSuites)
       ),
       "Design" -> site.Toc(
