@@ -6,6 +6,9 @@ import scala.scalajs.js
 
 given marked:Markup = Markup({ (s:String) => js.Dynamic.global.marked.parse(s).asInstanceOf[String] })
 
+val markedInline:Markup = Markup({ (s:String) => js.Dynamic.global.marked.parseInline(s).asInstanceOf[String] })
+
+
 /**
   * Common UI components to all the views
   */

@@ -12,12 +12,16 @@ import scala.scalajs.js
   */
 class Markup(transform:(String) => String) {
 
+  def div(data:String):Fixed = Fixed(data, <.div(^.cls := "markup-node"))
+
+  def span(data:String):Fixed = Fixed(data, <.span(^.cls := "markup-node"))
+  
   /**
     * A Fixed MarkupNode is only equal if its data is equal. In most uses, this means that if the data has changed
     * the component will be replaced.
     * @param data
     */
-  case class Fixed(data:String) extends VHtmlNode {
+  case class Fixed(data:String, element:DElement[Element] = <.div(^.cls := "markup-node")) extends VHtmlNode {
 
     private var _domNode: Option[Element] = None
 
@@ -29,7 +33,7 @@ class Markup(transform:(String) => String) {
       * domNode
       */
     override def attach(): Node = {
-      val e = <.div(^.cls := "markup-node").create()
+      val e = element.create()
       _domNode = Some(e)
       e
     }
