@@ -1,5 +1,5 @@
 import sbt.Keys.testFrameworks
-// Turn this project into a Scala.js project by importing these settings
+import scala.sys.process._
 
 val versionStr = "0.1-SNAPSHOT"
 
@@ -79,7 +79,8 @@ lazy val doctacular = project.in(file("doctacular"))
   )
 
 
-val deployScript = taskKey[Unit]("Copies the fullOptJS script to deployscripts/")
+val deployFast = taskKey[Unit]("Copies the fastLinkJS script to compiled.js")
+val deployFull = taskKey[Unit]("Copies the fullLinkJS script to compiled.js")
 
 lazy val docs = project.in(file("docs"))
   .enablePlugins(ScalaJSPlugin)
@@ -87,13 +88,25 @@ lazy val docs = project.in(file("docs"))
   .settings(commonSettings:_*)
   .settings(
     name := "veautiful-docs",
+    
     scalaJSUseMainModuleInitializer := true,
+
+    scalaJSLinkerConfig ~= { _.withModuleKind(ModuleKind.CommonJSModule) }, // At the moment in Scala.js, ESModule would cause Closure minimisation to get turned off.
+
     scalacOptions ++= Seq("-unchecked", "-deprecation"),
-    // Used by Travis-CI to get the script out from the .gitignored target directory
-    // Don't run it locally, or you'll find the script gets loaded twice in index.html!
-    deployScript := {
-      val opt = (Compile / fullOptJS).value
-      IO.copyFile(opt.data, new java.io.File("docs/deployscripts/compiled.js"))
+
+    deployFast := {
+      val opt = (Compile / fastLinkJS).value
+      (
+        Process(s"npx webpack --config webpack.config.js --env entry=./target/scala-3.1.0/veautiful-docs-fastopt/main.js --env mode=development", Some(new java.io.File("docs")))
+      ).!
+    },
+
+    deployFull := {
+      val opt = (Compile / fullLinkJS).value
+      (
+        Process(s"npx webpack --config webpack.config.js --env entry=./target/scala-3.1.0/veautiful-docs-opt/main.js --env mode=production", Some(new java.io.File("docs")))
+      ).!
     }
   )
 

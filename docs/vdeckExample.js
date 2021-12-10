@@ -7,7 +7,7 @@ console.debug("Loaded vdeckExample.js!");
 
 (function() {
 
-  let deck = new DeckBuilder(1280, 720)
+  deckBuilder(1280, 720)
       .markdownSlide(`
         # V-Deck from JavaScript
         

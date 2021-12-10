@@ -31,8 +31,12 @@ abstract class HistoryRouter[Route] extends ElementComponent(<.div) {
 
   def handleHistoryEvent(event: Event):Unit = {
     logger.debug(s"History event $event")
-    route = routeFromLocation()
-    renderElements(render)
+    val newRoute = routeFromLocation()
+    if (route != newRoute) {
+      dom.window.scrollTo(0, 0)
+      route = newRoute
+      renderElements(render)
+    }
   }
 
 

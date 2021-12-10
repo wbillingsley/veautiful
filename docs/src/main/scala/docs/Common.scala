@@ -3,10 +3,17 @@ package docs
 import com.wbillingsley.veautiful.html.{<, Markup, SVG, VHtmlNode, ^}
 
 import scala.scalajs.js
+import scala.scalajs.js.annotation._
 
-given marked:Markup = Markup({ (s:String) => js.Dynamic.global.marked.parse(s).asInstanceOf[String] })
+@js.native
+@JSImport("marked", "marked")
+object Marked extends js.Object:
+  def parse(s:String):String = js.native
+  def parseInline(s:String):String = js.native
 
-val markedInline:Markup = Markup({ (s:String) => js.Dynamic.global.marked.parseInline(s).asInstanceOf[String] })
+given marked:Markup = Markup({ (s:String) => Marked.parse(s) })
+
+val markedInline:Markup = Markup({ (s:String) => Marked.parseInline(s) })
 
 
 /**

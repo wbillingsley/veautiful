@@ -15,5 +15,5 @@ project/metals.sbt
 
 node_modules/
 
-# Ignore docs/packed in development
-docs/packed/
+# Don't ignore docs/packed in gh-pages
+!docs/packed/

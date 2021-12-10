@@ -10,7 +10,9 @@ import scala.scalajs.js.annotation.{JSExport, JSExportTopLevel}
 sealed trait Slide
 
 @JSExportTopLevel("DeckBuilder")
-class DeckBuilder(width:Int = 1920, height:Int = 1080, slides:List[Seq[() => VHtmlNode]] = Nil)(using markup:Markup = Markup((s) => js.Dynamic.global.marked.parse(s).asInstanceOf[String])) {
+def makeDeckBuilder(parser:(String) => String) = (w:Int, h:Int) => DeckBuilder(w, h)(using Markup { parser })
+
+class DeckBuilder(width:Int = 1920, height:Int = 1080, slides:List[Seq[() => VHtmlNode]] = Nil)(using markup:Markup) {
 
   def stripIndent(s:String):String = {
     val lines = s.split('\n')
