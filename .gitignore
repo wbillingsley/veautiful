@@ -1,0 +1,19 @@
+target/
+.cache
+.classpath
+.project
+.settings/
+.idea/
+
+.bloop/
+.metals/
+.bsp/
+.vscode/
+
+project/project/
+project/metals.sbt
+
+node_modules/
+
+# Don't ignore docs/packed in gh-pages
+!docs/packed/
