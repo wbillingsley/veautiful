@@ -30,10 +30,15 @@ jobs:
       - name: Run a one-line script
         run: echo Deploy script has started!
 
+
+      # Ensure npm dependencies are present
+      - name: npm install
+        run: npm install
+        working-directory: docs
+
       # Runs a set of commands using the runners shell
       - name: Compile the deck to JavaScript
         run: |
-          npm install
           sbt "docs / deployFull"
           mv .github/workflows/.gitignore.gh-pages .gitignore
 
