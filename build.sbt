@@ -3,7 +3,7 @@ import scala.sys.process._
 
 val versionStr = "0.1-SNAPSHOT"
 
-val scalaVersionStr = "3.1.0"
+val scalaVersionStr = "3.1.2"
 
 lazy val commonSettings = Seq(
   version := versionStr,
@@ -13,7 +13,7 @@ lazy val commonSettings = Seq(
   scalaVersion := scalaVersionStr,
 
   libraryDependencies ++= Seq(
-    ("org.scala-js" %%% "scalajs-dom" % "1.1.0").cross(CrossVersion.for3Use2_13),
+    "org.scala-js" %%% "scalajs-dom" % "2.2.0",
     "org.scalameta" %%% "munit" % "0.7.26" % Test
   ),
 
@@ -98,14 +98,14 @@ lazy val docs = project.in(file("docs"))
     deployFast := {
       val opt = (Compile / fastLinkJS).value
       (
-        Process(s"npx webpack --config webpack.config.js --env entry=./target/scala-3.1.0/veautiful-docs-fastopt/main.js --env mode=development", Some(new java.io.File("docs")))
+        Process(s"npx webpack --config webpack.config.js --env entry=./target/scala-3.1.2/veautiful-docs-fastopt/main.js --env mode=development", Some(new java.io.File("docs")))
       ).!
     },
 
     deployFull := {
       val opt = (Compile / fullLinkJS).value
       (
-        Process(s"npx webpack --config webpack.config.js --env entry=./target/scala-3.1.0/veautiful-docs-opt/main.js --env mode=production", Some(new java.io.File("docs")))
+        Process(s"npx webpack --config webpack.config.js --env entry=./target/scala-3.1.2/veautiful-docs-opt/main.js --env mode=production", Some(new java.io.File("docs")))
       ).!
     }
   )
