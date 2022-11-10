@@ -3,7 +3,7 @@ package com.wbillingsley.scatter
 import com.wbillingsley.veautiful.OnScreen
 import com.wbillingsley.veautiful.html.<.VSVGElement
 import com.wbillingsley.veautiful.html.{SVG, VHtmlComponent, ^}
-import org.scalajs.dom.raw.{MouseEvent, SVGElement}
+import org.scalajs.dom.{MouseEvent, SVGElement}
 
 /**
   * When tiles are not in sockets, they can often be moved around the canvas.

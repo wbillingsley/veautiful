@@ -4,7 +4,7 @@ import com.wbillingsley.veautiful.html.{DElement, SVG, VHtmlComponent, VHtmlDiff
 import com.wbillingsley.veautiful.logging.Logger
 import com.wbillingsley.veautiful.OnScreen
 import com.wbillingsley.veautiful.html.<.{VDOMElement, VSVGElement}
-import org.scalajs.dom.raw.{MouseEvent, SVGElement}
+import org.scalajs.dom.{MouseEvent, SVGElement}
 
 import scala.annotation.tailrec
 
