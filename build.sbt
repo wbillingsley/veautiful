@@ -5,11 +5,21 @@ val versionStr = "0.1-SNAPSHOT"
 
 val scalaVersionStr = "3.1.2"
 
-lazy val commonSettings = Seq(
-  version := versionStr,
-
+inThisBuild(List(
   organization := "com.wbillingsley",
+  homepage := Some(url("https://www.wbillingsley.com/veautiful")),
+  licenses := List(License.MIT),
+  developers := List(
+    Developer(
+      "wbillingsley",
+      "William Billingsley",
+      "wbillingsley@cantab.net",
+      url("https://www.wbillingsley.com")
+    )
+  )
+))
 
+lazy val commonSettings = Seq(
   scalaVersion := scalaVersionStr,
 
   libraryDependencies ++= Seq(
@@ -65,6 +75,9 @@ lazy val wren = project.in(file("wren"))
   .settings(commonSettings:_*)
   .settings(
     name := "wren",
+
+    // Don't publish to Maven Central yet, as much of this is in Circuits Up instead at the moment
+    publish / skip := true,
   )
 
 /**
@@ -88,6 +101,9 @@ lazy val docs = project.in(file("docs"))
   .settings(commonSettings:_*)
   .settings(
     name := "veautiful-docs",
+
+    // Don't publish the documentation site to Maven Central
+    publish / skip := true,
     
     scalaJSUseMainModuleInitializer := true,
 
@@ -109,4 +125,13 @@ lazy val docs = project.in(file("docs"))
       ).!
     }
   )
+
+// Don't publish the root/aggregate project
+publish / skip := true
+
+//Uncomment this block to stop sbt loading but print out the dynamically generated version
+//Global / onLoad := (Global / onLoad).value.andThen { s =>
+//  dynverAssertTagVersion.value
+//  s
+//}
 

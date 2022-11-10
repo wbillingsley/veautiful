@@ -29,10 +29,9 @@ def gettingStarted:VHtmlNode = Common.markdown(
     | 
     |## Manual install
     |
-    |Veautiful is published for Scala 3 (dotty), currently for version 3.0.0-M3 (the Scala 3 developer preview).
-    | 
-    |While Veautiful is in snapshot (probably until Scala 3 final is released), the easiest way to get it is via jitpack.
-    |If you're using SBT, you can get the core library using:
+    |Veautiful is published for Scala 3 (dotty). The latest commits try to set up releases to Maven Central using sbt-ci-release, though initially with RC version numbers.
+    |
+    |If you want to track the development version, the latest commit on the main/master branch can also be imported via jitpack. e.g.
     |
     |```scala
     |resolvers += "jitpack" at "https://jitpack.io"
@@ -41,7 +40,8 @@ def gettingStarted:VHtmlNode = Common.markdown(
     |)
     |```
     |
-    |but you might want some of the extras too, such as the Router, Doctacular, or VSlides.
+    |but you might want some of the extras too, such as the Router, Doctacular, or VSlides. In which case, import the "doctacular" artifact. 
+    |
     |
     |""".stripMargin)
 
