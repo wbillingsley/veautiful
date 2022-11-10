@@ -15,5 +15,8 @@ project/metals.sbt
 
 node_modules/
 
+# GnuPG shouldn't go into version control
+.gnupg/
+
 # Ignore docs/packed in development
 docs/packed/
