@@ -29,7 +29,7 @@ abstract class HistoryRouter[Route] extends ElementComponent(<.div) {
     }
   }
 
-  def handleHistoryEvent(event: Event):Unit = {
+  val handleHistoryEvent: Event => Unit = { event =>
     logger.debug(s"History event $event")
     val newRoute = routeFromLocation()
     if (route != newRoute) {

@@ -4,7 +4,7 @@ import com.wbillingsley.veautiful._
 import com.wbillingsley.veautiful.html.<.VSVGElement
 import com.wbillingsley.veautiful.html.{<, DElement, ElementComponent, SVG, VHtmlNode, ^}
 import docs.Model.Asteroid
-import org.scalajs.dom.raw.HTMLInputElement
+import org.scalajs.dom.HTMLInputElement
 
 /**
   * A version of the UI that works most closely to a React-style interface. The UI is

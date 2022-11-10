@@ -7,7 +7,7 @@ val scalaVersionStr = "3.1.0"
 
 inThisBuild(List(
   organization := "com.wbillingsley",
-  homepage := Some(url("https://wbillingsley.com/veautiful")),
+  homepage := Some(url("https://www.wbillingsley.com/veautiful")),
   licenses := List(License.MIT),
   developers := List(
     Developer(
@@ -23,7 +23,7 @@ lazy val commonSettings = Seq(
   scalaVersion := scalaVersionStr,
 
   libraryDependencies ++= Seq(
-    ("org.scala-js" %%% "scalajs-dom" % "1.1.0").cross(CrossVersion.for3Use2_13),
+    "org.scala-js" %%% "scalajs-dom" % "2.2.0",
     "org.scalameta" %%% "munit" % "0.7.26" % Test
   ),
 

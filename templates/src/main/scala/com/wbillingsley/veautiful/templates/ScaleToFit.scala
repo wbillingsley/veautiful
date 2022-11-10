@@ -21,7 +21,7 @@ case class ScaleToFit(width:Int, height:Int)(var content: VHtmlNode) extends VHt
     println(s"Scale is now $scale")
   }
 
-  def rescaleEventListener(e:Event):Unit = {
+  val rescaleEventListener:Event => Unit = { e => 
     rerender()
   }
 

@@ -5,7 +5,7 @@ import com.wbillingsley.veautiful.html.<.{VHTMLElement, VSVGElement}
 import com.wbillingsley.veautiful.html.{<, DElement, ElementComponent, SVG, VHtmlNode, ^}
 import org.scalajs.dom
 import org.scalajs.dom.Node
-import org.scalajs.dom.raw.HTMLInputElement
+import org.scalajs.dom.HTMLInputElement
 import org.scalajs.dom.svg.Circle
 
 import scala.collection.mutable.ArrayBuffer

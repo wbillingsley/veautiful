@@ -3,7 +3,7 @@ package com.wbillingsley.scatter
 import com.wbillingsley.veautiful.html.{<, VHtmlComponent, VHtmlDiffNode, ^}
 import com.wbillingsley.veautiful.logging.Logger
 import org.scalajs.dom
-import org.scalajs.dom.raw.{MouseEvent, SVGElement}
+import org.scalajs.dom.{MouseEvent, SVGElement}
 
 import scala.collection.mutable
 import scala.util.Random
