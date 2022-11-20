@@ -9,6 +9,7 @@ import html.Div
 
 import scala.collection.mutable
 import scala.scalajs.js
+import com.wbillingsley.veautiful.Retention
 
 case class Lstnr(`type`:String, func:Event => _, usCapture:Boolean=false)
 case class AttrVal(name:String, value:String)
@@ -26,7 +27,15 @@ object DElement {
   val svgNS = "http://www.w3.org/2000/svg"
 }
 
-case class DElement[+T <: dom.Element](name:String, var uniqEl:Option[Any] = None, ns:String = DElement.htmlNS) extends DiffNode[T, dom.Node] {
+class DElement[+T <: dom.Element](name:String, var uniqEl:Option[Any] = None, ns:String = DElement.htmlNS) extends DiffNode[T, dom.Node] {
+
+  /**
+   * Our DOM elements can be given a key in their properties, so the retention strategy is dynamic: Keyed if a key is set; Keep(element name) if not
+   */
+  override def retention: Retention = uniqEl match {
+    case Some(key) => Retention.Keyed(key)
+    case _ => Retention.Keep(name)
+  }
 
   private var attributes:mutable.Map[String, AttrVal] = mutable.Map.empty
 

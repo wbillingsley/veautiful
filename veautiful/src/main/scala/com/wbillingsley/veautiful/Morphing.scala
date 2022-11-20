@@ -8,9 +8,7 @@ import html.VHtmlComponent
   * 
   * When `makeItSo` is called with an equal Morphing, the property is changed and `update()` is called.
   */
-trait Morphing[P](val initial: P) extends MakeItSo {
-  this: Update =>
-  
+trait Morphing[P](val initial: P) extends MakeItSo with Update with HasTestMatch with HasRetention {
   final var _prop: P = initial
 
   final def prop: P = _prop
@@ -50,5 +48,11 @@ trait Morphing[P](val initial: P) extends MakeItSo {
 
   /** Delegate MakeItSo implementation to the morpher */
   export morpher.makeItSo
+
+  override def testMatches(other: HasRetention): Boolean = 
+    super.testMatches(other) && (other match {
+      case m:Morphing[_] => prop == m.prop
+      case _ => false
+    })
 
 }

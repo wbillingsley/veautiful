@@ -1,11 +1,12 @@
 package com.wbillingsley.veautiful.reconcilers
 
 import com.wbillingsley.veautiful.logging.Logger
-import com.wbillingsley.veautiful.{DNode, DiffNode, Keyable, MakeItSo, Update, VNode}
+import com.wbillingsley.veautiful.{DNode, DiffNode, HasRetention, Retention, MakeItSo, Update, VNode}
 
 import scala.collection.mutable
 import scala.collection.mutable.ArrayBuffer
 import scala.scalajs.js
+import com.wbillingsley.veautiful.retainFor
 
 class DefaultReconciler(shouldUpdate: => Boolean) extends Reconciler {
 
@@ -32,7 +33,7 @@ class DefaultReconciler(shouldUpdate: => Boolean) extends Reconciler {
    * Generates a difference report between the two sets of nodes
    * @return
    */
-  def diffs[K <: Keyable](left:collection.Seq[K], right:collection.Seq[K]): DiffReport[K] = {
+  def diffs[K <: HasRetention](left:collection.Seq[K], right:collection.Seq[K]): DiffReport[K] = {
 
     val ops = ArrayBuffer.empty[DiffOp[K]]
 
@@ -95,7 +96,7 @@ class DefaultReconciler(shouldUpdate: => Boolean) extends Reconciler {
 
         } else {
           val l = leftIt.next()
-          if (l == r) { // The common case will be the item will already be there
+          if (l.retainFor(r)) { // The common case will be the item will already be there
             //ops.append(Retain)
             update(index) = l // We retain the old item
             done = true

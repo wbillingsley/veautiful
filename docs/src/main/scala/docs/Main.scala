@@ -44,7 +44,6 @@ object Main {
       site.TocLine,
       "Intro" -> site.Toc(
         "Home" -> site.HomeRoute,
-        "Getting started" -> site.addPage("getting-started", gettingStarted),
         "Hello world" -> site.addPage("hello-world", helloWorld),
         "Function components" -> site.addPage("pure-functions", pureFunctions),
         "Stateful components" -> site.addPage("stateful-components", statefulComponents),

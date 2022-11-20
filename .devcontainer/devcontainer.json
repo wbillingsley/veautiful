@@ -4,7 +4,8 @@
         "dockerfile": "Dockerfile"
     },
     "extensions": [
-        "scala-lang.scala"
+        "scala-lang.scala",
+        "scalameta.metals",
     ]
   
   }
