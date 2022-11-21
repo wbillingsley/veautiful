@@ -1,5 +1,6 @@
 package com.wbillingsley.veautiful.html
 
+import com.wbillingsley.veautiful
 import com.wbillingsley.veautiful.reconcilers.Reconciler
 import com.wbillingsley.veautiful.{DefaultNodeOps, DiffNode, NodeOps, VNode}
 import org.scalajs.dom
@@ -52,18 +53,19 @@ class ElementAction[T <: dom.Element](f: DElement[T] => Unit) extends CustomElem
 
 type VHTMLElement = DElement[html.Element]
 
-type VSVGElement = DElement[dom.svg.Element]
+/** For convenience, we alias the VSVGElement type into the html package as well */
+type VSVGElement = veautiful.svg.VSVGElement
 
 type VDOMElement = DElement[dom.Element]
 
 type HTMLAppliable = ElementChild[html.Element]
 
-type SVGAppliable = ElementChild[dom.svg.Element]
-
 // "Appliable" is a coding-centric name. "Modifier" may be more meaningful.
 type VHTMLModifier = HTMLAppliable
-type VSVGModifier = SVGAppliable
 
+/** For convenience, we alias the VSVGModifier type into the html package as well */
+type SVGAppliable = veautiful.svg.SVGAppliable
+type VSVGModifier = veautiful.svg.VSVGModifier
 
 /**
  * Represents a DOM Element using a Virtual DOM-like strategy (reconciling its children). The D is for DOM or Diff.
@@ -286,9 +288,25 @@ class DElement[+T <: dom.Element](name:String, var uniqEl:Option[Any] = None, ns
 
 }
 
+/**
+  * Trait implemented by the HTML and SVG objects
+  *
+  * @param defaultTag
+  * @param defaultNS
+  */
+trait DElementBuilder[T <: dom.Element](defaultTag:String, defaultNS:String) {
 
-object < {
+  def apply(n:String):DElement[T] = DElement[T](n, ns=defaultNS)
 
+  def apply(modifiers:ElementChild[T]*):DElement[T] = apply(defaultNS)(modifiers*)
+
+  def applyT[T <: dom.Element](n:String):DElement[T] = DElement[T](n, ns=defaultNS)
+
+  def apply[T <: dom.Element](n:String, u:String = "", ns:String):DElement[T] = DElement[T](n, if (u.isEmpty) None else Some(u), ns)
+  
+}
+
+object HTML extends DElementBuilder[dom.HTMLElement]("html", DElement.htmlNS) {
 
   def p = applyT[html.Paragraph]("p")
   def div = applyT[html.Div]("div")
@@ -323,44 +341,14 @@ object < {
   def th = applyT[html.TableCell]("th")
   def td = applyT[html.TableCell]("td")
 
-  def svg = SVG.svg
-
-  def apply(n:String):VHTMLElement = DElement[html.Element](n, ns=DElement.htmlNS)
-
-  def applyT[T <: dom.Element](n:String):DElement[T] = DElement[T](n, ns=DElement.htmlNS)
-
-  def apply[T <: dom.Element](n:String, u:String = "", ns:String):DElement[T] = DElement[T](n, if (u.isEmpty) None else Some(u), ns)
+  def svg = veautiful.svg.svg
+  def SVG = veautiful.svg.SVG
 
 }
 
-object SVG {
-
-  def apply(ac: VSVGModifier *):VSVGElement = <.apply("svg", ns=DElement.svgNS)(ac:_*)
-
-  def svg = <.apply[org.scalajs.dom.svg.SVG]("svg", ns=DElement.svgNS)
-
-  def circle = <.apply[dom.svg.Circle]("circle", ns=DElement.svgNS)
-
-  def ellipse = <.apply[dom.svg.Ellipse]("ellipse", ns=DElement.svgNS)
-
-  def polygon = <.apply[dom.svg.Polygon]("polygon", ns=DElement.svgNS)
-
-  def line = <.apply[dom.svg.Line]("line", ns=DElement.svgNS)
-
-  def text = <.apply[dom.svg.Text]("text", ns=DElement.svgNS)
-
-  def tspan = <.apply[dom.svg.TSpan]("tspan", ns=DElement.svgNS)
-
-  def g = <.apply[dom.svg.G]("g", ns=DElement.svgNS)
-
-  def path = <.apply[dom.svg.Path]("path", ns=DElement.svgNS)
-
-  def rect = <.apply[dom.svg.Element]("rect", ns=DElement.svgNS)
-
-  def foreignObject = <.apply[dom.svg.Element]("foreignObject", ns=DElement.svgNS)
-
-}
-
+val el = HTML
+val < = HTML
+export HTML.*
 
 object ^ {
 
