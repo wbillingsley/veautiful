@@ -1,8 +1,7 @@
 package docs
 
 import com.wbillingsley.veautiful._
-import com.wbillingsley.veautiful.html.<.{VHTMLElement, VSVGElement}
-import com.wbillingsley.veautiful.html.{<, DElement, ElementComponent, SVG, VHtmlNode, ^}
+import com.wbillingsley.veautiful.html.{<, DElement, ElementComponent, SVG, VHtmlNode, ^, VHTMLElement, VSVGElement}
 import org.scalajs.dom
 import org.scalajs.dom.Node
 import org.scalajs.dom.HTMLInputElement

@@ -1,25 +1,23 @@
 package com.wbillingsley.veautiful.html
 
-import com.wbillingsley.veautiful.html.<.{ElementAction, CustomElementChild}
 import com.wbillingsley.veautiful.reconcilers.Reconciler
 import com.wbillingsley.veautiful.{DefaultNodeOps, DiffNode, NodeOps, VNode}
 import org.scalajs.dom
 import org.scalajs.dom.{Element, Event, Node, html}
-import html.Div
 
 import scala.collection.mutable
 import scala.scalajs.js
 import com.wbillingsley.veautiful.Retention
 
-case class Lstnr(`type`:String, func:Event => _, usCapture:Boolean=false)
-case class AttrVal(name:String, value:String)
-case class PropVal(name:String, value:js.Any)
-case class InlineStyle(name:String, value:String)
-case class EvtListener[T](`type`:String, f:Function[T, _], capture:Boolean)
-
+sealed trait PredefinedElementChild
+object PredefinedElementChild {
+  case class AttrVal(name:String, value:String) extends PredefinedElementChild
+  case class PropVal(name:String, value:js.Any) extends PredefinedElementChild
+  case class InlineStyle(name:String, value:String) extends PredefinedElementChild
+  case class EventListener[-T <: Event](`type`:String, func:Function[T, _], capture:Boolean=false) extends PredefinedElementChild //TODO: Add other flags, e.g. once & passive
+}
 
 object DElement {
-  
   /** The namespace for HTML nodes */
   val htmlNS = "http://www.w3.org/1999/xhtml"
   
@@ -27,7 +25,66 @@ object DElement {
   val svgNS = "http://www.w3.org/2000/svg"
 }
 
+/**
+  * An individual item that can be passed into the `apply` method of a DElement. e.g. in
+  * 
+  * <.button(^.onClick --> println("bang"), "Hello ", <.b("World"))
+  */
+type SingleElementChild[-T <: dom.Element] = String | VNode[dom.Node] | PredefinedElementChild | CustomElementChild[T]
+
+/**
+  * Things that can be arguments to the DElement's apply method. 
+  * This allows Sequences, Options, etc of SingleChild to be included, simplifying the syntax
+  */
+type ElementChild[-T <: dom.Element] = SingleElementChild[T] | Iterable[SingleElementChild[T]]
+
+/**
+  * Allows libraries to define their own operations that can be passed into the apply method of an element in a DSL
+  */
+trait CustomElementChild[-T <: dom.Element] {
+  def applyTo[TT <: T](d:DElement[TT]):Unit
+}
+
+class ElementAction[T <: dom.Element](f: DElement[T] => Unit) extends CustomElementChild[T] {
+  def applyTo[TT <: T](d:DElement[TT]) = f(d)
+}
+
+
+type VHTMLElement = DElement[html.Element]
+
+type VSVGElement = DElement[dom.svg.Element]
+
+type VDOMElement = DElement[dom.Element]
+
+type HTMLAppliable = ElementChild[html.Element]
+
+type SVGAppliable = ElementChild[dom.svg.Element]
+
+// "Appliable" is a coding-centric name. "Modifier" may be more meaningful.
+type VHTMLModifier = HTMLAppliable
+type VSVGModifier = SVGAppliable
+
+
+/**
+ * Represents a DOM Element using a Virtual DOM-like strategy (reconciling its children). The D is for DOM or Diff.
+ * 
+ * As many other components will render a tree such as:
+ * 
+ * {{{
+ * div(
+ *   ul(li("item1"), li("item2"), li("item3"))
+ * )
+ * }}}
+ * 
+ * DElement ends up being the heart of how the kit works.
+ * 
+ * Its apply method accepts a number of ElementChidren / modifiers. This can cover any number of different kinds of setting - e.g. 
+ * attributes, properties, listeners, but also things like changing the reconciliation strategy or adding a key to the element to 
+ * make it more likely to be retained in a reconciliation.
+ */
 class DElement[+T <: dom.Element](name:String, var uniqEl:Option[Any] = None, ns:String = DElement.htmlNS) extends DiffNode[T, dom.Node] {
+
+  import PredefinedElementChild.*
 
   /**
    * Our DOM elements can be given a key in their properties, so the retention strategy is dynamic: Keyed if a key is set; Keep(element name) if not
@@ -37,11 +94,11 @@ class DElement[+T <: dom.Element](name:String, var uniqEl:Option[Any] = None, ns
     case _ => Retention.Keep(name)
   }
 
-  private var attributes:mutable.Map[String, AttrVal] = mutable.Map.empty
+  private var attributes:mutable.Map[String, PredefinedElementChild.AttrVal] = mutable.Map.empty
 
   var properties:Map[String, PropVal] = Map.empty
 
-  var listeners:Map[String, Lstnr] = Map.empty
+  var listeners:Map[String, EventListener[_ <: Event]] = Map.empty
 
   var styles:Seq[InlineStyle] = Seq.empty
 
@@ -73,11 +130,11 @@ class DElement[+T <: dom.Element](name:String, var uniqEl:Option[Any] = None, ns
   val eventDispatch:(Event) => Unit = (e:Event) => {
     for {
       h <- listeners.get(e.`type`)
-    } h.func.apply(e)
+    } h.func.asInstanceOf[Function[Event, _]].apply(e)
   }
 
   def updateSelf: PartialFunction[DiffNode[_, Node], _] = {
-    case el:DElement[T] =>
+    case el:DElement[_] =>
 
       // Update attributes
       for { n <- domNode } {
@@ -131,13 +188,13 @@ class DElement[+T <: dom.Element](name:String, var uniqEl:Option[Any] = None, ns
     }
   }
 
-  def applyLsntrsToNode(as:Iterable[Lstnr]):Unit = {
+  def applyLsntrsToNode(as:Iterable[EventListener[_]]):Unit = {
     for { n <- domNode; a <- as } {
       n.addEventListener(a.`type`, eventDispatch, false)
     }
   }
 
-  def removeLsntrsFromNode(as:Iterable[Lstnr]):Unit = {
+  def removeLsntrsFromNode(as:Iterable[EventListener[_]]):Unit = {
     for { n <- domNode; a <- as } {
       n.removeEventListener(a.`type`, eventDispatch, false)
     }
@@ -179,22 +236,24 @@ class DElement[+T <: dom.Element](name:String, var uniqEl:Option[Any] = None, ns
   }
 
   
-  def apply(ac: <.ElementChild[T] *):DElement[T] = {
+  def apply(ac: ElementChild[T] *):DElement[T] = {
+    // The @unchecked annotations in here should be ok, so long as ElementChild's definition
+    // doesn't have duplicate outer types. E.g. we have VNode[dom.Node] but no other
+    // types of VNode in the type union.
     for child <- ac do child match
-      case n:VNode[dom.Node] => addChildren(n)
+      case n:VNode[dom.Node] @unchecked => addChildren(n)
       case s:String => addChildren(Text(s))
       case a:AttrVal => attrs(a)
       case p:PropVal => prop(p)
       case s:InlineStyle => style(s)
-      case l:Lstnr => on(l)
-      case appliable:CustomElementChild[T] => appliable.applyTo(this)
-      case i:Iterable[<.SingleChild[T]] => i.foreach((sc) => apply(sc))
+      case l:EventListener[_] => on(l)
+      case appliable:CustomElementChild[T] @unchecked => appliable.applyTo(this)
+      case i:Iterable[SingleElementChild[T]] @unchecked => i.foreach((sc) => apply(sc))
     this
   }
 
-  def on(l: Lstnr *) = {
+  def on(l: EventListener[_] *) = {
     listeners ++= l.map({x => x.`type` -> x }).toMap
-    this
   }
 
 
@@ -205,8 +264,8 @@ class DElement[+T <: dom.Element](name:String, var uniqEl:Option[Any] = None, ns
       e.setAttribute(a, value)
     }
 
-    for { Lstnr(t, _, cap) <- listeners.values } {
-      e.addEventListener(t, eventDispatch, cap)
+    for { EventListener(t, _, capture) <- listeners.values } {
+      e.addEventListener(t, eventDispatch, capture)
     }
 
     applyStylesToNode(styles)
@@ -230,37 +289,6 @@ class DElement[+T <: dom.Element](name:String, var uniqEl:Option[Any] = None, ns
 
 object < {
 
-  type VHTMLElement = DElement[html.Element]
-  type VSVGElement = DElement[dom.svg.Element]
-  type VDOMElement = DElement[dom.Element]
-
-
-  type HTMLAppliable = ElementChild[html.Element]
-  type SVGAppliable = ElementChild[dom.svg.Element]
-
-  /**
-    * An individual item that can be passed into the `apply` method of a DElement. e.g. in
-    * 
-    * <.button(^.onClick --> println("bang"), "Hello ", <.b("World"))
-    */
-  type SingleChild[-T <: dom.Element] = String | VNode[dom.Node] | AttrVal | PropVal | Lstnr | InlineStyle | CustomElementChild[T]
-  
-  /**
-    * Things that can be arguments to the DElement's apply method. 
-    * This allows Sequences, Options, etc of SingleChild to be included, simplifying the syntax
-    */
-  type ElementChild[-T <: dom.Element] = SingleChild[T] | Iterable[SingleChild[T]]
-
-  /**
-    * Allows libraries to define their own operations that can be passed into the apply method of an element in a DSL
-    */
-  trait CustomElementChild[-T <: dom.Element] {
-    def applyTo[TT <: T](d:DElement[TT]):Unit
-  }
-
-  class ElementAction[T <: dom.Element](f: DElement[T] => Unit) extends CustomElementChild[T] {
-    def applyTo[TT <: T](d:DElement[TT]) = f(d)
-  }
 
   def p = applyT[html.Paragraph]("p")
   def div = applyT[html.Div]("div")
@@ -307,7 +335,7 @@ object < {
 
 object SVG {
 
-  def apply(ac: <.CustomElementChild[dom.svg.Element] *):DElement[dom.svg.Element] = <.apply("svg", ns=DElement.svgNS)(ac:_*)
+  def apply(ac: VSVGModifier *):VSVGElement = <.apply("svg", ns=DElement.svgNS)(ac:_*)
 
   def svg = <.apply[org.scalajs.dom.svg.SVG]("svg", ns=DElement.svgNS)
 
@@ -336,6 +364,8 @@ object SVG {
 
 object ^ {
 
+  import PredefinedElementChild.*
+
   case class Attrable(n:String) {
     def :=(s:String) = AttrVal(n, s)
 
@@ -353,7 +383,7 @@ object ^ {
   }
 
   object Keyable {
-    def :=(k: String): <.CustomElementChild[Element] = new <.CustomElementChild[dom.Element] {
+    def :=(k: String): CustomElementChild[Element] = new CustomElementChild[dom.Element] {
       override def applyTo[TT <: Element](d: DElement[TT]): Unit = {
         d.uniqEl = Some(k)
       }
@@ -379,10 +409,10 @@ object ^ {
   def href = Attrable("href")
 
   case class Lsntrable(n:String) {
-    def -->(e: => Unit ) = Lstnr(n, (x:Event) => e, false)
+    def -->(e: => Unit ) = EventListener[Event](n, (x:Event) => e, false)
 
     def ==>(f: (Event) => Unit) = {
-      Lstnr(n, f, false)
+      EventListener(n, f, false)
     }
   }
 

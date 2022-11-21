@@ -1,8 +1,7 @@
 package com.wbillingsley.scatter
 
 import com.wbillingsley.veautiful.OnScreen
-import com.wbillingsley.veautiful.html.<.VSVGElement
-import com.wbillingsley.veautiful.html.{SVG, VHtmlComponent, ^}
+import com.wbillingsley.veautiful.html.{VSVGElement, SVG, VHtmlComponent, ^}
 import org.scalajs.dom.{MouseEvent, SVGElement}
 
 /**

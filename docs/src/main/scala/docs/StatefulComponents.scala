@@ -19,10 +19,10 @@ case class Greeter() extends VHtmlComponent {
 def statefulComponents = <.div(Common.markdown("""
     |# Stateful Components
     |
-    |If your component needs to keep some ephemeral local state, implement it as a *case class* extending 
-    |`VHtmlComponent`. 
+    |If your component needs to keep some ephemeral local state, implementing it as a class extending 
+    |`VHtmlComponent`. Usually a case class.
     |
-    |This requires you to implement a `render` method to describe the tree your component should produce. 
+    |`VHtmlComponent` requires you to implement a `render` method to describe the tree your component should produce. 
     |This should produce a consistent outer element (e.g. a `<.div()` or a `<.span()`), but its contents can then be
     |whatever you want.
     |
@@ -64,11 +64,24 @@ def statefulComponents = <.div(Common.markdown("""
     |there's some component in the tree where it's obvious you'll want to trigger a re-renders &mdash; even if only the
     |site's router.
     |
-    |Typically, components are implemented as `case classes`. This is not a strict requirement, but it makes things
-    |much simpler to write because components that use a virtual DOM style (reconciling their children for updates)
-    |use equality to determine whether a component needs to be replaced or can just be asked to reconcile itself.
+    |Often, components are implemented as `case classes`. This tells the reconciler when to try to retain your component and
+    |when to replace it. The default strategy is to try to keep your component if it equals the target, and replace it if it doesn't.
     |Making your component a case class makes it simple and clear to show what would make your component "not equal"
     |to another instance of itself (and require replacement).
+    |
+    |However, if you don't want your component to be a case class, you can also implement `Keep(value)` to tell the reconciler
+    |when to keep your component.
+    |
+    |e.g. 
+    |
+    |```scala
+    |// This isn't a case class, so `MyComponent(1, 2) != MyComponent(1, 2)` 
+    |// But because it implements Keep((a, b)), the component would be hinted as being retained rather than replaced.
+    |class MyComponent(a:Int, b:Int) extends VHtmlComponent with Keep((a, b)) {
+    |  val now = System.currentTimeMillis
+    |  def render = p(s"I was created at $now, and $a + $b = ${a + b}")
+    |}
+    |```
     |
     |## Using external state
     |

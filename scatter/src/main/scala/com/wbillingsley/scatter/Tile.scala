@@ -1,9 +1,8 @@
 package com.wbillingsley.scatter
 
-import com.wbillingsley.veautiful.html.{DElement, SVG, VHtmlComponent, VHtmlDiffNode, ^}
+import com.wbillingsley.veautiful.html.{DElement, SVG, VHtmlComponent, VHtmlDiffNode, ^, VDOMElement, VSVGElement}
 import com.wbillingsley.veautiful.logging.Logger
 import com.wbillingsley.veautiful.OnScreen
-import com.wbillingsley.veautiful.html.<.{VDOMElement, VSVGElement}
 import org.scalajs.dom.{MouseEvent, SVGElement}
 
 import scala.annotation.tailrec

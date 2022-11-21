@@ -1,8 +1,7 @@
 package docs
 
 import com.wbillingsley.veautiful._
-import com.wbillingsley.veautiful.html.<.VSVGElement
-import com.wbillingsley.veautiful.html.{<, DElement, ElementComponent, SVG, VHtmlNode, ^}
+import com.wbillingsley.veautiful.html.{<, DElement, ElementComponent, SVG, VHtmlNode, ^, VSVGElement}
 import docs.Model.Asteroid
 import org.scalajs.dom.HTMLInputElement
 
