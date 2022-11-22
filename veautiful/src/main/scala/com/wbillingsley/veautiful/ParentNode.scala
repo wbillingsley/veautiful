@@ -4,7 +4,7 @@ import org.scalajs.dom
 import org.scalajs.dom.Node
 
 /**
-  * As DNodes can themselves be made up of multiple nodes, we need some node operations for adding children into
+  * As ParentNodes can themselves be made up of multiple nodes, we need some node operations for adding children into
   * the DOM.
   */
 trait NodeOps[N] {
@@ -15,7 +15,7 @@ trait NodeOps[N] {
 
   def insertAttachedChildBefore(v:VNode[N], before:VNode[N]):Unit
 
-  def replaceAttachedChild(newNode:VNode[N], oldNode:VNode[N]):Unit
+  def replaceAttachedChild(newNode:VNode[N], olParentNode:VNode[N]):Unit
 
   /**
     * Insert operations can move DOM nodes. This means that by the time we get to process a child VNode for removal, it
@@ -40,8 +40,8 @@ case class DefaultNodeOps(n:dom.Node) extends NodeOps[dom.Node] {
     cc <- c.domNode; bb <- before.domNode
   } n.insertBefore(cc, bb)
 
-  override def replaceAttachedChild(newNode: VNode[dom.Node], oldNode: VNode[dom.Node]): Unit = for {
-    nc <- newNode.domNode; oc <- oldNode.domNode
+  override def replaceAttachedChild(newNode: VNode[dom.Node], olParentNode: VNode[dom.Node]): Unit = for {
+    nc <- newNode.domNode; oc <- olParentNode.domNode
   } n.replaceChild(nc, oc)
 
   override def nodeIsChildOfMine(node: VNode[dom.Node]): Boolean = {
@@ -51,13 +51,13 @@ case class DefaultNodeOps(n:dom.Node) extends NodeOps[dom.Node] {
 
 
 /**
-  * A DNode has a create and a makeItSo
+  * A ParentNode has children
   */
-trait DNode[+N, C] extends VNode[N] {
+trait ParentNode[+N, C] extends VNode[N] {
 
   /**
-    * A DNode can itself have multiple nodes. We need to be able to get a NodeOps that can perform low-level operations
-    * such as insterting and replacing nodes in the tree. This method should return one if the DNode is attached.
+    * A ParentNode can itself have multiple nodes. We need to be able to get a NodeOps that can perform low-level operations
+    * such as insterting and replacing nodes in the tree. This method should return one if the ParentNode is attached.
     *
     * By default, the implementation of this function assumes we are just adding any children to the top-level
     * domNode. Subclasses that wish to add their children elsewhere should override this.
@@ -76,7 +76,7 @@ trait DNode[+N, C] extends VNode[N] {
   }
 
   /**
-    * Creates this node (not its children) and attaches this DNode to it. This is called by the default implementation
+    * Creates this node (not its children) and attaches this ParentNode to it. This is called by the default implementation
     * of attach - which attaches this node and then recurses down the children.
     * @return
     */

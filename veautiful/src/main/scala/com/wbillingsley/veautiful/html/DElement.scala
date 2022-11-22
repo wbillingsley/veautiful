@@ -284,8 +284,8 @@ class DElement[+T <: dom.Element](name:String, var uniqEl:Option[Any] = None, ns
 
 
   /**
-    * A DNode can itself have multiple nodes. We need to be able to get a NodeOps that can perform low-level operations
-    * such as insterting and replacing nodes in the tree. This method should return one if the DNode is attached.
+    * A ParentNode can itself have multiple nodes. We need to be able to get a NodeOps that can perform low-level operations
+    * such as insterting and replacing nodes in the tree. This method should return one if the ParentNode is attached.
     *
     * By default, the implementation of this function assumes we are just adding any children to the top-level
     * domNode. Subclasses that wish to add their children elsewhere should override this.

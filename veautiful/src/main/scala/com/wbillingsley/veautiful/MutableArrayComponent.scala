@@ -6,7 +6,7 @@ package com.wbillingsley.veautiful
   * There's no "key" function (as there is in d3) because it might make sense to have a MutableMapComponent for that.
   * Note that this is not aimed at being a full d3 replacement. (Just use d3 for that - it can be embedded in a VNode)
   */
-class MutableArrayComponent[Container, AcceptChild, RealChild <: AcceptChild, Data](container: DNode[Container, AcceptChild], data: Array[Data])(
+class MutableArrayComponent[Container, AcceptChild, RealChild <: AcceptChild, Data](container: ParentNode[Container, AcceptChild], data: Array[Data])(
   onEnter: (Data, Int) => VNode[RealChild],
   onUpdate: (Data, Int, VNode[RealChild]) => Unit,
   onExit: (Data, Int, VNode[RealChild]) => Unit = { (_:Data, _:Int, _:VNode[RealChild]) => },

@@ -14,7 +14,7 @@ import scala.collection.mutable
   * The implementation of MakeItSo is left to subclasses, as some might wish to accept `Blueprint`s as well as rendered
   * nodes.
   */
-trait DiffNode[+N, C] extends DNode[N, C] with MakeItSo {
+trait DiffNode[+N, C] extends ParentNode[N, C] with MakeItSo {
 
   /** How children should be reconciled. This is left undefined, as some child classes may wish to make it settable. */
   def reconciler:Reconciler

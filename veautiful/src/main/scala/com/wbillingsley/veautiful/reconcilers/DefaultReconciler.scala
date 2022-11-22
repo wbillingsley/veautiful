@@ -1,7 +1,7 @@
 package com.wbillingsley.veautiful.reconcilers
 
 import com.wbillingsley.veautiful.logging.Logger
-import com.wbillingsley.veautiful.{DNode, DiffNode, HasRetention, Retention, MakeItSo, Update, VNode}
+import com.wbillingsley.veautiful.{ParentNode, DiffNode, HasRetention, Retention, MakeItSo, Update, VNode}
 
 import scala.collection.mutable
 import scala.collection.mutable.ArrayBuffer
@@ -163,7 +163,7 @@ class DefaultReconciler(shouldUpdate: => Boolean) extends Reconciler {
     )
   }
 
-  def processDiffs[N, C](parent:DNode[N, C], ops:collection.Seq[DiffOp[VNode[C]]]):Unit = {
+  def processDiffs[N, C](parent:ParentNode[N, C], ops:collection.Seq[DiffOp[VNode[C]]]):Unit = {
 
     for {
       nodeOps <- parent.nodeOps
