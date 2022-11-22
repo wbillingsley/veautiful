@@ -68,5 +68,33 @@ class DefaultReconcilerSuite extends FunSuite  {
     assert(report.update.contains(sourceMorph))
   }
 
+  test("An appended Blueprint should result in appending its item") {
+    val before = (1 to 5).map(CaseClassItem.apply)
+
+    class CCBlueprint(i:Int) extends Blueprint(classOf[CaseClassItem]) {
+      override def build() = CaseClassItem(i)
+    }
+
+    val after = (1 to 5).map(CaseClassItem.apply) :+ CCBlueprint(6)
+
+    val report = Reconciler.default.diffs(before, after)
+    assert(report.ops == Seq(Append(CaseClassItem(6))))
+
+  }
+
+  test("The default reconciler should retain Keep items when matched against Keep blueprints for those items if the Keeps match") {
+    val before = (1 to 5).map(KeepItem(_))
+
+    class KBlueprint(i:Int) extends Blueprint(classOf[KeepItem]) with Keep(i) {
+      override def build() = KeepItem(i)
+    }
+
+    val after = (1 to 5).map(KBlueprint(_))
+
+    val report = Reconciler.default.diffs(before, after)
+    assert(report.update.zip(before).forall { case (x, y) => x == y })
+
+  }
+
 
 }

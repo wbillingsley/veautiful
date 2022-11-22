@@ -98,6 +98,10 @@ class DElement[+T <: dom.Element](name:String, var uniqEl:Option[Any] = None, ns
 
   private var attributes:mutable.Map[String, PredefinedElementChild.AttrVal] = mutable.Map.empty
 
+  private var _children:collection.Seq[VNode[dom.Node]] = Seq.empty
+
+  override def children = _children
+
   var properties:Map[String, PropVal] = Map.empty
 
   var listeners:Map[String, EventListener[_ <: Event]] = Map.empty
@@ -233,7 +237,7 @@ class DElement[+T <: dom.Element](name:String, var uniqEl:Option[Any] = None, ns
   }
 
   def addChildren(ac:VNode[dom.Node]*):DElement[T] = {
-    children = children ++ ac
+    _children = _children ++ ac
     this
   }
 
@@ -275,6 +279,10 @@ class DElement[+T <: dom.Element](name:String, var uniqEl:Option[Any] = None, ns
     e
   }
 
+  def updateChildren(to:collection.Seq[VNode[dom.Node]]):Unit = 
+     _children = reconciler.updateChildren(this, to)
+
+
   /**
     * A DNode can itself have multiple nodes. We need to be able to get a NodeOps that can perform low-level operations
     * such as insterting and replacing nodes in the tree. This method should return one if the DNode is attached.
@@ -285,6 +293,13 @@ class DElement[+T <: dom.Element](name:String, var uniqEl:Option[Any] = None, ns
     * @return
     */
   override def nodeOps: Option[NodeOps[Node]] = domNode.map(DefaultNodeOps(_))
+
+  override def makeItSo = {
+    case to:DElement[T] => 
+      updateSelf(to)
+      updateChildren(to.children)
+  }
+
 
 }
 

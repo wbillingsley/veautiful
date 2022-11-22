@@ -1,6 +1,6 @@
 package com.wbillingsley.veautiful.reconcilers
 
-import com.wbillingsley.veautiful.{DiffNode, VNode}
+import com.wbillingsley.veautiful.{DiffNode, VNode, Blueprint}
 
 /**
   * A reconciler is how children of a DiffNode are handled.
@@ -12,7 +12,7 @@ import com.wbillingsley.veautiful.{DiffNode, VNode}
   * By allowing different Reconcilers to be chosen at different points in the tree, we can enable different behaviours.
   */
 trait Reconciler {
-  def updateChildren[N, C](node:DiffNode[N, C], to:collection.Seq[VNode[C]]):Unit
+  def updateChildren[N, C](node:DiffNode[N, C], to:collection.Seq[VNode[C] | Blueprint[VNode[C]]]):collection.Seq[VNode[C]]
 }
 
 object Reconciler {

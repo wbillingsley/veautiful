@@ -108,7 +108,7 @@ class Markup(transform:(String) => String) {
       // do nothing
     }
 
-    override def makeItSo: PartialFunction[MakeItSo, _] = { case other:Settable =>
+    override def makeItSo = { case other:Settable =>
       if (data != other.data) {
         data = other.data
         renderMarkup()

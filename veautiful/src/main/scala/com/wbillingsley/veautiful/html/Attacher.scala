@@ -5,19 +5,31 @@ import com.wbillingsley.veautiful.{DefaultNodeOps, DiffNode, NodeOps, VNode}
 import org.scalajs.dom
 import org.scalajs.dom.{Element, Node}
 
+/**
+ * Responsible for mounting Veautiful scenes into an HTML document
+ */ 
 object Attacher {
 
-  class RootNode(el:dom.Element) extends VHtmlDiffNode {
+  /**
+    * Renders the scene. 
+    *
+    * @param el the DOM element into which to render the scene
+    */
+  class RootNode(el:dom.Element) extends DiffNode[dom.Node, dom.Node] {
+
+    protected var _children:collection.Seq[VNode[dom.Node]] = collection.Seq.empty
+    override def children = _children
 
     override def reconciler: Reconciler = Reconciler.default
 
     var domNode:Option[dom.Element] = None
 
     def render(e: VNode[dom.Node]):Unit = {
-      updateChildren(Seq(e))
+      _children = reconciler.updateChildren(this, collection.Seq(e))
     }
 
-    override def updateSelf: PartialFunction[DiffNode[_, Node], _] = { case _ => /* Do Nothing */ }
+    override def makeItSo = 
+      case e:VNode[dom.Node] @unchecked => render(e)
 
     override def nodeOps: Option[NodeOps[Node]] = domNode.map(DefaultNodeOps(_))
 

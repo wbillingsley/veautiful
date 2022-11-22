@@ -7,6 +7,7 @@ import scala.collection.mutable
 import scala.collection.mutable.ArrayBuffer
 import scala.scalajs.js
 import com.wbillingsley.veautiful.retainFor
+import com.wbillingsley.veautiful.Blueprint
 
 class DefaultReconciler(shouldUpdate: => Boolean) extends Reconciler {
 
@@ -33,18 +34,22 @@ class DefaultReconciler(shouldUpdate: => Boolean) extends Reconciler {
    * Generates a difference report between the two sets of nodes
    * @return
    */
-  def diffs[K <: HasRetention](left:collection.Seq[K], right:collection.Seq[K]): DiffReport[K] = {
+  def diffs[K <: HasRetention](left:collection.Seq[K], right:collection.Seq[K | Blueprint[K]]): DiffReport[K] = {
 
     val ops = ArrayBuffer.empty[DiffOp[K]]
 
     val create = ArrayBuffer.empty[K]
     val remove = ArrayBuffer.empty[K]
-    val update:js.WrappedArray[K] = right match {
-      case a:js.WrappedArray[K] => a
-      case _ => js.WrappedArray.from(right)
-    }
+    val update = ArrayBuffer.empty[K]
 
     val movedUpSet = mutable.Set.empty[Any]
+
+    // Unwraps the union type of an item and its blueprint
+    // Fails if K is Blueprint but that'd be a very strange edge case to do.
+    def ensureItem[K <: HasRetention](item:K | Blueprint[K]):K = item match {
+      case b:Blueprint[K] @unchecked => b.build()
+      case i:K @unchecked => i
+    }
 
     val leftKeys = (for {
       t <- left
@@ -59,12 +64,16 @@ class DefaultReconciler(shouldUpdate: => Boolean) extends Reconciler {
     val leftIt = left.iterator
     val rightIt = right.iterator
 
+    /** Clears all the remaining items on the left */
     def clearRemaining() = {
       ops.appendAll(leftIt.map(Remove.apply))
     }
 
+    /** Appends all the remaining items on the right */
     def appendRemaining() = {
-      ops.appendAll(rightIt.map(Append.apply))
+      val remaining = rightIt.map(ensureItem).toSeq
+      ops.appendAll(remaining.map(Append.apply))
+      update.appendAll(remaining)
     }
 
     def movedUp(i:K) = i.key.exists(movedUpSet.contains)
@@ -84,28 +93,28 @@ class DefaultReconciler(shouldUpdate: => Boolean) extends Reconciler {
             case Some(k) =>
               logger.trace(s"Found an item that moved down")
               ops.append(Append(k))
-              update(index) = k
+              update.append(k)
               done = true
 
             case _ =>
-              ops.append(Append(r))
-              update(index) = r
-              create.append(r)
+              val item = ensureItem(r)
+              ops.append(Append(item))
+              update.append(item)
+              create.append(item)
               done = true
           }
 
         } else {
           val l = leftIt.next()
           if (l.retainFor(r)) { // The common case will be the item will already be there
-            //ops.append(Retain)
-            update(index) = l // We retain the old item
+            update.append(l) // We retain the old item
             done = true
           } else if (!movedUp(l)) { // If we're looking at a left item that's moved up the list, skip it
 
             r.key.flatMap(leftKeys.get) match { // Try to find it in the left keys and move it here
               case Some(item) =>
                 ops.append(InsertBefore(item, l))
-                update(index) = item // The found item should sit at this point in the update array
+                update.append(item) // The found item should sit at this point in the update array
                 movedUpSet.add(item.key.get)
                 done = true
 
@@ -194,21 +203,23 @@ class DefaultReconciler(shouldUpdate: => Boolean) extends Reconciler {
     }
   }
 
-  override def updateChildren[N, C](node: DiffNode[N, C], to: collection.Seq[VNode[C]]): Unit = {
+  override def updateChildren[N, C](node: DiffNode[N, C], to: collection.Seq[VNode[C] | Blueprint[VNode[C]]]): collection.Seq[VNode[C]] = {
     if (shouldUpdate) {
-      if (node.children != to) {
+      val out = if node.children == to then node.children else {
         val diffReport = diffs(node.children, to)
         processDiffs(node, diffReport.ops)
-        node.children = diffReport.update
-      }
+        diffReport.update
+      } 
 
       // Now we recurse down the list
-      node.children.iterator.zip(to.iterator) foreach {
-        case (uu: MakeItSo, tt: MakeItSo) => uu.makeItSo(tt)
+      out.iterator.zip(to.iterator) foreach {
+        case (uu: MakeItSo, target) => uu.makeItSo(target)
         case (u: Update, _) => u.update()
         case _ => // nothing to do
       }
-    }
+
+      out
+    } else node.children
   }
 
 }

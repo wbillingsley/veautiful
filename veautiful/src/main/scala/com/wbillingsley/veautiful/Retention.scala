@@ -29,11 +29,29 @@ trait Keep[T](v:T) extends HasRetention {
 }
 
 extension (r:HasRetention) {
-  def retainFor(other:HasRetention) = r.retention match {
-    case Retention.Equality => r == other
-    case Retention.Keep(v) => r.getClass.isAssignableFrom(other.getClass) && r.retention == other.retention
-    case Retention.Keyed(k) => r.getClass.isAssignableFrom(other.getClass) && r.retention == other.retention
-  }
+  def retainFor(other:HasRetention):Boolean = (r == other) || (r.retention match {
+    case Retention.Equality => 
+      other match {
+        case b:Blueprint[_] => r == b.build() // This is an inefficient case
+        case _ => false
+      }
+    case Retention.Keep(v) => 
+      other match {
+        case b:Blueprint[_ <: HasRetention] => r.getClass.isAssignableFrom(b.cls) && (b.retention match {
+          case Retention.Keep(vv) => v == vv
+          case _ => r.retainFor(b.build()) // This is an inefficient case
+        })
+        case _ => r.getClass.isAssignableFrom(other.getClass) && r.retention == other.retention
+      }
+    case Retention.Keyed(k) => 
+      other match {
+        case b:Blueprint[_ <: HasRetention] => r.getClass.isAssignableFrom(b.cls) && (b.retention match {
+          case Retention.Keyed(kk) => k == kk
+          case _ => r.retainFor(b.build()) // This is an inefficient case
+        })
+        case _ => r.getClass.isAssignableFrom(other.getClass) && r.retention == other.retention
+      }
+  })
 
 }
 
@@ -47,4 +65,25 @@ trait HasTestMatch { self:HasRetention =>
    * Traits that retain but alter nodes (e.g. Morphing) should also check the properties they morph on
    */
   def testMatches(other:HasRetention):Boolean = this.retainFor(other)
+}
+
+
+/**
+  * A marker trait indicating that an item is a blueprint for a MakeItSo; 
+  * this is important if you want to pass a Blueprint (instead of a live object) to a Reconciler.
+  * 
+  * Blueprints have to have a retention strategy, so that the reconciler knows how to compare them.
+  * 
+  * A Blueprint with Retention.Equality is inefficient, because the reconciler will have to build the item
+  * as it compares it with items in the tree, possibly leading to it being built multiple times. The 
+  * Blueprint is a different class than the MakeItSo, so the Blueprint itself cannot be == the MakeItSo.
+  * 
+  * However, if the MakeItSo and the Blueprint both implement the Keyed or Keep retention strategies, 
+  * the reconciler can attempt to do the comparison just on the data from the Blueprint without calling build().
+  */
+trait Blueprint[+C <: HasRetention](val cls:Class[_ <: C]) extends HasRetention {
+
+  /** Builds the item. Called by the reconciler if your object needs inserting into a rendered view. */
+  def build():C
+
 }
