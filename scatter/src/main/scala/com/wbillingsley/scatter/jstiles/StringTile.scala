@@ -1,10 +1,9 @@
 package com.wbillingsley.scatter.jstiles
 
 import com.wbillingsley.scatter.{Tile, TileComponent, TileSpace, TileText}
-import com.wbillingsley.veautiful.html.VHtmlComponent
 import com.wbillingsley.veautiful.DiffComponent
 
-case class StringTile(tileSpace:TileSpace[JSExpr], text:String) extends Tile(tileSpace) with VHtmlComponent {
+case class StringTile(tileSpace:TileSpace[JSExpr], text:String) extends Tile(tileSpace) {
 
   override val tileContent: TileComponent[JSExpr] = TileText(s""""${text}"""")
 

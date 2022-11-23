@@ -1,18 +1,18 @@
 package com.wbillingsley.veautiful.templates
 
 import com.wbillingsley.veautiful.MakeItSo
-import com.wbillingsley.veautiful.html.{<, VHtmlComponent, VHtmlNode, ^}
+import com.wbillingsley.veautiful.html.{<, DHtmlComponent, VDomNode, ^}
 import org.scalajs.dom
 import org.scalajs.dom.raw.{Event, HTMLElement}
 
-case class ScaleToFit(width:Int, height:Int)(var content: VHtmlNode) extends VHtmlComponent with MakeItSo {
+case class ScaleToFit(width:Int, height:Int)(var content: VDomNode) extends DHtmlComponent with MakeItSo {
 
   var scale:Double = 1
   var top:Double = 0
   var left:Double = 0
 
   def rescale() = for { n <- domNode } {
-    val r = n.asInstanceOf[HTMLElement].getBoundingClientRect()
+    val r = n.getBoundingClientRect()
     scale = Math.min(r.height / height, r.width / width)
 
     left = Math.max((r.width - scale * width) / 2, 0)

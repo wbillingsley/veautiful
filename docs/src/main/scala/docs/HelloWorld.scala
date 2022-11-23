@@ -1,7 +1,9 @@
 package docs
 
-import com.wbillingsley.veautiful.html.{<, ^}
+import com.wbillingsley.veautiful.html.{HTML, <, ^}
+import HTML.*
 import org.scalajs.dom
+
 
 def helloWorld = <.div(Common.markdown(
   """# Hello World
@@ -10,57 +12,94 @@ def helloWorld = <.div(Common.markdown(
     |The `Attacher` connects to a DOM element, and can render a Veautiful tree into it:
     |
     |```scala
-    |import com.wbillingsley.veautiful.html.{Attacher, <, ^}
+    |import com.wbillingsley.veautiful.html.{Attacher, HTML}
+    |import HTML.*
     |import org.scalajs.dom
     |
     |val root = Attacher.newRoot(dom.document.getElementById("render-here"))
-    |root.render(<.p("Hello world"))
+    |root.render(p("Hello world"))
     |```
     |
     |Later, we'll render more interesting components that can update themselves, but this will get us started.
     |
-    |## HTML elements
+    |## Rendering elements
     |
     |As with other frameworks, Veautiful defines a way to write HTML nodes. So, in the code above
     |
     |```scala
-    |<.p("Hello world")
+    |p("Hello world")
     |```
     |
     |Produces:
     |
     |""".stripMargin),
-  <.div(^.cls := embeddedExampleStyle.className,
-    <.p("Hello World"),
+  div(^.cls := embeddedExampleStyle.className,
+    p("Hello World"),
   ),
   Common.markdown("""
     |
     |If you'd like to check, you can take a look at the code for this page on GitHub.
     |
-    |`<` is just an object holding the `p` method for defining a `p` element. The library's use of `<` and `^` is
-    |inspired by scalatags and scalajs-react, and hopefully is visually reminiscent of all the angle brackets in HTML.
+    |### `HTML`, `SVG`, and `<`
     |
-    |There are pre-defined methods on `<` for many HTML tags, but if we've forgotten one, you can create it anyway via
+    |In our hello world example, I just imported all the HTML tags. (`import HTML.*`.) 
+    |I could instead have said `HTML.p("Hello world")`. Or, the `HTML` object is also aliased as `<`. 
+    |This can let you write code in a way that is a bit more visually reminiscent of HTML and stands out in your code. 
+    |It also helps avoid namespace collisions with the fact that
+    |`i`, `a`, `s`, etc, are HTML tag names but also common names people use for little local variables.
+    |The `<` style was inspide by the Scalatags project.
+    |
+    |e.g.
+    |
+    |```
+    |<.div(
+    |  <.h1("My heading"),
+    |  <.p("And a paragraph")
+    |)
+    |```
+    |
+    |There are pre-defined methods on `<` for most HTML tags, but if we've forgotten one, you can create it anyway via
     |(for example):
     | 
     |```scala 
-    |<("aside")("This is an aside")
+    |<("newFangledElement")("This is a new fangled element that Veautiful doesn't know yet")
     |```
     |
-    |There's also an `SVG` object for declaring elements in the SVG namespace.
+    |There's also an `SVG` object for declaring SVG elements. Within the `com.wbillingsley.veautiful.svg` package,
+    |it's also aliased as `<`. 
     |
     |## Attributes, properties, and events
     |
-    |Let's start with an example:
+    |Just as the `HTML` and `SVG` objects (or `<`) let us define tags for HTML elements, there is a `modifiers` object
+    |in each package that can set attributes, event listeners, and some other special modifiers.
+    |
+    |It's aliased as `^`, again mimicking the Scalatags style. Or you could `import modifiers.*` if you don't want the `^` prefix.
+    |
+    |e.g.:
     |
     |```scala
     |<.div(^.cls := embeddedExampleStyle.className,
     |  <.button(
-    |    ^.attr("style") := "background: cornflowerblue; color: white;",
+    |    ^.style := "background: cornflowerblue; color: white;",
     |    ^.onClick ==> { (_) => dom.window.alert("I was clicked") },
     |    "Pop an alert"
     |  )
     |)
+    |```
+    |
+    |or 
+    |
+    |```scala
+    |import HTML.*
+    |import modifiers.*
+    |
+    |div(cls := embeddedExampleStyle.className,
+    |  button(
+    |    style := "background: cornflowerblue; color: white;",
+    |    onClick ==> { (_) => dom.window.alert("I was clicked") },
+    |    "Pop an alert"
+    |  )
+    |))
     |```
     |
     |""".stripMargin),
@@ -74,7 +113,7 @@ def helloWorld = <.div(Common.markdown(
   Common.markdown("""
     |Just as the `<` object contained methods for defining elements, the `^` object contains items for defining
     |attributes, properties, and event handlers. Again, there are methods defined for many of the common ones, but
-    |there will be plenty that have been missed, so:
+    |there will be some that have been missed, so:
     |
     |* `^.attr("attrName") := "foo"` sets an attribute 
     |* `^.on("eventName") ==> { (e) => dom.console.log(e) }` sets an event handler
@@ -84,7 +123,7 @@ def helloWorld = <.div(Common.markdown(
     |
     |Again, the notation for event handlers is inspired from scalajs-react and scalatags.
     |
-    |## Element children
+    |## Children and Modifiers
     |
     |In the button example, you'll notice that we nest attributes and child elements for a node inside the same 
     |set of parentheses.
@@ -98,10 +137,8 @@ def helloWorld = <.div(Common.markdown(
     |* Properties
     |* Event handler settings
     |* Virtual node settings (extra functionality the framework defines)
-    |* or `Iterable[ElementChild[T]]`
-    | 
-    |The fact that we can pass an `Iterable` means we can pass `Option`s, `Seq`s, `List`s, and they'll work as you'd
-    |expect.
+    |* or `Iterable[ElementChild[T]]`. i.e. we can pass `Option`s, `Seq`s, and `List`s of modifiers and they'll work as
+    |  you'd expect
     |
     |""".stripMargin)
 )

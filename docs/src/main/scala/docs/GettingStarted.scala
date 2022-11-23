@@ -1,24 +1,29 @@
 package docs
 
-import com.wbillingsley.veautiful.html.VHtmlNode
+import com.wbillingsley.veautiful.html.VDomNode
 
-def gettingStarted:VHtmlNode = Common.markdown(
+def gettingStarted:VDomNode = Common.markdown(
   """
     |# Getting started
     |
-    |Congratulations, you've made the decision to write a project using Veautiful, Doctacular, VSlides, Scatter, or
-    |some of our other wonderful componentry!
+    |Veautiful (the core UI toolkit), veautiful-templates (a collection of useful stuff like a router and slide decks), and 
+    |doctacular (a system for publishing docs or teaching sites) are published to Maven Central.
     |
-    |(Well, we can hope. You've read this far at least!)
+    |```
+    |"com.wbillingsley" %%% "veautiful" % "0.3-M1" // just the core toolkit, latest milestone
+    |"com.wbillingsley" %%% "veautiful" % "0.3-SNAPSHOT" // just the core toolkit, latest snapshot
+    |```
     |
-    |## Quickstart
+    |or
     |
-    |If you'd like to get started quickly, we have some starter projects up on GitHub:
+    |```
+    |"com.wbillingsley" %%% "doctacular" % "0.3-M1" // also includes some components and the site system, latest milestone
+    |"com.wbillingsley" %%% "doctacular" % "0.3-SNAPSHOT" // also includes some components and the site system, latest snapshot
+    |```
     |
-    |(To do: publish sample repositories)
+    |## Here's some I made earlier
     |
-    |Or, if you're in the mood to look through something more complicated, there are some published course sites
-    |that have been built with Veautiful:
+    |I use Veautiful in a number of interactive open educational resources I've built
     |
     |* [Thinking about Programming](https://theintelligentbook.com/thinkingaboutprogramming) - live slides and 
     |  programmable game environments that go alongside a computational thinking course.
@@ -26,22 +31,8 @@ def gettingStarted:VHtmlNode = Common.markdown(
     |  that teaches computer architecture from electronics up.
     |* [The Adventures of Will Scala](https://theintelligentbook.com/willscala) - a simpler site (mostly video
     |  and text) that goes alongside my undergraduate Scala course.
+    |* [Supercollaborative](https://theintelligentbook.com/supercollaborative) - for a software studio course, includes
+    |  a git simulation built into the decks in the version control week.
     | 
-    |## Manual install
-    |
-    |Veautiful is published for Scala 3 (dotty). The latest commits try to set up releases to Maven Central using sbt-ci-release, though initially with RC version numbers.
-    |
-    |If you want to track the development version, the latest commit on the main/master branch can also be imported via jitpack. e.g.
-    |
-    |```scala
-    |resolvers += "jitpack" at "https://jitpack.io"
-    |libraryDependencies ++= Seq(
-    |  "com.github.wbillingsley.veautiful" %%% "veautiful" % "master-SNAPSHOT",
-    |)
-    |```
-    |
-    |but you might want some of the extras too, such as the Router, Doctacular, or VSlides. In which case, import the "doctacular" artifact. 
-    |
-    |
     |""".stripMargin)
 

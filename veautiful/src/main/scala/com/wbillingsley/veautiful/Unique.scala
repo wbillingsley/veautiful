@@ -1,7 +1,5 @@
 package com.wbillingsley.veautiful
 
-import com.wbillingsley.veautiful.html.VHtmlNode
-
 /**
   * A VNode that delegates its operations to the delegate passed in its contstructor.
   * 
@@ -28,7 +26,6 @@ class Unique[N](val delegate: VNode[N]) extends VNode[N] with Update {
     case u:Update => u.update()
     case _ => // Do nothing
   }
-  
 }
 
 

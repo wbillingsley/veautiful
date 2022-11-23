@@ -1,6 +1,6 @@
 package com.wbillingsley.veautiful.templates
 
-import com.wbillingsley.veautiful.html.{<, DElement, SVG, VHtmlNode, ^}
+import com.wbillingsley.veautiful.html.{<, DElement, SVG, VDomNode, ^}
 
 case class ScatterPlot(plotWidth:Int, plotHeight:Int, xName:String, yName:String, xLabel:(Double) => String, yLabel:(Double) => String, defaultxMax:Double, defaultyMax:Double) {
 
@@ -13,7 +13,7 @@ case class ScatterPlot(plotWidth:Int, plotHeight:Int, xName:String, yName:String
 
   val viewBox = s"${-marginLeft} ${-marginTop} ${plotWidth + marginLeft + marginRight} ${plotHeight + marginTop + marginBottom}"
 
-  def plot(data:Seq[(Double, Double)]):VHtmlNode = {
+  def plot(data:Seq[(Double, Double)]):VDomNode = {
 
     val xMax = if (data.isEmpty) defaultxMax else {
       Math.max(defaultxMax, data.maxBy(_._1)._1)
@@ -36,7 +36,7 @@ case class ScatterPlot(plotWidth:Int, plotHeight:Int, xName:String, yName:String
       plotHeight - (ratio * v).toInt
     }
 
-    def xAxis(ticks:Int, name:String):VHtmlNode = {
+    def xAxis(ticks:Int, name:String):VDomNode = {
       <("g", ns=DElement.svgNS)(
         <("line", ns=DElement.svgNS)(^.attr("x1") := "0", ^.attr("x2") := plotWidth.toString, ^.attr("y1") := plotHeight.toString, ^.attr("y2") := plotHeight.toString),
         <("text", ns=DElement.svgNS)(
@@ -61,7 +61,7 @@ case class ScatterPlot(plotWidth:Int, plotHeight:Int, xName:String, yName:String
       )
     }
 
-    def yAxis(ticks:Int, name:String):VHtmlNode = {
+    def yAxis(ticks:Int, name:String):VDomNode = {
 
       SVG.g(
         <("line", ns=DElement.svgNS)(

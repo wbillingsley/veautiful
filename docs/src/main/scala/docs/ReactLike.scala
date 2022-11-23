@@ -1,9 +1,7 @@
 package docs
 
 import com.wbillingsley.veautiful._
-import com.wbillingsley.veautiful.html.<.VSVGElement
-import com.wbillingsley.veautiful.html.{<, DElement, ElementComponent, SVG, VHtmlNode, ^}
-import docs.Model.Asteroid
+import com.wbillingsley.veautiful.html.{<, DElement, ElementComponent, SVG, VDomNode, ^, DSvgElement}
 import org.scalajs.dom.HTMLInputElement
 
 /**
@@ -21,7 +19,7 @@ object ReactLike {
   /**
     * The SVG that will contain the asteroid field
     */
-  def svg:VSVGElement = <.svg.attrs(
+  def svg:DSvgElement = <.svg.attrs(
     ^.attr("viewbox") := "0 0 640 480",
     ^.attr("width") := "100%",
     ^.attr("height") := "480"
@@ -36,7 +34,7 @@ object ReactLike {
   val polyShape = polyPoints.map(pointToString).mkString
 
   /** Turns an asteroid into an SVG DElement */
-  def svgAsteroid(a:Asteroid):VHtmlNode = {
+  def svgAsteroid(a:Asteroid):VDomNode = {
     val (x, y) = a.pos
 
     // Once we've worked out what to put into it, the asteroid is just a polygon node
@@ -44,7 +42,7 @@ object ReactLike {
   }
 
   /** Creates an SVG for a gravity well */
-  def svgWell(w:Well):VHtmlNode = {
+  def svgWell(w:Well):VDomNode = {
     val (x, y) = w.pos
 
     // This one's just a circle node
@@ -58,7 +56,7 @@ object ReactLike {
     * The is is the view code that the router directs to (puts into the page) when
     * you click on this page of the docs.
     */
-  def page:VHtmlNode = <.div(
+  def page:VDomNode = <.div(
       <.h1("Example -- asteroids rendering into an SVG"),
       <.p(
         <.a(^.href := "https://github.com/wbillingsley/veautiful/blob/master/docs/src/main/scala/example/ReactLike.scala",

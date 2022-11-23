@@ -7,7 +7,7 @@ package com.wbillingsley.veautiful
   *
   * @tparam N the type of node this VNode controls. E.g., dom.Node, dom.Element, but could be any target
   */
-trait VNode[+N] extends Keyable {
+trait VNode[+N] extends HasRetention with HasTestMatch {
 
   /**
     * The dom node that this is currently attached to.

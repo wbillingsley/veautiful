@@ -1,6 +1,6 @@
 package docs
 
-import com.wbillingsley.veautiful.html.{<, Markup, SVG, VHtmlNode, ^}
+import com.wbillingsley.veautiful.html.{<, Markup, SVG, VDomNode, ^}
 
 import scala.scalajs.js
 import scala.scalajs.js.annotation._
@@ -21,7 +21,7 @@ val markedInline:Markup = Markup({ (s:String) => Marked.parseInline(s) })
   */
 object Common {
 
-  def markdown(s:String):VHtmlNode = marked.Fixed(s)
+  def markdown(s:String):VDomNode = marked.Fixed(s)
   
   def logoPaths = SVG.g(
     SVG.path(

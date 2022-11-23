@@ -1,6 +1,6 @@
 package com.wbillingsley.veautiful.templates
 
-import com.wbillingsley.veautiful.html.{<, Styling, VHtmlComponent, VHtmlDiffNode, VHtmlNode, ^}
+import com.wbillingsley.veautiful.html.{<, Styling, DHtmlComponent, VHtmlDiffNode, VDomNode, ^}
 import com.wbillingsley.veautiful.Morphing
 import com.wbillingsley.veautiful.logging.Logger
 import org.scalajs.dom
@@ -10,10 +10,10 @@ object VSlides {
   val logger = Logger.getLogger(VSlides.getClass)
 
   trait Layout:
-    def apply(slides:VSlides, slide:VHtmlNode, index:Int):VHtmlNode
+    def apply(slides:VSlides, slide:VDomNode, index:Int):VDomNode
 
   object DefaultLayout extends Layout:
-    def apply(slides:VSlides, slide:VHtmlNode, index:Int):VHtmlNode =
+    def apply(slides:VSlides, slide:VDomNode, index:Int):VDomNode =
       <.div(
         ^.cls := s"v-slide ${defaultTheme.className}", ^.attr("style") := s"height: ${slides.height}px", slide
       )
@@ -98,14 +98,14 @@ case class VSlides(
   def laidOut = content.zipWithIndex.map { (item, idx)  => layout(this, item, idx) }
 }
 
-/** Something that can take a deck, and a page number, and render it to a VHtmlNode */
-type VSlidesPlayer = (VSlides, Int) => VHtmlNode
+/** Something that can take a deck, and a page number, and render it to a VDomNode */
+type VSlidesPlayer = (VSlides, Int) => VDomNode
 
 case class DefaultVSlidesPlayer(deck: VSlides, override val key: Option[String] = None, scaleToWindow:Boolean = true)(
   index: Int = 0,
   onIndexChange: Option[Int => Unit] = None,
   sequencerLayout: Sequencer.LayoutFunc = Sequencer.defaultLayout
-) extends VHtmlComponent with Morphing(VSlidesConfig(index, onIndexChange, sequencerLayout)) {
+) extends DHtmlComponent with Morphing(VSlidesConfig(index, onIndexChange, sequencerLayout)) {
   
   val morpher = createMorpher(this)
 
@@ -119,7 +119,7 @@ case class DefaultVSlidesPlayer(deck: VSlides, override val key: Option[String] 
     }
   }
 
-  override def render: VHtmlDiffNode = {
+  override def render = {
     val config = prop
     
     val sequencer = Sequencer()(

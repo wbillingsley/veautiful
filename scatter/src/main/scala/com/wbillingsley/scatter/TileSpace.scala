@@ -1,6 +1,6 @@
 package com.wbillingsley.scatter
 
-import com.wbillingsley.veautiful.html.{<, VHtmlComponent, VHtmlDiffNode, ^}
+import com.wbillingsley.veautiful.html.{<, DSvgComponent, VDomElement, ^}
 import com.wbillingsley.veautiful.logging.Logger
 import org.scalajs.dom
 import org.scalajs.dom.{MouseEvent, SVGElement}
@@ -8,14 +8,14 @@ import org.scalajs.dom.{MouseEvent, SVGElement}
 import scala.collection.mutable
 import scala.util.Random
 
-case class TileSpace[T](override val key:Option[String] = None, val language:TileLanguage[T])(val canvasSize:(Int, Int) = (480, 640)) extends VHtmlComponent {
+case class TileSpace[T](override val key:Option[String] = None, val language:TileLanguage[T])(val canvasSize:(Int, Int) = (480, 640)) extends DSvgComponent {
 
   import TileSpace._
 
   /** A tile space contains some set of free tiles */
   private val freeTiles:mutable.Buffer[FreeTile[T]] = mutable.Buffer.empty
 
-  override def render: VHtmlDiffNode = <.svg(^.attr("width") := canvasSize._1.toString, ^.attr("height") := canvasSize._2.toString, ^.cls := "scatter-area",
+  override def render = <.svg(^.attr("width") := canvasSize._1.toString, ^.attr("height") := canvasSize._2.toString, ^.cls := "scatter-area",
     freeTiles
   )
 
@@ -82,7 +82,7 @@ case class TileSpace[T](override val key:Option[String] = None, val language:Til
     * @param tc the tileComponent whose co-ordinates should be calculated
     * @return
     */
-  def relativeLocation(tc:VHtmlComponent):(Int, Int) = {
+  def relativeLocation(tc:VDomElement):(Int, Int) = {
     val s = scale getOrElse 1.0
     val (tx, ty) = screenLocation(tc)
     val (mx, my) = screenLocation(this)
@@ -259,7 +259,7 @@ object TileSpace {
 
   val logger:Logger = Logger.getLogger(TileSpace.getClass)
 
-  def screenLocation(n:VHtmlComponent):(Int, Int) = {
+  def screenLocation(n:VDomElement):(Int, Int) = {
     n.domNode.map { e =>
       val r = e.getBoundingClientRect()
       (r.left.toInt, r.top.toInt)

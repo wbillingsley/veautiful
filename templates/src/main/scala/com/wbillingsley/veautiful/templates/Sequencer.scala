@@ -1,15 +1,15 @@
 package com.wbillingsley.veautiful.templates
 
 import com.wbillingsley.veautiful._
-import com.wbillingsley.veautiful.html.{<, Styling, VHtmlComponent, VHtmlDiffNode, VHtmlNode, ^}
+import com.wbillingsley.veautiful.html.{<, Styling, DHtmlComponent, VHtmlDiffNode, VDomNode, ^}
 import com.wbillingsley.veautiful.reconcilers.Reconciler
 import com.wbillingsley.veautiful.templates.Sequencer.{LayoutFunc, defaultFootBoxStyle, sequencerSlideStyle}
 
 object Sequencer {
 
-  type LayoutFunc = (Sequencer, VHtmlNode, Int) => VHtmlNode
+  type LayoutFunc = (Sequencer, VDomNode, Int) => VDomNode
 
-  def footBoxLayout(additionalItems:Seq[VHtmlNode]):LayoutFunc = { (sequencer, item, i) =>
+  def footBoxLayout(additionalItems:Seq[VDomNode]):LayoutFunc = { (sequencer, item, i) =>
     <.div(^.cls := inheritWrapper.className, item, sequencer.footBoxWithInsert(additionalItems))
   }
 
@@ -79,7 +79,7 @@ case class SequencerConfig(
 case class Sequencer(override val key:Option[String] = None)(
   nodes: Seq[SequenceItem], index:Int = 0, layout:Sequencer.LayoutFunc = Sequencer.defaultLayout,
   onIndexChange: Option[Int => Unit] = None
-) extends VHtmlComponent with Morphing(SequencerConfig(nodes, index, layout, onIndexChange)) {
+) extends DHtmlComponent with Morphing(SequencerConfig(nodes, index, layout, onIndexChange)) {
   
   val morpher = createMorpher(this)
 
@@ -101,19 +101,19 @@ case class Sequencer(override val key:Option[String] = None)(
     }
   }
 
-  private def prevButton():VHtmlNode =
+  private def prevButton():VDomNode =
     if (prop.index > 0) then
       <.button(^.onClick --> previous(), "<")
     else
       <.button(^.attr("disabled") := "disabled", "<")
 
-  private def nextButton():VHtmlNode =
+  private def nextButton():VDomNode =
     if (prop.index + 1 < nodes.length) then
       <.button(^.onClick --> next(), ">")
     else
       <.button(^.attr("disabled") := "disabled", ">")
 
-  def footBoxWithInsert(additional:Seq[VHtmlNode]):VHtmlNode = {
+  def footBoxWithInsert(additional:Seq[VDomNode]):VDomNode = {
     <.div(^.cls := s"v-sequencer-footbox ${defaultFootBoxStyle.className} ",
       additional,
       prevButton(),
@@ -122,7 +122,7 @@ case class Sequencer(override val key:Option[String] = None)(
     )
   }
   
-  def footBox:VHtmlNode = {
+  def footBox:VDomNode = {
     <.div(^.cls := s"v-sequencer-footbox ${defaultFootBoxStyle.className} ",
       prevButton(),
       <.span(s" ${prop.index+1} / ${nodes.size} "),
@@ -130,14 +130,14 @@ case class Sequencer(override val key:Option[String] = None)(
     )
   }
   
-  private def layoutItem(item:SequenceItem, i:Int):VHtmlNode = {
+  private def layoutItem(item:SequenceItem, i:Int):VDomNode = {
     item match {
       case csi:CustomSequenceItem => csi.layout(this, i)
-      case n:VHtmlNode => layout(this, n, i)
+      case n:VDomNode => layout(this, n, i)
     }
   }
 
-  override def render: VHtmlDiffNode = <.div(^.cls := "v-sequencer",
+  override def render = <.div(^.cls := "v-sequencer",
     <.div(^.cls := "v-sequencer-inner",
       for {
         (item, i) <- prop.nodes.zipWithIndex
@@ -157,9 +157,9 @@ case class Sequencer(override val key:Option[String] = None)(
 
 }
 
-type SequenceItem = VHtmlNode // | CustomSequenceItem
+type SequenceItem = VDomNode // | CustomSequenceItem
 
 trait CustomSequenceItem {
-  def layout(sequencer:Sequencer, index:Int):VHtmlNode
+  def layout(sequencer:Sequencer, index:Int):VDomNode
 }
 

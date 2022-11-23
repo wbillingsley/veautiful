@@ -1,7 +1,6 @@
 package docs
 
-import com.wbillingsley.veautiful.html.<.VHTMLElement
-import com.wbillingsley.veautiful.html.{<, EventMethods, VHtmlComponent, VHtmlNode, ^}
+import com.wbillingsley.veautiful.html.{<, EventMethods, DHtmlComponent, VDomNode, ^, VHTMLElement}
 import org.scalajs.dom
 import org.scalajs.dom.raw.HTMLInputElement
 
@@ -13,7 +12,7 @@ object ToDoList {
     * In this example, let's implement the whole list as a mutable component. In larger applications, we'd want
     * the data storage to be outside the UI components, but this is just a little to-do list.
     */
-  object MyToDoList extends VHtmlComponent {
+  object MyToDoList extends DHtmlComponent {
 
     /** To-do items are data */
     case class ToDoItem(val s:String, var done:Boolean)
@@ -35,12 +34,12 @@ object ToDoList {
     }
 
     /** Let's define a component for adding entries into the list */
-    case class AddItem() extends VHtmlComponent {
+    case class AddItem() extends DHtmlComponent {
 
       /* holds the text we're typing in, React-like updated on each keypress */
       private var adding:Option[String] = None
 
-      override def render:VHTMLElement = <.div(^.cls := "input-group",
+      override def render = <.div(^.cls := "input-group",
         <.input(^.attr("type") := "text", ^.cls := "form-control",
           ^.attr("placeholder") := "type item here",
           ^.prop("value") := adding.getOrElse(""),
@@ -91,7 +90,7 @@ object ToDoList {
   }
 
 
-  def page:VHtmlNode = <.div(
+  def page:VDomNode = <.div(
     Common.markdown(
       """
         |# Example: To Do List
@@ -107,7 +106,7 @@ object ToDoList {
       Common.markdown(
         """
           |```scala
-          |object MyToDoList extends VHtmlComponent {
+          |object MyToDoList extends DHtmlComponent {
           |
           |  /** To-do items are data */
           |  case class ToDoItem(val s:String, var done:Boolean)
@@ -129,7 +128,7 @@ object ToDoList {
           |  }
           |
           |  /** Let's define a component for adding entries into the list */
-          |  case class AddItem() extends VHtmlComponent {
+          |  case class AddItem() extends DHtmlComponent {
           |
           |    /* holds the text we're typing in, React-like updated on each keypress */
           |    private var adding:Option[String] = None

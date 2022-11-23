@@ -3,7 +3,7 @@ import com.wbillingsley.veautiful.html.{SVG, VHtmlDiffNode, ^}
 
 case class TileText[T](text:String) extends TileComponent[T] {
 
-  override def render: VHtmlDiffNode = {
+  override def render = {
     SVG.text(^.attr("x") := x, ^.attr("y") := y, ^.cls := "tile-text", text)
   }
 

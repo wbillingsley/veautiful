@@ -32,7 +32,7 @@ class ValueSlider(v:Value, pos:(Int, Int), orientation: Orientation = Orientatio
   }
 
 
-  override def render: VHtmlDiffNode = {
+  override def render = {
     val (x, y) = pos
 
     SVG.foreignObject(^.attr("x") := x, ^.attr("y") := y, ^.attr("width") := 150, ^.attr("height") := 30,

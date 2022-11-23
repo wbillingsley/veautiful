@@ -1,7 +1,7 @@
 package docs
 
 import com.wbillingsley.veautiful.html._
-import org.scalajs.dom.raw.HTMLTextAreaElement
+import org.scalajs.dom.HTMLTextAreaElement
 
 import scala.collection.immutable.ArraySeq
 
@@ -61,21 +61,21 @@ object AssemblyExample {
     )
   }
 
-  def regs(cpu:CPU):VHtmlNode = {
+  def regs(cpu:CPU):VDomNode = {
     <.table(^.cls := "register reg-registers",
       (cpu.state.registers.iterator.zipWithIndex map {
         case (b, i) =>
           <.tr(
             <.th(^.cls := "register-name", i.toHexString),
               toBits(b).map { bit => <.td(oneZero(bit)) },
-            <.td(^.cls := "hex", b.formatted("%02X"))
+            <.td(^.cls := "hex", "%02X".format(b))
           )
       }).toSeq
     )
   }
 
 
-  def io(state:CPUState):VHtmlNode = {
+  def io(state:CPUState):VDomNode = {
     <.table(^.cls := "register io-registers",
 
 
@@ -116,7 +116,7 @@ object AssemblyExample {
 }
 
 
-class CodeWidget(cols:Int = 40, rows:Int = 20) extends VHtmlComponent {
+class CodeWidget(cols:Int = 40, rows:Int = 20) extends DHtmlComponent {
 
   var currentLine:Option[Int] = None
   var highlights:Seq[(Int, String)] = Seq.empty
@@ -134,9 +134,7 @@ class CodeWidget(cols:Int = 40, rows:Int = 20) extends VHtmlComponent {
 
   def text:String = ta.domNode.map({ case e:HTMLTextAreaElement => e.value }).getOrElse("")
 
-  override protected def render: VHtmlDiffNode = {
-
-    println(text)
+  override protected def render = {
     <.div(^.cls := "codewidget",
       lineNums, ta
     )

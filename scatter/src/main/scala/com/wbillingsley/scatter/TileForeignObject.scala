@@ -1,15 +1,15 @@
 package com.wbillingsley.scatter
 
-import com.wbillingsley.veautiful.html.{SVG, VHtmlDiffNode, VHtmlNode, ^}
+import com.wbillingsley.veautiful.html.{SVG, VHtmlDiffNode, VDomNode, ^}
 
-case class TileForeignObject[T](content: VHtmlNode) extends TileComponent[T] {
+case class TileForeignObject[T](content: VDomNode) extends TileComponent[T] {
 
   override def emptySockets: Seq[(Int, Int, Socket[T])] = Seq.empty
 
   var width:Int = 20
   var height:Int = 20
 
-  override protected def render: VHtmlDiffNode =
+  override protected def render =
     SVG.foreignObject(^.attr("width") := width, ^.attr("height") := height,
       content
     )

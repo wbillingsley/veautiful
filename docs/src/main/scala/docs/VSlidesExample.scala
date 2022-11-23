@@ -1,6 +1,6 @@
 package docs
 
-import com.wbillingsley.veautiful.html.{<, VHtmlNode, ^}
+import com.wbillingsley.veautiful.html.{<, VDomNode, ^}
 import com.wbillingsley.veautiful.templates.{DeckBuilder, DefaultVSlidesPlayer, VSlides}
 
 object VSlidesExample {
@@ -35,7 +35,7 @@ object VSlidesExample {
         |## Rendering from Scala.js
         |
         |When rendering from Scala.js, we *don't* use `renderInto` (which would create a separate root node). Instead,
-        |we just ask the builder to create the deck - which is a `VHtmlNode` and so can be directly included in the
+        |we just ask the builder to create the deck - which is a `VDomNode` and so can be directly included in the
         |page.
         |
         |~~~scala
@@ -47,7 +47,7 @@ object VSlidesExample {
       .markdownSlide("""
         |## Embedding widgets
         |
-        |In the builder, we can also include other \`VHtmlNodes`\. For example, this part of the deck call
+        |In the builder, we can also include other \`VDomNodes`\. For example, this part of the deck call
         |produces the next slide in this deck:
         |
         |~~~scala
@@ -64,13 +64,13 @@ object VSlidesExample {
     ))
     .renderSlides
 
-  def page1(i:Int):VHtmlNode = {
+  def page1(i:Int):VDomNode = {
     <.div(^.cls := "resizable",
       DefaultVSlidesPlayer(deck)(i)
     )
   }
 
-  def page(i:Int):VHtmlNode = {
+  def page(i:Int):VDomNode = {
       <.div(
         Common.markdown(
           s"""

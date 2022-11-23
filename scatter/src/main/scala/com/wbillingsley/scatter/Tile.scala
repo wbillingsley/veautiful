@@ -1,9 +1,9 @@
 package com.wbillingsley.scatter
 
-import com.wbillingsley.veautiful.html.{DElement, SVG, VHtmlComponent, VHtmlDiffNode, ^}
+import com.wbillingsley.veautiful.html.{DSvgComponent, ^}
+import com.wbillingsley.veautiful.svg.{SVG, DSvgElement}
 import com.wbillingsley.veautiful.logging.Logger
 import com.wbillingsley.veautiful.OnScreen
-import com.wbillingsley.veautiful.html.<.{VDOMElement, VSVGElement}
 import org.scalajs.dom.{MouseEvent, SVGElement}
 
 import scala.annotation.tailrec
@@ -21,7 +21,7 @@ enum TypeLoopMode {
   case Never, WhenFree, Always
 }
 
-abstract class Tile[T](val ts:TileSpace[T], val mobile:Boolean = true, val typeLoopMode:TypeLoopMode = TypeLoopMode.WhenFree, val cssClass:String = "") extends VHtmlComponent {
+abstract class Tile[T](val ts:TileSpace[T], val mobile:Boolean = true, val typeLoopMode:TypeLoopMode = TypeLoopMode.WhenFree, val cssClass:String = "") extends DSvgComponent {
 
   import Tile._
   
@@ -122,7 +122,7 @@ abstract class Tile[T](val ts:TileSpace[T], val mobile:Boolean = true, val typeL
 
   def contentOffsetY:Int = Tile.padding
 
-  override def render: VHtmlDiffNode = {
+  override def render = {
     logger.trace(s"render called on $this")
 
     val (w, h) = tileContent.size getOrElse (20,20)
@@ -162,7 +162,7 @@ abstract class Tile[T](val ts:TileSpace[T], val mobile:Boolean = true, val typeL
     */
   val tileContent:TileComponent[T]
 
-  val tileBoundary:VSVGElement = SVG.path(^.cls := "tile-path")
+  val tileBoundary:DSvgElement = SVG.path(^.cls := "tile-path")
 
   def layout():Unit = {
     tileContent.layoutChildren()

@@ -1,6 +1,6 @@
 package docs
 
-import com.wbillingsley.veautiful.html.{<, VHtmlNode, ^}
+import com.wbillingsley.veautiful.html.{<, VDomNode, ^}
 import com.wbillingsley.wren._
 
 object WrenExample {
@@ -50,7 +50,7 @@ object WrenExample {
     circuit.rerender()
   }
 
-  def page:VHtmlNode = <.div(^.cls := "row",
+  def page:VDomNode = <.div(^.cls := "row",
     <.div(^.cls := "col", circuit)
   )
 

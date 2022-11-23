@@ -1,11 +1,11 @@
 package com.wbillingsley.wren
-import com.wbillingsley.veautiful.html.{<, DElement, SVG, VHtmlDiffNode, VHtmlNode, ^}
+import com.wbillingsley.veautiful.html.{<, DElement, SVG, VHtmlDiffNode, VDomNode, ^}
 
 import scala.scalajs.js.|
 
-class ValueLabel(name:(String, String), v:Value, pos:(Int, Int), anchorClass:String = "left ", symbol:Seq[VHtmlNode] = Seq.empty) extends Component {
+class ValueLabel(name:(String, String), v:Value, pos:(Int, Int), anchorClass:String = "left ", symbol:Seq[VDomNode] = Seq.empty) extends Component {
 
-  def render: VHtmlDiffNode = {
+  def render = {
     val (x, y) = pos
     val (n, sub) = name
 
@@ -36,7 +36,7 @@ object ValueLabel {
     s"M 0 0 l $stemLength 0 l ${-headLength} ${-headWidth} M $stemLength 0 l ${-headLength} ${headWidth}"
   }
 
-  def currentArrow(pos:(Int, Int), direction:Orientation):VHtmlNode = {
+  def currentArrow(pos:(Int, Int), direction:Orientation):VDomNode = {
     val (x, y) = pos
 
     SVG.g(^.cls := "current-arrow", ^.attr("transform") := s"translate(${x}, ${y}) rotate(${direction.deg})",
@@ -44,7 +44,7 @@ object ValueLabel {
     )
   }
 
-  def voltageMarkers(pos:(Int, Int), neg:(Int, Int)):VHtmlNode = {
+  def voltageMarkers(pos:(Int, Int), neg:(Int, Int)):VDomNode = {
     val (x1, y1) = pos
     val (x2, y2) = neg
 

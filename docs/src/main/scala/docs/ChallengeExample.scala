@@ -1,6 +1,5 @@
 package docs
 
-import com.wbillingsley.veautiful.DiffNode
 import com.wbillingsley.veautiful.templates.Challenge
 import com.wbillingsley.veautiful.html.{<}
 import org.scalajs.dom.{Element, Node}
@@ -10,7 +9,7 @@ object ChallengeExample {
   case class YouTubeStage(content:String) extends Challenge.Stage:
     val kind = "video"
     var rendered = false
-    override def render: DiffNode[Element, Node] = {
+    override def render = {
       rendered = true
       <.div(Challenge.textColumn(Common.markdown(content)))
     }
@@ -19,7 +18,7 @@ object ChallengeExample {
   class MarkdownStage(content:String) extends Challenge.Stage:
     val kind = "text"
     var rendered = false
-    override def render: DiffNode[Element, Node] = {
+    override def render = {
       rendered = true
       <.div(Challenge.textColumn(Common.markdown(content)))
     }
@@ -43,7 +42,7 @@ object ChallengeExample {
       MarkdownStage(
         """## Defining challenges
           |
-          |Each level is made up of `Stage`s. This is a `VHtmlComponent` that is also required to implement two
+          |Each level is made up of `Stage`s. This is a `DHtmlComponent` that is also required to implement two
           |extra methods:
           |
           |* `completion`, to report whether it is `Open`, `Incomplete`, or `Complete`

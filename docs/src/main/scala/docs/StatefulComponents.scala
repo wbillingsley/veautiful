@@ -1,8 +1,8 @@
 package docs
 
-import com.wbillingsley.veautiful.html.{<, VHtmlComponent, ^, EventMethods}
+import com.wbillingsley.veautiful.html.{<, DHtmlComponent, ^, EventMethods}
 
-case class Greeter() extends VHtmlComponent {
+case class Greeter() extends DHtmlComponent {
 
   private var name:String = ""
 
@@ -17,12 +17,12 @@ case class Greeter() extends VHtmlComponent {
 }
 
 def statefulComponents = <.div(Common.markdown("""
-    |# Stateful Components
+    |# Stateful components
     |
-    |If your component needs to keep some ephemeral local state, implement it as a *case class* extending 
-    |`VHtmlComponent`. 
+    |If your component needs to keep some ephemeral local state, implementing it as a class extending 
+    |`DHtmlComponent`. Usually a case class.
     |
-    |This requires you to implement a `render` method to describe the tree your component should produce. 
+    |`DHtmlComponent` requires you to implement a `render` method to describe the tree your component should produce. 
     |This should produce a consistent outer element (e.g. a `<.div()` or a `<.span()`), but its contents can then be
     |whatever you want.
     |
@@ -38,16 +38,16 @@ def statefulComponents = <.div(Common.markdown("""
     Common.markdown(
       """
         |```scala
-        |import com.wbillingsley.veautiful.html.{<, VHtmlComponent, ^, EventMethods}
+        |import com.wbillingsley.veautiful.html.{<, DHtmlComponent, ^, EventMethods}
         |
-        |case class Greeter() extends VHtmlComponent {
+        |case class Greeter() extends DHtmlComponent {
         |
         |  private var name:String = "World"
         |
         |  override def render = <.div(^.cls := "hello-world",
         |    <.input(
         |      ^.prop("value") := name,
-        |      ^.attr("placeholder") := "Hello who?", ^.on("input") ==> { e => e.inputValue.foreach(name = _); rerender() }
+        |      ^.attr("placeholder") := "Hello who?", ^.onInput ==> { e => e.inputValue.foreach(name = _); rerender() }
         |    ),
         |    <.span(s" Hello ${ (if (name.isEmpty) "World" else name) }"),
         |  )
@@ -64,15 +64,28 @@ def statefulComponents = <.div(Common.markdown("""
     |there's some component in the tree where it's obvious you'll want to trigger a re-renders &mdash; even if only the
     |site's router.
     |
-    |Typically, components are implemented as `case classes`. This is not a strict requirement, but it makes things
-    |much simpler to write because components that use a virtual DOM style (reconciling their children for updates)
-    |use equality to determine whether a component needs to be replaced or can just be asked to reconcile itself.
+    |Often, components are implemented as `case classes`. This tells the reconciler when to try to retain your component and
+    |when to replace it. The default strategy is to try to keep your component if it equals the target, and replace it if it doesn't.
     |Making your component a case class makes it simple and clear to show what would make your component "not equal"
     |to another instance of itself (and require replacement).
     |
+    |However, if you don't want your component to be a case class, you can also implement `Keep(value)` to tell the reconciler
+    |when to keep your component.
+    |
+    |e.g. 
+    |
+    |```scala
+    |// This isn't a case class, so `MyComponent(1, 2) != MyComponent(1, 2)` 
+    |// But because it implements Keep((a, b)), the component would be hinted as being retained rather than replaced.
+    |class MyComponent(a:Int, b:Int) extends DHtmlComponent with Keep((a, b)) {
+    |  val now = System.currentTimeMillis
+    |  def render = p(s"I was created at $now, and $a + $b = ${a + b}")
+    |}
+    |```
+    |
     |## Using external state
     |
-    |You can also define `VHtmlComponents` that use external state - for instance, if your state is kept in a reactive
+    |You can also define `DHtmlComponents` that use external state - for instance, if your state is kept in a reactive
     |date store. In this case, you can just hook the `rerender` method to be triggered by your data store's event notification.
     |
     |Override the `afterAttach` method to install your event hook, and override `beforeDetach` to remove it.

@@ -1,12 +1,12 @@
 package docs
 
 import com.wbillingsley.veautiful.{DiffNode, MutableArrayComponent}
-import com.wbillingsley.veautiful.html.{<, SVG, VHtmlComponent, VHtmlNode, ^}
+import com.wbillingsley.veautiful.html.{<, SVG, DHtmlComponent, VDomNode, ^}
 import org.scalajs.dom
 import org.scalajs.dom.html.Canvas
 import org.scalajs.dom.{Element, MouseEvent, Node, svg}
 
-case class MouseTrails() extends VHtmlNode {
+case class MouseTrails() extends VDomNode {
 
   private var _domNode:Option[Canvas] = None
 
@@ -57,7 +57,7 @@ case class MouseTrails() extends VHtmlNode {
   }
 }
 
-object Particles extends VHtmlComponent {
+object Particles extends DHtmlComponent {
 
   private val particles = Array.fill(1000)((Math.random() * 100, Math.random() * 100))
 
@@ -97,7 +97,7 @@ object Particles extends VHtmlComponent {
     }
   )
 
-  override protected def render: DiffNode[Element, Node] = {
+  override protected def render = {
     <.div(
       plot,
       if (animating) {
@@ -112,13 +112,33 @@ object Particles extends VHtmlComponent {
 }
 
 def advancedComponents = <.div(Common.markdown(
-  """# Advanced Components
+  """# Low level components
     |
-    |At the lowest level, a Veautiful UI is made up of `VNode[N]`s. These are JavaScript objects that can attach to
-    |and control a node in the UI. When working with HTML, these control DOM nodes and elements, and we use the
-    |type alias `VHtmlNode`.
+    |At the lowest level, a Veautiful UI is made up of `VNode[N]`s. These are JavaScript objects that own
+    |and control a node in the UI. When working with HTML, these control DOM nodes and elements, and we use
+    |type aliases like `VDomNode`, `VHtmlElement`, or `VSvgElement`.
     |
-    |This means we can implement components as low-level nodes directly calling operations on their nodes.
+    |A `VNode` has two states
+    |
+    |* *Attached* - that is, it is controlling a DOM node 
+    |* *Umattached* - it's not controlling a DOM node in the tree, and can be passed around like a cheap object
+    |
+    |Effectively, this gives us a tree of View Controllers. But we can pass around trees of *unattached* View Controllers
+    |as if they were a virtual DOM whenever we want.
+    |
+    |`VNode`s go through a very traditional UI lifecycle:
+    |
+    |1. creation
+    |2. before attach / mount
+    |3. attach / mount
+    |4. after attach / mount
+    |5. before detach / unmount
+    |6. detach / unmount
+    |7. after detach / unmount
+    |
+    |## Manually implementing a Veautiful node
+    |
+    |This means we can implement components as low-level `VNode`s by directly calling operations on their nodes.
     |It's a little more verbose, but not complicated.
     |For example, let's do a canvas widget that paints a mouse trail:
     |
@@ -128,12 +148,12 @@ def advancedComponents = <.div(Common.markdown(
     Common.markdown(
       """
         |```scala
-        |import com.wbillingsley.veautiful.html.{VHtmlNode, <, ^}
+        |import com.wbillingsley.veautiful.html.{VDomNode, <, ^}
         |import org.scalajs.dom
         |import org.scalajs.dom.{MouseEvent, Node}
         |import org.scalajs.dom.html.Canvas
         |
-        |case class MouseTrails() extends VHtmlNode {
+        |case class MouseTrails() extends VDomNode {
         |
         |    private var _domNode:Option[Canvas] = None
         |
@@ -142,11 +162,11 @@ def advancedComponents = <.div(Common.markdown(
         |    var points:Seq[(Int, Int)] = Seq.empty
         |
         |    /** Create the real node and make it accessible */
-        |    override def attach(): Node = {
+        |    override def attach() = {
         |      val el = <.canvas(
-        |        ^.attr("style") := "background: white; border-radius: 10px",
+        |        ^.style := "background: white; border-radius: 10px",
         |        ^.attr("width") := 200, ^.attr("height") := 100, ^.cls := "mousetrails",
-        |        ^.on("mousemove") ==> { case e:MouseEvent =>
+        |        ^.onMouseMove ==> { e =>
         |          update((e.clientX.toInt, e.clientY.toInt))
         |        }
         |      ).create()
@@ -188,6 +208,31 @@ def advancedComponents = <.div(Common.markdown(
   ),
   Common.markdown(
     """
+      |## Direct nodes
+      |
+      |More commonly, we might have some JavaScript that produces a real DOM node (e.g. from another library) and we need to incorporate that
+      |node into the tree.
+      |
+      |There's a helper class for this called `DirectElement`
+      |
+      |```scala
+      |import com.wbillingsley.veautiful
+      |import veautiful.html.<
+      |
+      |val domElement:dom.html.Element = somethingThatReturnsAReadDOMElement()
+      |
+      |val directElement = DirectElement(domElement)
+      |
+      |// I can now use this in a render tree
+      |val myFragment = <.div(
+      |  <.h1("Here it is"),
+      |  directElement
+      |)
+      |```
+      |
+      |We can also extend `DirectElement` if we want to manipulate the element ourselves. This isn't a hack; it is idiomatic in Veautiful.
+      |The role of a `VNode` is to *own and control* an element in the tree.
+      |
       |### Example: Mutable Array Components
       |
       |To demonstrate how components can be quite different if they need to be, let's show a `MutableArrayComponent`.
@@ -224,12 +269,12 @@ def advancedComponents = <.div(Common.markdown(
     Common.markdown(
       """
         |```scala
-        |import com.wbillingsley.veautiful.html.{VHtmlNode, <, ^}
+        |import com.wbillingsley.veautiful.html.{VDomNode, <, ^}
         |import org.scalajs.dom
         |import org.scalajs.dom.{MouseEvent, Node}
         |import org.scalajs.dom.html.Canvas
         |
-        |object Particles extends VHtmlComponent {
+        |object Particles extends DHtmlComponent {
         |
         |    private val particles = Array.fill(1000)((Math.random() * 100, Math.random() * 100))
         |
@@ -266,14 +311,14 @@ def advancedComponents = <.div(Common.markdown(
         |      }
         |    )
         |
-        |    override protected def render: DiffNode[Element, Node] = {
+        |    override protected def render = {
         |      <.div(
         |        plot,
         |        <.div(
         |          if (animating) {
-        |            <.button(^.cls := "btn btn-secondary", ^.onClick --> { animating = false; rerender() }, <("i")(^.cls := "fa fa-pause"))
+        |            <.button(^.cls := "btn btn-secondary", ^.onClick --> { animating = false; rerender() }, <.i(^.cls := "fa fa-pause"))
         |          } else {
-        |            <.button(^.cls := "btn btn-secondary", ^.onClick --> start(), <("i")(^.cls := "fa fa-play"))
+        |            <.button(^.cls := "btn btn-secondary", ^.onClick --> start(), <.i(^.cls := "fa fa-play"))
         |          }
         |        )
         |      )
@@ -286,3 +331,4 @@ def advancedComponents = <.div(Common.markdown(
         |""".stripMargin)
   )
 )
+

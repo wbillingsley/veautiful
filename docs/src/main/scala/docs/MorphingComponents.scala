@@ -1,12 +1,12 @@
 package docs
 
 import com.wbillingsley.veautiful.Morphing
-import com.wbillingsley.veautiful.html.{<, Markup, SVG, VHtmlNode, VHtmlComponent, ^}
+import com.wbillingsley.veautiful.html.{<, Markup, SVG, VDomNode, DHtmlComponent, ^}
 import scala.scalajs.js
 import Common._
 
 
-case class MyMorphingComponent()(initialName:String) extends VHtmlComponent with Morphing(initialName) {
+case class MyMorphingComponent()(initialName:String) extends DHtmlComponent with Morphing(initialName) {
   val morpher = createMorpher(this)
   
   var count = 0
@@ -18,7 +18,7 @@ case class MyMorphingComponent()(initialName:String) extends VHtmlComponent with
   
 }
 
-case class BobOrSusan() extends VHtmlComponent {
+case class BobOrSusan() extends DHtmlComponent {
   var toggle = true
   
   def render = <.div(
@@ -70,14 +70,14 @@ def morphingComponents = <.div(
       |* Declare `makeItSo`, which will update the property and then call `update` to trigger the component to rerender
       |  itself.
       |  
-      |It's not a lot of work, but it's common enough that I wrote a helper that keeps it tidy and typesafe:
+      |It's not a lot of work, but it's common enough that the library provides a helper that keeps it tidy and typesafe:
       |
       |## Morphing
       |
-      |When defining a `VHtmlComponent`, you can mix in `Morphing[T]`. For example:
+      |When defining a `DHtmlComponent`, you can mix in `Morphing[T]`. For example:
       |
       |```scala
-      |case class MyMorphingComponent()(initialName:String) extends VHtmlComponent with Morphing(initialName) {
+      |case class MyMorphingComponent()(initialName:String) extends DHtmlComponent with Morphing(initialName) {
       |
       |  // Implementing the trait just requires you to insert this line. 
       |  val morpher = createMorpher(this)
@@ -105,7 +105,7 @@ def morphingComponents = <.div(
     BobOrSusan(), <.p(),
     <.pre(
       """
-        |case class MyMorphingComponent()(initialName:String) extends VHtmlComponent with Morphing(initialName) {
+        |case class MyMorphingComponent()(initialName:String) extends DHtmlComponent with Morphing(initialName) {
         |  val morpher = createMorpher(this)
         |  
         |  var count = 0
@@ -117,7 +117,7 @@ def morphingComponents = <.div(
         |  
         |}
         |
-        |case class BobOrSusan() extends VHtmlComponent {
+        |case class BobOrSusan() extends DHtmlComponent {
         |  var toggle = true
         |  
         |  def render = <.div(
@@ -135,8 +135,8 @@ def morphingComponents = <.div(
       |For a more realistic example, this is how the Doctacular sidebar is defined:
       |
       |```scala
-      |case class SideBarAndLayout()(initL: () => VHtmlNode, initR: () => VHtmlNode, var open:Boolean = true) 
-      |           extends VHtmlComponent with Morphing((initL, initR)) {
+      |case class SideBarAndLayout()(initL: () => VDomNode, initR: () => VDomNode, var open:Boolean = true) 
+      |           extends DHtmlComponent with Morphing((initL, initR)) {
       |
       |  val morpher = createMorpher(this)
       |   
@@ -165,6 +165,7 @@ def morphingComponents = <.div(
       |}
       |```
       |
+      |
       |## Keeping it type-safe
       |
       |You might notice the line:
@@ -178,7 +179,7 @@ def morphingComponents = <.div(
       |If you define a component with a concrete property type, it will compile correctly with no warnings:
       |
       |```scala
-      |case class MyIntMorph()(init:Int) extends VHtmlComponent with Morphing(init) {
+      |case class MyIntMorph()(init:Int) extends DHtmlComponent with Morphing(init) {
       |  val morpher = createMorpher(this)
       |  def render = // Whatever we want to render
       |}
@@ -187,7 +188,7 @@ def morphingComponents = <.div(
       |But suppose we tried to declare a morphing component that had a type parameter for its property:
       |
       |```scala
-      |case class MyAnyMorph[T]()(init:T) extends VHtmlComponent with Morphing(init) {
+      |case class MyAnyMorph[T]()(init:T) extends DHtmlComponent with Morphing(init) {
       |  val morpher = createMorpher(this)
       |  def render = // Whatever we want to render
       |}
@@ -211,5 +212,36 @@ def morphingComponents = <.div(
       |```
       |
       |Rather than have it fail unexpectedly at runtime, we'd prefer to get the warning from the Scala compiler.
+      |
+      |## Retention and Keep
+      |
+      |The first example in the page was defined as a case class, so that it would equal another component of the same type.
+      |
+      |Although that is convenient, it might feel a bit clunky. Is a component with one name really *equal* to another component with a different name?
+      |
+      |If we want to work more cleanly, we can instead change our component's *retention strategy* by mixing in `Keep` or `Keyed`.
+      |
+      |* `Keep` will default to retaining the component if the `Keep` values match - but some reconcilers might replace it anyway for efficiency
+      |* `Keyed` will retain the component if the keys match - and reconcilers will go out of their way to retain the item.
+      |
+      |Generally, use `Keyed` for components that are expensive to replace, like videos, and `Keep` otherwise.
+      |
+      |for example
+      |
+      |```
+      |// This component would be morphed for a different name, but replaced for a different greeting
+      |class MyKeepComponent(greeting:String)(initialName:String) extends DHtmlComponent
+      |  with Keep(greeting) with Morphing(initialName) {
+      |    val morpher = createMorpher(this)
+      |  
+      |    def render =
+      |      val name = prop 
+      |      <.p(s"$greeting $name")
+      |  )
+      |}
+      |```
+      |
+      |
+      |
       |""".stripMargin)
 )
