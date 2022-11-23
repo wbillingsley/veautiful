@@ -1,7 +1,7 @@
 package com.wbillingsley.veautiful.html
 
 import com.wbillingsley.veautiful.reconcilers.Reconciler
-import com.wbillingsley.veautiful.{DefaultNodeOps, DiffNode, NodeOps, VNode}
+import com.wbillingsley.veautiful.{DefaultNodeOps, DiffNode, NodeOps, VNode, Blueprint}
 import org.scalajs.dom
 import org.scalajs.dom.{Element, Node}
 
@@ -24,12 +24,13 @@ object Attacher {
 
     var domNode:Option[dom.Element] = None
 
-    def render(e: VNode[dom.Node]):Unit = {
+    def render(e: VNode[dom.Node] | Blueprint[VNode[dom.Node]]):Unit = {
       _children = reconciler.updateChildren(this, collection.Seq(e))
     }
 
     override def makeItSo = 
       case e:VNode[dom.Node] @unchecked => render(e)
+      case e:Blueprint[VNode[dom.Node]] @unchecked => render(e)
 
     override def nodeOps: Option[NodeOps[Node]] = domNode.map(DefaultNodeOps(_))
 

@@ -23,7 +23,7 @@ lazy val commonSettings = Seq(
   scalaVersion := scalaVersionStr,
 
   libraryDependencies ++= Seq(
-    "org.scala-js" %%% "scalajs-dom" % "2.2.0",
+    "org.scala-js" %%% "scalajs-dom" % "2.3.0",
     "org.scalameta" %%% "munit" % "0.7.26" % Test
   ),
 

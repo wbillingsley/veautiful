@@ -11,18 +11,20 @@ import org.scalajs.dom.html.Canvas
 def intro = <.div(
   <.p(^.cls := "logo",
     Common.logoWithTitle(200, 200),
-    <.p(^.cls := "logo-slogan", "A devastatingly simple Scala.js front end")
+    <.p(^.cls := "logo-slogan", "A devastatingly simple Scala.js front end.")
   ),
   Common.markdown(
     """
-      |Veautiful is a small but effective web front end for Scala.js, written by [Will Billingsley](https://www.wbillingsley.com).
+      |Veautiful is a web front end for Scala.js, written by [Will Billingsley](https://www.wbillingsley.com).
+      |It combines low level control with high level ease of use. 
       |
       |I wanted something flexible enough to write explorable explanations (teaching materials with embedded models and simulations)
-      |but that would feel simpler to use than common frameworks such as React.
-      |
+      |but that would feel simpler to use than common frameworks such as React. 
       |As I have also written university courses in Scala and Advanced Web Programming, I also wanted its concepts to be
-      |straightforward enough to teach to undergraduate students in less than a week. (It's origin story is I got bored of
-      |teaching *how to use* front end toolkits and )
+      |straightforward enough to teach to undergraduate students in less than a week. It's origin story is that in 2017 I got bored of
+      |teaching *how to use* front end toolkits and decided to try creating one small enough I could show how it was built. The
+      |first version was only around 400 lines of code. It's grown, but I try to keep it as simple as possible, while still letting me
+      |be expressive writing explorable explanations and interactive materials.
       |
       |### Veautifully Built
       |
@@ -46,7 +48,7 @@ def intro = <.div(
       |doctacular (a system for publishing docs or teaching sites) are published to Maven Central.
       |
       |```
-      |"com.wbillingsley" %%% "veautiful" % "0.3-M1" // just the core toolkit, latest milestone
+      |"com.wbillingsley" %%% "veautiful" % "0.3-M2" // just the core toolkit, latest milestone
       |"com.wbillingsley" %%% "veautiful" % "0.3-SNAPSHOT" // just the core toolkit, latest snapshot
       |```
       |
@@ -62,8 +64,8 @@ def intro = <.div(
       |Scala is a mixed paradigm language that permits imperative code *and* makes functional code pleasent to write. 
       |Veautiful is a mixed paradigm framework that permits low-level imperative manipulation of elements *and* makes declarative UIs pleasant to write. 
       |
-      |Most frameworks make you choose between a Virtual DOM and direct updates. Veautiful lets your *components*
-      |choose. In practice, this makes writing UIs that can have some very complex behaviours simpler and clearer.
+      |The toolkit starts from some very small low-level primitives, but quickly provides classes that give you the smooth
+      |declarative style of UI writing you might be looking for. 
       |
       |e.g.:
       |
@@ -76,9 +78,6 @@ def intro = <.div(
       |interactive widgets that needed to work differently because they *were different*. From simulations of a thousand molecules,
       |to programmable maze games, to circuits simulating the voltages in wires in a register of flip-flops, to plain old 
       |forms and pages. So that's what my toolkit tries to make easy to do.
-      |
-      |So, the toolkit starts from some very small low-level primitives, but quickly provides classes that give you the smooth
-      |declarative style of UI writing you might be looking for. 
       |
       |""".stripMargin
   ),

@@ -2,7 +2,7 @@ package com.wbillingsley.veautiful.html
 
 import com.wbillingsley.veautiful
 import com.wbillingsley.veautiful.reconcilers.Reconciler
-import com.wbillingsley.veautiful.{DefaultNodeOps, DiffNode, NodeOps, VNode}
+import com.wbillingsley.veautiful.{DefaultNodeOps, DiffNode, NodeOps, VNode, Blueprint}
 import org.scalajs.dom
 import org.scalajs.dom.{Element, Event, Node, html}
 
@@ -14,6 +14,7 @@ sealed trait PredefinedElementChild
 object PredefinedElementChild {
   case class AttrVal(name:String, value:String) extends PredefinedElementChild
   case class PropVal(name:String, value:js.Any) extends PredefinedElementChild
+  case class KeyVal(key:Any) extends PredefinedElementChild
   case class InlineStyle(name:String, value:String) extends PredefinedElementChild
   case class EventListener[-T <: Event](`type`:String, func:Function[T, _], capture:Boolean=false) extends PredefinedElementChild //TODO: Add other flags, e.g. once & passive
 }
@@ -77,7 +78,7 @@ class DElement[+T <: dom.Element](name:String, var uniqEl:Option[Any] = None, ns
    */
   override def retention: Retention = uniqEl match {
     case Some(key) => Retention.Keyed(key)
-    case _ => Retention.Keep(name)
+    case _ => Retention.Keep((name, ns))
   }
 
   private var attributes:mutable.Map[String, PredefinedElementChild.AttrVal] = mutable.Map.empty
@@ -235,6 +236,7 @@ class DElement[+T <: dom.Element](name:String, var uniqEl:Option[Any] = None, ns
       case s:String => addChildren(Text(s))
       case a:AttrVal => attrs(a)
       case p:PropVal => prop(p)
+      case KeyVal(k) => uniqEl = Option(k)
       case s:InlineStyle => style(s)
       case l:EventListener[_] => on(l)
       case appliable:CustomElementChild[T] @unchecked => appliable.applyTo(this)
@@ -279,13 +281,47 @@ class DElement[+T <: dom.Element](name:String, var uniqEl:Option[Any] = None, ns
   override def nodeOps: Option[NodeOps[Node]] = domNode.map(DefaultNodeOps(_))
 
   override def makeItSo = {
-    case to:DElement[T] => 
+    // We leave this unchecked because conventionally, we'll only be calling makeItSo if the target has matched the retention strategy
+    case to:DElement[T] @unchecked => 
       updateSelf(to)
       updateChildren(to.children)
+    case bp:Blueprint[DElement[T]] @unchecked => 
+      val target = bp.build() // TODO: Update directly from a DElementBlueprint for better efficiency
+      makeItSo(bp)
   }
+}
 
+/**
+  * A Blueprint for a DElement
+  *
+  * @param name the tag of the element
+  * @param key will cause the element to use the Keyed retention strategy
+  * @param ns the namespace of the element
+  * @param modifiers any number of ElementChildren, applied in order
+  */
+class DElementBlueprint[+T <: dom.Element](name:String, ns:String = DElement.htmlNS, modifiers:Seq[ElementChild[T]] = Seq.empty) 
+  extends Blueprint[DElement[T]](classOf[DElement[T]]) {
+
+    def apply(modifiers:ElementChild[T]*):DElementBlueprint[T] = DElementBlueprint[T](name, ns, this.modifiers ++ modifiers)
+
+    /** Our key is set by the modifiers. As it's possible to apply ^.key := more than once, we pick the last one. */
+    lazy val lastKey:Option[Any] = modifiers.collect({ case PredefinedElementChild.KeyVal(x) => x}).lastOption
+
+    override def build(): DElement[T] = DElement(name, key, ns)(modifiers*)
+
+    /** Alias for build, to be explicit it's the VNode not the DOM node we're building */
+    def vnode() = build()
+
+    /**
+     * Our DOM elements can be given a key in their properties, so the retention strategy is dynamic: Keyed if a key is set; Keep(element name) if not
+     */
+    override def retention: Retention = lastKey match {
+      case Some(key) => Retention.Keyed(key)
+      case _ => Retention.Keep((name, ns))
+    }    
 
 }
+
 
 /**
   * Trait implemented by the HTML and SVG objects
@@ -307,7 +343,7 @@ trait DElementBuilder[T <: dom.Element](defaultTag:String, defaultNS:String) {
 
 
 
-object ^ {
+trait ModifierDSL {
 
   import PredefinedElementChild.*
 
@@ -327,42 +363,69 @@ object ^ {
     def ?=(j:Option[String]) = PropVal(n, j.orNull[String])
   }
 
-  object Keyable {
-    def :=(k: String): CustomElementChild[Element] = new CustomElementChild[dom.Element] {
-      override def applyTo[TT <: Element](d: DElement[TT]): Unit = {
-        d.uniqEl = Some(k)
-      }
-    }
-  }
-
   object reconciler {
     def :=(r:Reconciler) = new ElementAction[dom.Element]({ x => x.reconciler = r })
   }
 
-  def key = Keyable
+  object key {
+    def :=(k: String) = KeyVal(k)
+  }
 
   def attr(x:String) = Attrable(x)
 
   def prop(n:String) = Propable(n)
 
-  def alt = Attrable("alt")
-  def style = Attrable("style")
-  def src = Attrable("src")
-  def `class` = Attrable("class")
+  def alt = attr("alt")
+  def style = attr("style")
+  def src = attr("src")
+  def `class` = attr("class")
   def cls = `class`
-  def role = Attrable("role")
-  def href = Attrable("href")
+  def role = attr("role")
+  def href = attr("href")
 
-  case class Lsntrable(n:String) {
-    def -->(e: => Unit ) = EventListener[Event](n, (x:Event) => e, false)
+  case class Lsntrable[T <: Event](n:String) {
+    def -->(e: => Unit ) = EventListener[T](n, (x:T) => e, false)
 
-    def ==>(f: (Event) => Unit) = {
+    def ==>(f: (T) => Unit) = {
       EventListener(n, f, false)
     }
   }
 
-  def onClick = Lsntrable("click")
-  def on(s:String) = Lsntrable(s)
+  def on[T <: Event](s:String) = Lsntrable[T](s)
+
+  def onClick = Lsntrable[dom.MouseEvent]("click")
+  def onDblClick = Lsntrable[dom.MouseEvent]("dblclick")
+  def onMouseDown = Lsntrable[dom.MouseEvent]("mousedown")
+  def onMouseEnter = Lsntrable[dom.MouseEvent]("mouseenter")
+  def onMouseLeave = Lsntrable[dom.MouseEvent]("mouseleave")
+  def onMouseMove = Lsntrable[dom.MouseEvent]("mousemove")
+  def onMouseOut = Lsntrable[dom.MouseEvent]("mouseout")
+  def onMouseOver = Lsntrable[dom.MouseEvent]("mouseover")
+  def onMouseUp = Lsntrable[dom.MouseEvent]("mouseup")
+
+  def onPointerCancel = Lsntrable[dom.PointerEvent]("pointercancel")
+  def onPointerDown = Lsntrable[dom.PointerEvent]("pointerdown")
+  def onPointerEnter = Lsntrable[dom.PointerEvent]("pointerenter")
+  def onPointerLeave = Lsntrable[dom.PointerEvent]("pointerleave")
+  def onPointerMove = Lsntrable[dom.PointerEvent]("pointermove")
+  def onPointerOut = Lsntrable[dom.PointerEvent]("pointerout")
+  def onPointerOver = Lsntrable[dom.PointerEvent]("pointerover")
+  def onPointerUp = Lsntrable[dom.PointerEvent]("pointerup")
+
+  def onTouchCancel = Lsntrable[dom.TouchEvent]("touchcancel")
+  def onTouchEnd = Lsntrable[dom.TouchEvent]("touchend")
+  def onTouchMove = Lsntrable[dom.TouchEvent]("touchmove")
+  def onTouchStart = Lsntrable[dom.TouchEvent]("touchstart")
+
+  def onScroll = Lsntrable[dom.Event]("scroll")
+
+  def onBlur = Lsntrable[dom.FocusEvent]("blur")
+  def onFocus = Lsntrable[dom.FocusEvent]("focus")
+  def onFocusIn = Lsntrable[dom.FocusEvent]("focusin")
+  def onFocusOut = Lsntrable[dom.FocusEvent]("focusout")
+
+  def onKeyDown = Lsntrable[dom.KeyboardEvent]("keydown")
+  def onKeyUp = Lsntrable[dom.KeyboardEvent]("keyup")
 
   case class InlineStylable(n:String) {
     def :=(v:String) = InlineStyle(n, v)

@@ -70,7 +70,7 @@ def morphingComponents = <.div(
       |* Declare `makeItSo`, which will update the property and then call `update` to trigger the component to rerender
       |  itself.
       |  
-      |It's not a lot of work, but it's common enough that I wrote a helper that keeps it tidy and typesafe:
+      |It's not a lot of work, but it's common enough that the library provides a helper that keeps it tidy and typesafe:
       |
       |## Morphing
       |
@@ -165,6 +165,7 @@ def morphingComponents = <.div(
       |}
       |```
       |
+      |
       |## Keeping it type-safe
       |
       |You might notice the line:
@@ -211,5 +212,36 @@ def morphingComponents = <.div(
       |```
       |
       |Rather than have it fail unexpectedly at runtime, we'd prefer to get the warning from the Scala compiler.
+      |
+      |## Retention and Keep
+      |
+      |The first example in the page was defined as a case class, so that it would equal another component of the same type.
+      |
+      |Although that is convenient, it might feel a bit clunky. Is a component with one name really *equal* to another component with a different name?
+      |
+      |If we want to work more cleanly, we can instead change our component's *retention strategy* by mixing in `Keep` or `Keyed`.
+      |
+      |* `Keep` will default to retaining the component if the `Keep` values match - but some reconcilers might replace it anyway for efficiency
+      |* `Keyed` will retain the component if the keys match - and reconcilers will go out of their way to retain the item.
+      |
+      |Generally, use `Keyed` for components that are expensive to replace, like videos, and `Keep` otherwise.
+      |
+      |for example
+      |
+      |```
+      |// This component would be morphed for a different name, but replaced for a different greeting
+      |class MyKeepComponent(greeting:String)(initialName:String) extends DHtmlComponent
+      |  with Keep(greeting) with Morphing(initialName) {
+      |    val morpher = createMorpher(this)
+      |  
+      |    def render =
+      |      val name = prop 
+      |      <.p(s"$greeting $name")
+      |  )
+      |}
+      |```
+      |
+      |
+      |
       |""".stripMargin)
 )

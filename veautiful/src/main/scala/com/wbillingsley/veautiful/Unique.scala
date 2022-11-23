@@ -26,7 +26,6 @@ class Unique[N](val delegate: VNode[N]) extends VNode[N] with Update {
     case u:Update => u.update()
     case _ => // Do nothing
   }
-  
 }
 
 

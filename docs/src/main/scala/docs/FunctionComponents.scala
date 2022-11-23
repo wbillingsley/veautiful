@@ -6,13 +6,13 @@ import org.scalajs.dom
 def pureFunctions = <.div(
   Common.markdown(
     """
-      |# Function components
+      |# Functions as components
       |
-      |In many cases, reusable components can just be functions that return a `VDomNode`. For example, from this documentation
+      |In many cases, reusable components can just be functions that return `DHtmlContent` (or `DSvgContent` for SVG). For example, from this documentation
       |site:
       |
       |```scala
-      |def linkToRoute(r:ExampleRoute, s:String):VDomNode = <.a(
+      |def linkToRoute(r:ExampleRoute, s:String):VHtmlContent = <.a(
       |  ^.href := Router.path(r),
       |  ^.cls := (if (Router.route == r) "toc-link active" else "toc-link"),
       |  s
@@ -22,7 +22,7 @@ def pureFunctions = <.div(
       |Then you can just call that function in other component functions
       |
       |```scala
-      |def leftMenu:VDomNode = <("nav")(^.cls := "d-none d-md-block",
+      |def leftMenu:DHtmlContent = <.nav(^.cls := "d-none d-md-block",
       |  <.div(^.cls := "sidebar-sticky",
       |    <.ul(^.cls := "toc",
       |      for { (r, t) <- routes } yield <.li(
@@ -34,34 +34,49 @@ def pureFunctions = <.div(
       |)
       |```
       |
-      |## Functions not values
+      |### Until 0.3-M3, prefer functions to values 
       |
-      |You should always define these as *functions*, not *values*. The virtual HTML nodes you are creating are,
-      |behind the scenes, *mutable*. When rendered into the document, they each attach themselves to a node within the page.
-      |This means, for instance, that a single `<.div()` can only exist in one location within the page.
+      |**Until 0.3-M3**, you should define these as functions, rather than values. 
       |
-      |By default, they can also be asked to morph themselves during the page update process. 
-      |One `<.div()` that is being removed might instead be asked to update its content to match another `<.div()`. 
-      |If you try to store a div in a `val`, you might be surprised to find it holding different children after the page update.
+      |Each `DHtmlElement`, when it is mounted in the page, "owns" a single DOM element. That means it can only appear once in the DOM tree.
+      |It's also intentionally mutable. A `DHtmlElement`'s key skill is that it can morph itself to match a target. This helps us to 
+      |declare our components and views in a declarative style, just stating what their output should look like, but still preserve as
+      |many of the real nodes in the DOM (with all their ephemeral state, like scroll position and loaded videos).
       |
-      |We'll save the reasons why for the design section, but briefly, `<.div()` isn't a low-level node in the virtual DOM. 
-      |It's a powerful component that declares it implements `MakeItSo` &mdash; a trait that indicates it can morph itself 
-      |to match another component of the same type (another `<.div()`), rather than needing to be pulled out of the tree 
-      |and replaced during a page update.
+      |By design, `DHtmlElement`s declare that their retention strategy is to morph them to match any element with the same tag name.
       |
-      |Later on, we'll see some more unique things you can do with it - such as instructing one to change its update
-      |strategy.
+      |However, that mutability can come as a surprise if you've said something like
       |
-      |*Caveat* - If you really do want to store one in a `val`, set its `^.key` to a unique value:
-      | 
       |```scala
-      |<.div(
-      |  ^.key := "my special component 678a942",
-      |  "Now this will only morph itself to match a div with the same key"
+      |val myPage1 = <.article(
+      |  <.h1("This is page 1")
       |)
       |```
       |
-      |It will only try to morph itself to match an element with the same tag and key. So, if the key is unique, you are
-      |safe from other components accidentally modifying it and can keep it in a `val`.
+      |only to find out later the `DHtmlElement` in the `myPage1` val has morphed itself to match page 2.
+      |
+      |If you do want to store one in a `val` rather than a `def`, though, there's a helper for that
+      | 
+      |```scala
+      |Unique(<.div(
+      |  "This node will only be considered equivalent to itself; it won't morph to match any other div"
+      |))
+      |```
+      |
+      |### From 0.3-M3, you can just use `val`
+      |
+      |The next release will switch the HTML DSL over so that instead of producing real `DHtmlElement`s, it 
+      |produces immutable `Blueprint`s for them (`DHtmlBlueprint`). As of 0.3-M2, we can ask elements
+      |to morph themselves to match either another element or a blueprint for one. In 0.3-M3, the HTML
+      |DSL will produce Blueprints by default.
+      |
+      |This is not a source compatible change. In the locations where you have put a `DHtmlElement` into a 
+      |`val`, you'll get a type error as it gives you a `DHtmlBlueprint` instead. You can fix it by calling
+      |`.build()` on the blueprint to get a real `DHtmlElement`.
+      |
+      |The type `DHtmlContent`, that you can see in the first example in the page, is a type alias for
+      |`DHtmlElement | DHtmlBlueprint`. That code example won't be affected - it'll just change which side of
+      |the union type it is producing.
+      |
       |""".stripMargin)
 )

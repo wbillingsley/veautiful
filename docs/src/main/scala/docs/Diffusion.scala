@@ -1,7 +1,7 @@
 package docs
 
 import com.wbillingsley.veautiful._
-import com.wbillingsley.veautiful.html.{<, DElement, ElementComponent, SVG, VDomNode, ^, VHTMLElement, DSvgElement}
+import com.wbillingsley.veautiful.html.{<, DElement, ElementComponent, SVG, VDomNode, ^, DHtmlElement, DSvgElement}
 import org.scalajs.dom
 import org.scalajs.dom.Node
 import org.scalajs.dom.HTMLInputElement
@@ -141,7 +141,7 @@ object Diffusion {
       moleculeNodes = Simulation.molecules.map { m => new MoleculeView(m) }
     }
 
-    val style:VHTMLElement = <("style")(
+    val style:DHtmlElement = <.style(
       """
         |svg {
         |  background: none;
@@ -173,7 +173,7 @@ object Diffusion {
     /**
      * The SVG that will contain the asteroid field
      */
-    def svg:DSvgElement = <.svg.attrs(
+    def svg:DSvgElement = <.svg(
       ^.attr("viewbox") := s"${Simulation.bounds.p1.x} ${Simulation.bounds.p1.y} ${Simulation.bounds.p2.x} ${Simulation.bounds.p2.y}",
       ^.attr("width") := s"${Simulation.bounds.p2.x - Simulation.bounds.p1.x}",
       ^.attr("height") := s"${Simulation.bounds.p2.y - Simulation.bounds.p1.y}"
@@ -181,7 +181,8 @@ object Diffusion {
 
     /** Turns an asteroid into an SVG DElement */
     def svgMolecule(m:Molecule):VDomNode = {
-      <("circle", ns=DElement.svgNS, u=Random.nextString(7))(
+      SVG.circle(
+        ^.key := Random.nextString(7),
         ^.attr("cx") := m.position.x, ^.attr("cy") := m.position.y, ^.attr("r") := 3,
         ^.cls := (if (m.ordinary) "molecule ordinary" else "molecule tracked")
       )
@@ -223,22 +224,22 @@ object Diffusion {
 
           <.div(^.cls := "form-row",
             <.div(^.cls := "btn-group col-md-3",
-              <("button")(
+              <.button(
                 ^.cls := "btn btn-sm btn-secondary", ^.onClick --> stopTicking(),
-                <("i")(^.cls := "fa fa-pause")
+                <.i(^.cls := "fa fa-pause")
               ),
-              <("button")(
+              <.button(
                 ^.cls := "btn btn-sm btn-secondary", ^.onClick --> startTicking(),
-                <("i")(^.cls := "fa fa-play")
+                <.i(^.cls := "fa fa-play")
               ),
-              <("button")(
+              <.button(
                 ^.cls := "btn btn-sm btn-secondary", ^.onClick --> reset(), "Reset"
               )
             ),
 
             <.div(^.cls := "input-group col-md-3",
               <.div(^.cls := "input-group-prepend", <.span(^.cls := "input-group-text", "Heat")),
-              <("input")(^.attr("type") := "number", ^.cls := "form-control",
+              <.input(^.attr("type") := "number", ^.cls := "form-control",
                 ^.attr("value") := Simulation.heat,
                 ^.on("change") ==> { event =>
                   event.target match {

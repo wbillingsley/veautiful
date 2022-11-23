@@ -17,7 +17,7 @@ case class Greeter() extends DHtmlComponent {
 }
 
 def statefulComponents = <.div(Common.markdown("""
-    |# Stateful Components
+    |# Stateful components
     |
     |If your component needs to keep some ephemeral local state, implementing it as a class extending 
     |`DHtmlComponent`. Usually a case class.
@@ -47,7 +47,7 @@ def statefulComponents = <.div(Common.markdown("""
         |  override def render = <.div(^.cls := "hello-world",
         |    <.input(
         |      ^.prop("value") := name,
-        |      ^.attr("placeholder") := "Hello who?", ^.on("input") ==> { e => e.inputValue.foreach(name = _); rerender() }
+        |      ^.attr("placeholder") := "Hello who?", ^.onInput ==> { e => e.inputValue.foreach(name = _); rerender() }
         |    ),
         |    <.span(s" Hello ${ (if (name.isEmpty) "World" else name) }"),
         |  )
