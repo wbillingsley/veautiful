@@ -1,7 +1,7 @@
 package com.wbillingsley.veautiful.doctacular
 
 import com.wbillingsley.veautiful.Morphing
-import com.wbillingsley.veautiful.html.{<, VHtmlComponent, VHtmlDiffNode, VHtmlNode, ^, StyleSuite, unique, Styling}
+import com.wbillingsley.veautiful.html.{<, DHtmlComponent, VHtmlDiffNode, VDomNode, ^, StyleSuite, unique, Styling}
 import com.wbillingsley.veautiful.templates.{DefaultVSlidesPlayer, Sequencer, VSlides, VSlidesConfig, WindowScaler, WindowWidthScaler}
 import org.scalajs.dom
 import org.scalajs.dom.raw.{Event, HTMLElement}
@@ -11,7 +11,7 @@ case class DoctacularFSVSlidesPlayer(
   override val key: Option[String] = None, scaleToWindow:Boolean = true
 )(
   index: Int = 0
-) extends VHtmlComponent with Morphing(index) {
+) extends DHtmlComponent with Morphing(index) {
   val morpher = createMorpher(this)
   
   private val internalOnIndexChange: Int => Unit = { i =>
@@ -22,7 +22,7 @@ case class DoctacularFSVSlidesPlayer(
     ^.onClick --> site.router.routeTo(site.DeckRoute(deckName, 0)), "⛶"
   )
 
-  override def render: VHtmlDiffNode = {
+  override def render = {
     val index = prop
 
     val sequencer = Sequencer()(
@@ -39,7 +39,7 @@ case class DoctacularVSlidesGallery(
   site: Site, deckName: String, deck: VSlides,
   override val key: Option[String] = None, scaleToWindow:Boolean = true)(
   index: Int = 0
-) extends VHtmlComponent with Morphing(index) {
+) extends DHtmlComponent with Morphing(index) {
   val morpher = createMorpher(this)
 
   private val internalOnIndexChange: Int => Unit = { i =>
@@ -47,7 +47,7 @@ case class DoctacularVSlidesGallery(
   }
 
 
-  override def render: VHtmlDiffNode = {
+  override def render = {
     val index = prop
     
     <.div(
@@ -81,14 +81,14 @@ class DeckLayout(site:Site) {
     ":hover" -> "filter: brightness(115%);"
   ).register()
   
-  def renderDeckFS(site:Site, name:String, deck:DeckResource, page:Int):VHtmlNode = {
+  def renderDeckFS(site:Site, name:String, deck:DeckResource, page:Int):VDomNode = {
     deck.fullScreenPlayer match {
       case Some(player) => player(name, page)
       case None => deck.defaultView(name)
     }
   }
 
-  def alternativesButtons(site:Site, name:String, deck:DeckResource, page:Int):VHtmlNode = <.p(
+  def alternativesButtons(site:Site, name:String, deck:DeckResource, page:Int):VDomNode = <.p(
     (for fsSupperted <- deck.fullScreenPlayer yield 
       <.button(^.cls := fsButtonStyle.className,
         ^.onClick --> site.router.routeTo(site.FullScreenDeckRoute(name, page)),
@@ -108,7 +108,7 @@ class DeckLayout(site:Site) {
       )
   )
 
-  def renderDeckGallery(site:Site, name:String, deck:DeckResource, page:Int):VHtmlNode = {
+  def renderDeckGallery(site:Site, name:String, deck:DeckResource, page:Int):VDomNode = {
     site.pageLayout.renderPage(
       site,
       <.div(
@@ -122,7 +122,7 @@ class DeckLayout(site:Site) {
     )
   }
 
-  def renderDeckNFS(site:Site, name:String, deck:DeckResource, page:Int):VHtmlNode = {
+  def renderDeckNFS(site:Site, name:String, deck:DeckResource, page:Int):VDomNode = {
     site.pageLayout.renderPage(site, 
       deck.fullScreenPlayer match {
         case Some(player) => <.div(^.key := "vslide-example2", ^.cls := "resizable", player(name, page))

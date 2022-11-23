@@ -1,12 +1,12 @@
 package docs
 
 import com.wbillingsley.veautiful.Morphing
-import com.wbillingsley.veautiful.html.{<, Markup, SVG, VHtmlNode, VHtmlComponent, ^}
+import com.wbillingsley.veautiful.html.{<, Markup, SVG, VDomNode, DHtmlComponent, ^}
 import scala.scalajs.js
 import Common._
 
 
-case class MyMorphingComponent()(initialName:String) extends VHtmlComponent with Morphing(initialName) {
+case class MyMorphingComponent()(initialName:String) extends DHtmlComponent with Morphing(initialName) {
   val morpher = createMorpher(this)
   
   var count = 0
@@ -18,7 +18,7 @@ case class MyMorphingComponent()(initialName:String) extends VHtmlComponent with
   
 }
 
-case class BobOrSusan() extends VHtmlComponent {
+case class BobOrSusan() extends DHtmlComponent {
   var toggle = true
   
   def render = <.div(
@@ -74,10 +74,10 @@ def morphingComponents = <.div(
       |
       |## Morphing
       |
-      |When defining a `VHtmlComponent`, you can mix in `Morphing[T]`. For example:
+      |When defining a `DHtmlComponent`, you can mix in `Morphing[T]`. For example:
       |
       |```scala
-      |case class MyMorphingComponent()(initialName:String) extends VHtmlComponent with Morphing(initialName) {
+      |case class MyMorphingComponent()(initialName:String) extends DHtmlComponent with Morphing(initialName) {
       |
       |  // Implementing the trait just requires you to insert this line. 
       |  val morpher = createMorpher(this)
@@ -105,7 +105,7 @@ def morphingComponents = <.div(
     BobOrSusan(), <.p(),
     <.pre(
       """
-        |case class MyMorphingComponent()(initialName:String) extends VHtmlComponent with Morphing(initialName) {
+        |case class MyMorphingComponent()(initialName:String) extends DHtmlComponent with Morphing(initialName) {
         |  val morpher = createMorpher(this)
         |  
         |  var count = 0
@@ -117,7 +117,7 @@ def morphingComponents = <.div(
         |  
         |}
         |
-        |case class BobOrSusan() extends VHtmlComponent {
+        |case class BobOrSusan() extends DHtmlComponent {
         |  var toggle = true
         |  
         |  def render = <.div(
@@ -135,8 +135,8 @@ def morphingComponents = <.div(
       |For a more realistic example, this is how the Doctacular sidebar is defined:
       |
       |```scala
-      |case class SideBarAndLayout()(initL: () => VHtmlNode, initR: () => VHtmlNode, var open:Boolean = true) 
-      |           extends VHtmlComponent with Morphing((initL, initR)) {
+      |case class SideBarAndLayout()(initL: () => VDomNode, initR: () => VDomNode, var open:Boolean = true) 
+      |           extends DHtmlComponent with Morphing((initL, initR)) {
       |
       |  val morpher = createMorpher(this)
       |   
@@ -178,7 +178,7 @@ def morphingComponents = <.div(
       |If you define a component with a concrete property type, it will compile correctly with no warnings:
       |
       |```scala
-      |case class MyIntMorph()(init:Int) extends VHtmlComponent with Morphing(init) {
+      |case class MyIntMorph()(init:Int) extends DHtmlComponent with Morphing(init) {
       |  val morpher = createMorpher(this)
       |  def render = // Whatever we want to render
       |}
@@ -187,7 +187,7 @@ def morphingComponents = <.div(
       |But suppose we tried to declare a morphing component that had a type parameter for its property:
       |
       |```scala
-      |case class MyAnyMorph[T]()(init:T) extends VHtmlComponent with Morphing(init) {
+      |case class MyAnyMorph[T]()(init:T) extends DHtmlComponent with Morphing(init) {
       |  val morpher = createMorpher(this)
       |  def render = // Whatever we want to render
       |}

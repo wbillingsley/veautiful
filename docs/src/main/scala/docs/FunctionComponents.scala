@@ -8,11 +8,11 @@ def pureFunctions = <.div(
     """
       |# Function components
       |
-      |In many cases, reusable components can just be functions that return a `VHtmlNode`. For example, from this documentation
+      |In many cases, reusable components can just be functions that return a `VDomNode`. For example, from this documentation
       |site:
       |
       |```scala
-      |def linkToRoute(r:ExampleRoute, s:String):VHtmlNode = <.a(
+      |def linkToRoute(r:ExampleRoute, s:String):VDomNode = <.a(
       |  ^.href := Router.path(r),
       |  ^.cls := (if (Router.route == r) "toc-link active" else "toc-link"),
       |  s
@@ -22,7 +22,7 @@ def pureFunctions = <.div(
       |Then you can just call that function in other component functions
       |
       |```scala
-      |def leftMenu:VHtmlNode = <("nav")(^.cls := "d-none d-md-block",
+      |def leftMenu:VDomNode = <("nav")(^.cls := "d-none d-md-block",
       |  <.div(^.cls := "sidebar-sticky",
       |    <.ul(^.cls := "toc",
       |      for { (r, t) <- routes } yield <.li(

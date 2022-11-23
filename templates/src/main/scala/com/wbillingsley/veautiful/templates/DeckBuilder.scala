@@ -1,6 +1,6 @@
 package com.wbillingsley.veautiful.templates
 
-import com.wbillingsley.veautiful.html.{<, Attacher, Markup, VHtmlNode, ^}
+import com.wbillingsley.veautiful.html.{<, Attacher, Markup, VDomNode, ^}
 import org.scalajs.dom
 
 import scala.collection.mutable
@@ -12,7 +12,7 @@ sealed trait Slide
 @JSExportTopLevel("DeckBuilder")
 def makeDeckBuilder(parser:(String) => String) = (w:Int, h:Int) => DeckBuilder(w, h)(using Markup { parser })
 
-class DeckBuilder(width:Int = 1920, height:Int = 1080, slides:List[Seq[() => VHtmlNode]] = Nil)(using markup:Markup) {
+class DeckBuilder(width:Int = 1920, height:Int = 1080, slides:List[Seq[() => VDomNode]] = Nil)(using markup:Markup) {
 
   def stripIndent(s:String):String = {
     val lines = s.split('\n')
@@ -29,7 +29,7 @@ class DeckBuilder(width:Int = 1920, height:Int = 1080, slides:List[Seq[() => VHt
   @JSExport
   def markdownSlide(m:String):DeckBuilder = new DeckBuilder(width, height, Seq(() => markup.Fixed(stripIndent(m))) :: slides)
 
-  def veautifulSlide(vnode:VHtmlNode):DeckBuilder = new DeckBuilder(width, height, Seq(() => vnode) :: slides)
+  def veautifulSlide(vnode:VDomNode):DeckBuilder = new DeckBuilder(width, height, Seq(() => vnode) :: slides)
 
   @JSExport
   def markdownSlides(m:String):DeckBuilder = {
@@ -63,6 +63,6 @@ class DeckBuilder(width:Int = 1920, height:Int = 1080, slides:List[Seq[() => VHt
 @JSExportTopLevel("DeckBuilderCompanion")
 object DeckBuilder {
 
-  val publishedDecks:mutable.Map[String, VHtmlNode] = mutable.Map.empty
+  val publishedDecks:mutable.Map[String, VDomNode] = mutable.Map.empty
 
 }

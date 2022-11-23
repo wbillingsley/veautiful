@@ -1,6 +1,6 @@
 package docs
 
-import com.wbillingsley.veautiful.html.{<, EventMethods, VHtmlComponent, VHtmlNode, ^, unique}
+import com.wbillingsley.veautiful.html.{<, EventMethods, VDomNode, ^, unique}
 import org.scalajs.dom
 import org.scalajs.dom.raw.HTMLInputElement
 

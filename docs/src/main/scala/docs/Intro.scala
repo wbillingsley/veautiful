@@ -3,7 +3,7 @@ package docs
 import java.nio.DoubleBuffer
 
 import com.wbillingsley.veautiful.{DiffNode, MutableArrayComponent}
-import com.wbillingsley.veautiful.html.{<, EventMethods, SVG, VHtmlComponent, VHtmlNode, ^, Styling}
+import com.wbillingsley.veautiful.html.{<, EventMethods, SVG, VDomNode, ^, Styling}
 import org.scalajs.dom
 import org.scalajs.dom.{Element, MouseEvent, Node, svg}
 import org.scalajs.dom.html.Canvas

@@ -1,7 +1,7 @@
 package com.wbillingsley.veautiful.html
 
 import com.wbillingsley.veautiful.{MakeItSo, Update}
-import org.scalajs.dom.{Element, Node}
+import org.scalajs.dom.html.Element
 
 import scala.scalajs.js
 
@@ -21,18 +21,18 @@ class Markup(transform:(String) => String) {
     * the component will be replaced.
     * @param data
     */
-  case class Fixed(data:String, element:DElement[Element] = <.div(^.cls := "markup-node")) extends VHtmlNode {
+  case class Fixed(data:String, element:DElement[Element] = <.div(^.cls := "markup-node")) extends VHtmlElement {
 
     private var _domNode: Option[Element] = None
 
     /** The dom node that this is currently attached to. */
-    override def domNode: Option[Node] = _domNode
+    override def domNode: Option[Element] = _domNode
 
     /**
       * Called to perform an attach operation -- ie, create the real DOM node and put it into
       * domNode
       */
-    override def attach(): Node = {
+    override def attach(): Element = {
       val e = element.create()
       _domNode = Some(e)
       e
@@ -66,18 +66,18 @@ class Markup(transform:(String) => String) {
     * var, and "MakeItSo" will update it if the data has changed.
     * @param data
     */
-  case class Settable()(var data:String) extends VHtmlNode with MakeItSo {
+  case class Settable()(var data:String) extends VHtmlElement with MakeItSo {
 
     private var _domNode: Option[Element] = None
 
     /** The dom node that this is currently attached to. */
-    override def domNode: Option[Node] = _domNode
+    override def domNode: Option[Element] = _domNode
 
     /**
       * Called to perform an attach operation -- ie, create the real DOM node and put it into
       * domNode
       */
-    override def attach(): Node = {
+    override def attach(): Element = {
       val e = <.div(^.cls := "markup-node").create()
       _domNode = Some(e)
       e
@@ -121,7 +121,7 @@ class Markup(transform:(String) => String) {
     * return false because anonymous functions in JavaScript are not equal to each other even if they are the same.
     * @param data
     */
-  case class Updatable()(data: () => String) extends VHtmlNode with Update {
+  case class Updatable()(data: () => String) extends VHtmlElement with Update {
 
     private var _domNode: Option[Element] = None
     private var lastData: Option[String] = None
@@ -132,13 +132,13 @@ class Markup(transform:(String) => String) {
       * Note that if a VNode uses more than one real node to implement itself, parent.get.domNode.get might not be
       * the same as domNode.get.getParent(), even if the gets were to succeed.
       */
-    override def domNode: Option[Node] = _domNode
+    override def domNode: Option[Element] = _domNode
 
     /**
       * Called to perform an attach operation -- ie, create the real DOM node and put it into
       * domNode
       */
-    override def attach(): Node = {
+    override def attach(): Element = {
       val e = <.div(^.cls := "markup-node").create()
       _domNode = Some(e)
       e

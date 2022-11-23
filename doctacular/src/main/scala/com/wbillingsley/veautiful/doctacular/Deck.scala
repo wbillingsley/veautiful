@@ -1,6 +1,6 @@
 package com.wbillingsley.veautiful.doctacular
 
-import com.wbillingsley.veautiful.html.VHtmlNode
+import com.wbillingsley.veautiful.html.VDomNode
 
 /**
   * To show a deck, we want to be able to produce widgets for when the deck is played
@@ -9,10 +9,10 @@ trait DeckResource {
     // We need to at least be able to put the deck on the screen
     // The deck name is passed through because the player might wish to integrate controls that do navigation
     // (which requires the deck name for the route)
-    def defaultView(deckName:String):VHtmlNode
+    def defaultView(deckName:String):VDomNode
 
     // Optionally, we might be able to directly play the deck full-screen
-    def fullScreenPlayer: Option[(String, Int) => VHtmlNode]
+    def fullScreenPlayer: Option[(String, Int) => VDomNode]
 }
 
 /**
@@ -24,10 +24,10 @@ trait DeckPlayer[T]:
     // We need to at least be able to put the deck on the screen
     // The deck name is passed through because the player might wish to integrate controls that do navigation
     // (which requires the deck name for the route)
-    def defaultView(deckName:String):VHtmlNode
+    def defaultView(deckName:String):VDomNode
 
     // Optionally, we might be able to directly play the deck full-screen
-    def fullScreenPlayer: Option[(String, Int) => VHtmlNode]
+    def fullScreenPlayer: Option[(String, Int) => VDomNode]
   }
 
 /**

@@ -5,7 +5,7 @@ import com.wbillingsley.veautiful.html.{SVG, VHtmlDiffNode, ^}
 
 case class VBox[T](children:TileComponent[T]*) extends TileComponent[T] {
 
-  override def render: VHtmlDiffNode = SVG.g(^.attr("transform") := s"translate($x, $y)", children)
+  override def render = SVG.g(^.attr("transform") := s"translate($x, $y)", children)
 
   override def layoutChildren():Unit = {
     super.layoutChildren()

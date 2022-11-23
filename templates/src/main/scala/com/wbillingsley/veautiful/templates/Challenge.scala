@@ -1,6 +1,6 @@
 package com.wbillingsley.veautiful.templates
 
-import com.wbillingsley.veautiful.html.{<, DElement, SVG, Styling, VHtmlComponent, VHtmlNode, ^, CustomElementChild, HTMLAppliable, VHTMLElement}
+import com.wbillingsley.veautiful.html.{<, DElement, SVG, Styling, DHtmlComponent, VDomNode, ^, CustomElementChild, HTMLAppliable, VHTMLElement}
 import com.wbillingsley.veautiful.templates.Challenge.{HomePath, LevelPath, StagePath}
 import com.wbillingsley.veautiful.templates.Sequencer.LayoutFunc
 
@@ -81,7 +81,7 @@ object Challenge {
   val textColumnStyling = Styling("margin-top: 50px; margin-left: 50px; margin-right: 50px;").register()
   def textColumn(ac: HTMLAppliable *) = <.div(^.cls := s"text-column ${textColumnStyling.className}", <.div(ac:_*))
 
-  def textAndEx(left: HTMLAppliable *)(right: HTMLAppliable *):VHtmlNode = {
+  def textAndEx(left: HTMLAppliable *)(right: HTMLAppliable *):VDomNode = {
     split(textColumn(left:_*))(right:_*)
   }
 
@@ -92,7 +92,7 @@ object Challenge {
   )
 
 
-  trait Stage extends VHtmlComponent {
+  trait Stage extends DHtmlComponent {
 
     def completion:Completion
 
@@ -121,7 +121,7 @@ object Challenge {
 
   def defaultHomeIcon:VHTMLElement = <.span(^.cls := "home-icon", "⌂")
 
-  def defaultHeader(homePath:HomePath, homeIcon: => VHtmlNode = defaultHomeIcon) = { (c:Challenge) =>
+  def defaultHeader(homePath:HomePath, homeIcon: => VDomNode = defaultHomeIcon) = { (c:Challenge) =>
     <.div(
       <.a(^.cls := "home-link", ^.href := homePath(c), homeIcon),
       <.span(^.cls := "challenge-name", c.levels(c.level).name)
@@ -177,7 +177,7 @@ object Challenge {
     )
   }
 
-  def apply(levels: Seq[Challenge.Level], homePath: HomePath, levelPath: LevelPath, stagePath: StagePath, homeIcon: => VHtmlNode = defaultHomeIcon, scaleToWindow:Boolean = true) = {
+  def apply(levels: Seq[Challenge.Level], homePath: HomePath, levelPath: LevelPath, stagePath: StagePath, homeIcon: => VDomNode = defaultHomeIcon, scaleToWindow:Boolean = true) = {
     new Challenge(levels,
       defaultHeader(homePath, homeIcon),
       defaultTopRight(),
@@ -189,12 +189,12 @@ object Challenge {
 }
 
 class Challenge(val levels: Seq[Challenge.Level],
-                val header: (Challenge) => VHtmlNode,
-                val tr: (Challenge) => VHtmlNode,
-                val progressBlock: (Challenge) => VHtmlNode,
-                val pageControls: (Challenge) => VHtmlNode,
+                val header: (Challenge) => VDomNode,
+                val tr: (Challenge) => VDomNode,
+                val progressBlock: (Challenge) => VDomNode,
+                val pageControls: (Challenge) => VDomNode,
                 scaleToWindow:Boolean = true
-               ) extends VHtmlComponent {
+               ) extends DHtmlComponent {
 
   var level:Int = 0
   var stage:Int = 0
@@ -211,7 +211,7 @@ class Challenge(val levels: Seq[Challenge.Level],
     )
   }
 
-  def show(l:Int, s:Int):VHtmlNode = {
+  def show(l:Int, s:Int):VDomNode = {
     level = l
     stage = s
     rerender()
@@ -226,7 +226,7 @@ class Challenge(val levels: Seq[Challenge.Level],
   }
 
   object Layout extends VSlides.Layout:
-    def apply(s:VSlides, node:VHtmlNode, i:Int):VHtmlNode = {
+    def apply(s:VSlides, node:VDomNode, i:Int):VDomNode = {
       <.div(^.cls := s"challenge-wrapper ${Challenge.defaultTheme.className}",
         <.div(^.cls := "challenge-header", header(Challenge.this)),
         <.div(^.cls := "challenge", node),

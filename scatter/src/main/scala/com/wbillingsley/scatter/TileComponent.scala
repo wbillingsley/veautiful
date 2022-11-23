@@ -1,6 +1,6 @@
 package com.wbillingsley.scatter
 
-import com.wbillingsley.veautiful.html.VHtmlComponent
+import com.wbillingsley.veautiful.svg.DSvgComponent
 import com.wbillingsley.veautiful.logging.Logger
 import com.wbillingsley.veautiful.{DiffComponent, DiffNode, VNode}
 import org.scalajs.dom.{Element, Node, HTMLElement, SVGElement}
@@ -11,7 +11,7 @@ import scala.util.Random
 /**
   * A tile component is a component that can be included within a tile.
   */
-trait TileComponent[T] extends VHtmlComponent {
+trait TileComponent[T] extends DSvgComponent {
 
   import TileComponent.logger
 
@@ -29,7 +29,7 @@ trait TileComponent[T] extends VHtmlComponent {
 
   def emptySockets:Seq[(Int, Int, Socket[T])]
 
-  override def attach(): Element = {
+  override def attach(): SVGElement = {
     logger.trace(s"Attach: $this $uid")
     super.attach()
   }

@@ -1,7 +1,7 @@
 package com.wbillingsley.veautiful.templates
 
 import com.wbillingsley.veautiful.Morphing
-import com.wbillingsley.veautiful.html.{<, VHtmlComponent, VHtmlDiffNode, VHtmlNode, ^, Styling}
+import com.wbillingsley.veautiful.html.{<, DHtmlComponent, VHtmlDiffNode, VDomNode, ^, Styling}
 import com.wbillingsley.veautiful.logging.Logger
 import org.scalajs.dom
 
@@ -27,7 +27,7 @@ object WindowWidthScaler {
 
 }
 
-case class WindowWidthScaler(width: Int)(content:VHtmlNode, scaleToWindow:Boolean = true) extends VHtmlComponent with Morphing(content, scaleToWindow) {
+case class WindowWidthScaler(width: Int)(content:VDomNode, scaleToWindow:Boolean = true) extends DHtmlComponent with Morphing(content, scaleToWindow) {
   
   import WindowWidthScaler._
 
@@ -39,7 +39,7 @@ case class WindowWidthScaler(width: Int)(content:VHtmlNode, scaleToWindow:Boolea
   var left:Double = 0
 
   def rescale() = for { n <- domNode } {
-    val r = n.asInstanceOf[dom.raw.HTMLElement].getBoundingClientRect()
+    val r = n.getBoundingClientRect()
     scale = r.width / width
 
     left = Math.max((r.width - scale * width) / 2, 0)
@@ -65,7 +65,7 @@ case class WindowWidthScaler(width: Int)(content:VHtmlNode, scaleToWindow:Boolea
     dom.window.removeEventListener("resize", rescaleEventListener)
   }
 
-  override def render: VHtmlDiffNode = {
+  override def render = {
     val (content, scaleToWindow) = prop
 
     <.div(^.cls := (if (scaleToWindow) s"${scalerTopStyle.className} window-width-scaler-top scaled" else s"${scalerTopStyle.className} window-scaler-top unscaled"),

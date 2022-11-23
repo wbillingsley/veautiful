@@ -16,7 +16,11 @@ def htmlNS = NS
 
 
 
-type VHtmlNode = VNode[dom.Node]
+type VDomNode = veautiful.dom.VDomNode
+
+type VDomElement = veautiful.dom.VDomElement
+
+type VHtmlElement = VNode[dom.html.Element]
 
 type VHtmlDiffNode = DiffNode[dom.Element, dom.Node]
 
@@ -40,6 +44,9 @@ type DSvgElement = veautiful.svg.DSvgElement
 
 /** For convenience, aliased in from the dom package */
 type DDomElement = veautiful.dom.DDomElement
+
+/** For convenience, aliased in from the svg package */
+type DSvgComponent = veautiful.svg.DSvgComponent
 
 /** For convenience, aliased in from the dom package */
 type DDomComponent = veautiful.dom.DDomComponent

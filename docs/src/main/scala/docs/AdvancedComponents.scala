@@ -1,12 +1,12 @@
 package docs
 
 import com.wbillingsley.veautiful.{DiffNode, MutableArrayComponent}
-import com.wbillingsley.veautiful.html.{<, SVG, VHtmlComponent, VHtmlNode, ^}
+import com.wbillingsley.veautiful.html.{<, SVG, DHtmlComponent, VDomNode, ^}
 import org.scalajs.dom
 import org.scalajs.dom.html.Canvas
 import org.scalajs.dom.{Element, MouseEvent, Node, svg}
 
-case class MouseTrails() extends VHtmlNode {
+case class MouseTrails() extends VDomNode {
 
   private var _domNode:Option[Canvas] = None
 
@@ -57,7 +57,7 @@ case class MouseTrails() extends VHtmlNode {
   }
 }
 
-object Particles extends VHtmlComponent {
+object Particles extends DHtmlComponent {
 
   private val particles = Array.fill(1000)((Math.random() * 100, Math.random() * 100))
 
@@ -97,7 +97,7 @@ object Particles extends VHtmlComponent {
     }
   )
 
-  override protected def render: DiffNode[Element, Node] = {
+  override protected def render = {
     <.div(
       plot,
       if (animating) {
@@ -116,7 +116,7 @@ def advancedComponents = <.div(Common.markdown(
     |
     |At the lowest level, a Veautiful UI is made up of `VNode[N]`s. These are JavaScript objects that can attach to
     |and control a node in the UI. When working with HTML, these control DOM nodes and elements, and we use the
-    |type alias `VHtmlNode`.
+    |type alias `VDomNode`.
     |
     |This means we can implement components as low-level nodes directly calling operations on their nodes.
     |It's a little more verbose, but not complicated.
@@ -128,12 +128,12 @@ def advancedComponents = <.div(Common.markdown(
     Common.markdown(
       """
         |```scala
-        |import com.wbillingsley.veautiful.html.{VHtmlNode, <, ^}
+        |import com.wbillingsley.veautiful.html.{VDomNode, <, ^}
         |import org.scalajs.dom
         |import org.scalajs.dom.{MouseEvent, Node}
         |import org.scalajs.dom.html.Canvas
         |
-        |case class MouseTrails() extends VHtmlNode {
+        |case class MouseTrails() extends VDomNode {
         |
         |    private var _domNode:Option[Canvas] = None
         |
@@ -224,12 +224,12 @@ def advancedComponents = <.div(Common.markdown(
     Common.markdown(
       """
         |```scala
-        |import com.wbillingsley.veautiful.html.{VHtmlNode, <, ^}
+        |import com.wbillingsley.veautiful.html.{VDomNode, <, ^}
         |import org.scalajs.dom
         |import org.scalajs.dom.{MouseEvent, Node}
         |import org.scalajs.dom.html.Canvas
         |
-        |object Particles extends VHtmlComponent {
+        |object Particles extends DHtmlComponent {
         |
         |    private val particles = Array.fill(1000)((Math.random() * 100, Math.random() * 100))
         |
@@ -266,7 +266,7 @@ def advancedComponents = <.div(Common.markdown(
         |      }
         |    )
         |
-        |    override protected def render: DiffNode[Element, Node] = {
+        |    override protected def render = {
         |      <.div(
         |        plot,
         |        <.div(

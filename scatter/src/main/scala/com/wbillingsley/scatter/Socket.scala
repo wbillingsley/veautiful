@@ -1,7 +1,7 @@
 package com.wbillingsley.scatter
 
 import com.wbillingsley.scatter.Tile.{boxAndArc, logger}
-import com.wbillingsley.veautiful.html.{<, DElement, VHtmlDiffNode, VHtmlNode, ^}
+import com.wbillingsley.veautiful.html.{<, DElement, VHtmlDiffNode, VDomNode, ^}
 import com.wbillingsley.veautiful.svg.{SVG, DSvgElement}
 import com.wbillingsley.veautiful.logging.Logger
 
@@ -76,7 +76,7 @@ class Socket[T](val within:Tile[T], acceptType:Option[String] = None, thin:Boole
     s
   }
 
-  override def render: VHtmlDiffNode = {
+  override def render = {
     SVG.g(^.cls := cssClass, ^.attr("transform") := s"translate($x, $y)",
       content match {
         case Some(t) => t
@@ -103,7 +103,7 @@ object Socket {
 
   val logger:Logger = Logger.getLogger(Socket.getClass)
 
-  def path[T](tile:Option[Tile[T]]):VHtmlNode = {
+  def path[T](tile:Option[Tile[T]]):VDomNode = {
     logger.trace(s"Calculating tile path for $tile")
     val (w, h) = tile.flatMap(_.tileContent.size) getOrElse (15, 15)
     <("path", ns=DElement.svgNS)(^.attr("d") := boxAndArc(w, h))

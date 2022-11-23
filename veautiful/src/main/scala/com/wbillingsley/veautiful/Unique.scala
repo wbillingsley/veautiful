@@ -1,7 +1,5 @@
 package com.wbillingsley.veautiful
 
-import com.wbillingsley.veautiful.html.VHtmlNode
-
 /**
   * A VNode that delegates its operations to the delegate passed in its contstructor.
   * 

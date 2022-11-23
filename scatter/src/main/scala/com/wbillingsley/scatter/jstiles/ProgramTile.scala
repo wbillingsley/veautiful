@@ -1,10 +1,10 @@
 package com.wbillingsley.scatter.jstiles
 
 import com.wbillingsley.scatter.{Socket, SocketList, Tile, TileForeignObject, TileSpace, VBox, TypeLoopMode}
-import com.wbillingsley.veautiful.html.VHtmlNode
+import com.wbillingsley.veautiful.html.VDomNode
 import com.wbillingsley.veautiful.VNode
 
-class ProgramTile(tileSpace:TileSpace[JSExpr], html:VHtmlNode) extends Tile(tileSpace, false, TypeLoopMode.Never, cssClass = "play") {
+class ProgramTile(tileSpace:TileSpace[JSExpr], html:VDomNode) extends Tile(tileSpace, false, TypeLoopMode.Never, cssClass = "play") {
 
   val socketList = new SocketList(this)
 

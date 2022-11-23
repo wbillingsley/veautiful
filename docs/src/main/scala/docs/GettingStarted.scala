@@ -1,8 +1,8 @@
 package docs
 
-import com.wbillingsley.veautiful.html.VHtmlNode
+import com.wbillingsley.veautiful.html.VDomNode
 
-def gettingStarted:VHtmlNode = Common.markdown(
+def gettingStarted:VDomNode = Common.markdown(
   """
     |# Getting started
     |

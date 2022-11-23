@@ -29,7 +29,7 @@ class SocketList[T](val within:Tile[T], acceptType:Option[String] = None) extend
     } yield (x + s.x, y + s.y, ss)
   }
 
-  override protected def render: VHtmlDiffNode = SVG.g(^.cls := "socket-list", ^.attr("transform") := s"translate($x, $y)",
+  override protected def render = SVG.g(^.cls := "socket-list", ^.attr("transform") := s"translate($x, $y)",
     content
   )
 

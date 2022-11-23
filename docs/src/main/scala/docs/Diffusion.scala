@@ -1,7 +1,7 @@
 package docs
 
 import com.wbillingsley.veautiful._
-import com.wbillingsley.veautiful.html.{<, DElement, ElementComponent, SVG, VHtmlNode, ^, VHTMLElement, DSvgElement}
+import com.wbillingsley.veautiful.html.{<, DElement, ElementComponent, SVG, VDomNode, ^, VHTMLElement, DSvgElement}
 import org.scalajs.dom
 import org.scalajs.dom.Node
 import org.scalajs.dom.HTMLInputElement
@@ -103,7 +103,7 @@ object Diffusion {
 
   }
 
-  class MoleculeView(m:Molecule) extends VHtmlNode with Update {
+  class MoleculeView(m:Molecule) extends VDomNode with Update {
 
     var domNode: Option[Circle] = None
 
@@ -180,7 +180,7 @@ object Diffusion {
     )
 
     /** Turns an asteroid into an SVG DElement */
-    def svgMolecule(m:Molecule):VHtmlNode = {
+    def svgMolecule(m:Molecule):VDomNode = {
       <("circle", ns=DElement.svgNS, u=Random.nextString(7))(
         ^.attr("cx") := m.position.x, ^.attr("cy") := m.position.y, ^.attr("r") := 3,
         ^.cls := (if (m.ordinary) "molecule ordinary" else "molecule tracked")
@@ -188,11 +188,11 @@ object Diffusion {
     }
 
     /** Turns an asteroid into an SVG DElement */
-    def svgRing(m:Ring):VHtmlNode = {
+    def svgRing(m:Ring):VDomNode = {
       SVG.circle(^.attr("cx") := m.p.x, ^.attr("cy") := m.p.y, ^.attr("r") := m.r, ^.cls := "ring")
     }
 
-    def table():VHtmlNode = <.div(^.cls := "results col-lg overflow-auto",
+    def table():VDomNode = <.div(^.cls := "results col-lg overflow-auto",
       <.table(^.cls := "table",
         <.thead(
           <.tr(
@@ -212,7 +212,7 @@ object Diffusion {
     )
 
     /** A function to work out what the local VDOM should look like for the current asteroids */
-    def card():VHtmlNode = <.div(^.cls := "row",
+    def card():VDomNode = <.div(^.cls := "row",
       <.div(^.cls := "card",
         svg(
           svgRing(Simulation.boundaryRing),

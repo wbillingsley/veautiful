@@ -1,8 +1,8 @@
 package docs
 
-import com.wbillingsley.veautiful.html.{<, VHtmlComponent, ^, EventMethods}
+import com.wbillingsley.veautiful.html.{<, DHtmlComponent, ^, EventMethods}
 
-case class Greeter() extends VHtmlComponent {
+case class Greeter() extends DHtmlComponent {
 
   private var name:String = ""
 
@@ -20,9 +20,9 @@ def statefulComponents = <.div(Common.markdown("""
     |# Stateful Components
     |
     |If your component needs to keep some ephemeral local state, implementing it as a class extending 
-    |`VHtmlComponent`. Usually a case class.
+    |`DHtmlComponent`. Usually a case class.
     |
-    |`VHtmlComponent` requires you to implement a `render` method to describe the tree your component should produce. 
+    |`DHtmlComponent` requires you to implement a `render` method to describe the tree your component should produce. 
     |This should produce a consistent outer element (e.g. a `<.div()` or a `<.span()`), but its contents can then be
     |whatever you want.
     |
@@ -38,9 +38,9 @@ def statefulComponents = <.div(Common.markdown("""
     Common.markdown(
       """
         |```scala
-        |import com.wbillingsley.veautiful.html.{<, VHtmlComponent, ^, EventMethods}
+        |import com.wbillingsley.veautiful.html.{<, DHtmlComponent, ^, EventMethods}
         |
-        |case class Greeter() extends VHtmlComponent {
+        |case class Greeter() extends DHtmlComponent {
         |
         |  private var name:String = "World"
         |
@@ -77,7 +77,7 @@ def statefulComponents = <.div(Common.markdown("""
     |```scala
     |// This isn't a case class, so `MyComponent(1, 2) != MyComponent(1, 2)` 
     |// But because it implements Keep((a, b)), the component would be hinted as being retained rather than replaced.
-    |class MyComponent(a:Int, b:Int) extends VHtmlComponent with Keep((a, b)) {
+    |class MyComponent(a:Int, b:Int) extends DHtmlComponent with Keep((a, b)) {
     |  val now = System.currentTimeMillis
     |  def render = p(s"I was created at $now, and $a + $b = ${a + b}")
     |}
@@ -85,7 +85,7 @@ def statefulComponents = <.div(Common.markdown("""
     |
     |## Using external state
     |
-    |You can also define `VHtmlComponents` that use external state - for instance, if your state is kept in a reactive
+    |You can also define `DHtmlComponents` that use external state - for instance, if your state is kept in a reactive
     |date store. In this case, you can just hook the `rerender` method to be triggered by your data store's event notification.
     |
     |Override the `afterAttach` method to install your event hook, and override `beforeDetach` to remove it.
