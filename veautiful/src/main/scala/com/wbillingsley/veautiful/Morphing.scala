@@ -1,7 +1,5 @@
 package com.wbillingsley.veautiful
 
-import html.VHtmlComponent
-
 /**
   * Morphing provides a means of decorating an Update component with the capability to take an
   * updatable property and "Make it so".

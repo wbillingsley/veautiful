@@ -5,12 +5,6 @@ import org.scalajs.dom
 import org.scalajs.dom.{Event, html}
 
 
-type VHtmlNode = VNode[dom.Node]
-
-type VHtmlDiffNode = DiffNode[dom.Element, dom.Node]
-
-type VHtmlComponent = DiffComponent[dom.Element, dom.Node]
-
 /**
   * Extension functions on Event that are useful for writing input elements
   */

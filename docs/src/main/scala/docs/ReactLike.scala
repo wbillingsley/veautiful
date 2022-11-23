@@ -1,7 +1,7 @@
 package docs
 
 import com.wbillingsley.veautiful._
-import com.wbillingsley.veautiful.html.{<, DElement, ElementComponent, SVG, VHtmlNode, ^, VSVGElement}
+import com.wbillingsley.veautiful.html.{<, DElement, ElementComponent, SVG, VHtmlNode, ^, DSvgElement}
 import docs.Model.Asteroid
 import org.scalajs.dom.HTMLInputElement
 
@@ -20,7 +20,7 @@ object ReactLike {
   /**
     * The SVG that will contain the asteroid field
     */
-  def svg:VSVGElement = <.svg.attrs(
+  def svg:DSvgElement = <.svg.attrs(
     ^.attr("viewbox") := "0 0 640 480",
     ^.attr("width") := "100%",
     ^.attr("height") := "480"

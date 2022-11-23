@@ -1,16 +1,30 @@
 package com.wbillingsley.veautiful.svg
 
-import com.wbillingsley.veautiful.html
+import com.wbillingsley.veautiful
+import veautiful.html
 import org.scalajs.dom
 import org.scalajs.dom.{Element, Event, Node}
-import com.wbillingsley.veautiful.html.DElementBuilder
+import html.DElementBuilder
 
-type VSVGElement = html.DElement[dom.svg.Element]
-type SVGAppliable = html.ElementChild[dom.svg.Element]
-type VSVGModifier = SVGAppliable
+/** A DElement for SVG */
+type DSvgElement = html.DElement[dom.svg.Element]
 
+/** Can be passed to a DSvgComponent's apply method */
+type DSvgModifier = html.ElementChild[dom.svg.Element]
 
-object SVG extends DElementBuilder[dom.SVGElement]("svg", html.DElement.svgNS) {
+/** A DiffComponent producing DSvgContent */
+type DSvgComponent = veautiful.DiffComponent[dom.svg.Element, dom.Node]
+
+/** A Blueprint for a DSvgElement */
+type DSvgBlueprint = veautiful.Blueprint[DSvgElement]
+
+/** A DSvgElement or a Blueprint for it */ 
+type DSvgContent = DSvgElement | DSvgBlueprint
+
+/** The namespace for SVG nodes */
+val NS = "http://www.w3.org/2000/svg"
+
+object SVG extends DElementBuilder[dom.SVGElement]("svg", NS) {
 
   def svg = applyT[dom.svg.SVG]("svg")
 

@@ -1,7 +1,7 @@
 package com.wbillingsley.scatter
 
-import com.wbillingsley.veautiful.html.{DElement, VHtmlComponent, VHtmlDiffNode, ^, VDOMElement}
-import com.wbillingsley.veautiful.svg.{SVG, VSVGElement}
+import com.wbillingsley.veautiful.html.{DElement, VHtmlComponent, VHtmlDiffNode, ^}
+import com.wbillingsley.veautiful.svg.{SVG, DSvgElement}
 import com.wbillingsley.veautiful.logging.Logger
 import com.wbillingsley.veautiful.OnScreen
 import org.scalajs.dom.{MouseEvent, SVGElement}
@@ -162,7 +162,7 @@ abstract class Tile[T](val ts:TileSpace[T], val mobile:Boolean = true, val typeL
     */
   val tileContent:TileComponent[T]
 
-  val tileBoundary:VSVGElement = SVG.path(^.cls := "tile-path")
+  val tileBoundary:DSvgElement = SVG.path(^.cls := "tile-path")
 
   def layout():Unit = {
     tileContent.layoutChildren()

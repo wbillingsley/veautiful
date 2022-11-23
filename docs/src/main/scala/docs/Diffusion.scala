@@ -1,7 +1,7 @@
 package docs
 
 import com.wbillingsley.veautiful._
-import com.wbillingsley.veautiful.html.{<, DElement, ElementComponent, SVG, VHtmlNode, ^, VHTMLElement, VSVGElement}
+import com.wbillingsley.veautiful.html.{<, DElement, ElementComponent, SVG, VHtmlNode, ^, VHTMLElement, DSvgElement}
 import org.scalajs.dom
 import org.scalajs.dom.Node
 import org.scalajs.dom.HTMLInputElement
@@ -173,7 +173,7 @@ object Diffusion {
     /**
      * The SVG that will contain the asteroid field
      */
-    def svg:VSVGElement = <.svg.attrs(
+    def svg:DSvgElement = <.svg.attrs(
       ^.attr("viewbox") := s"${Simulation.bounds.p1.x} ${Simulation.bounds.p1.y} ${Simulation.bounds.p2.x} ${Simulation.bounds.p2.y}",
       ^.attr("width") := s"${Simulation.bounds.p2.x - Simulation.bounds.p1.x}",
       ^.attr("height") := s"${Simulation.bounds.p2.y - Simulation.bounds.p1.y}"

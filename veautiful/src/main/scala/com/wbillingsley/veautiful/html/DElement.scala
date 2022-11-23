@@ -19,10 +19,10 @@ object PredefinedElementChild {
 }
 
 object DElement {
-  /** The namespace for HTML nodes */
+  @deprecated("moved to top-level definition html.NS or html.htmlNS in 0.3-M2")
   val htmlNS = "http://www.w3.org/1999/xhtml"
   
-  /** The namespace for SVG nodes */
+  @deprecated("moved to top-level definition svg.NS or html.svgNS in 0.3-M2")
   val svgNS = "http://www.w3.org/2000/svg"
 }
 
@@ -51,22 +51,6 @@ class ElementAction[T <: dom.Element](f: DElement[T] => Unit) extends CustomElem
 }
 
 
-type VHTMLElement = DElement[html.Element]
-
-/** For convenience, we alias the VSVGElement type into the html package as well */
-type VSVGElement = veautiful.svg.VSVGElement
-
-type VDOMElement = DElement[dom.Element]
-
-type HTMLAppliable = ElementChild[html.Element]
-
-// "Appliable" is a coding-centric name. "Modifier" may be more meaningful.
-type VHTMLModifier = HTMLAppliable
-
-/** For convenience, we alias the VSVGModifier type into the html package as well */
-type SVGAppliable = veautiful.svg.SVGAppliable
-type VSVGModifier = veautiful.svg.VSVGModifier
-
 /**
  * Represents a DOM Element using a Virtual DOM-like strategy (reconciling its children). The D is for DOM or Diff.
  * 
@@ -84,7 +68,7 @@ type VSVGModifier = veautiful.svg.VSVGModifier
  * attributes, properties, listeners, but also things like changing the reconciliation strategy or adding a key to the element to 
  * make it more likely to be retained in a reconciliation.
  */
-class DElement[+T <: dom.Element](name:String, var uniqEl:Option[Any] = None, ns:String = DElement.htmlNS) extends DiffNode[T, dom.Node] {
+class DElement[+T <: dom.Element](name:String, var uniqEl:Option[Any] = None, ns:String=NS) extends DiffNode[T, dom.Node] {
 
   import PredefinedElementChild.*
 
@@ -321,49 +305,7 @@ trait DElementBuilder[T <: dom.Element](defaultTag:String, defaultNS:String) {
   
 }
 
-object HTML extends DElementBuilder[dom.HTMLElement]("html", DElement.htmlNS) {
 
-  def p = applyT[html.Paragraph]("p")
-  def div = applyT[html.Div]("div")
-  def img = applyT[html.Image]("img")
-  def a = applyT[html.Anchor]("a")
-  def span = applyT[html.Span]("span")
-  def h1 = applyT[html.Heading]("h1")
-  def h2 = applyT[html.Heading]("h2")
-  def h3 = applyT[html.Heading]("h3")
-  def h4 = applyT[html.Heading]("h4")
-  def h5 = applyT[html.Heading]("h5")
-  def h6 = applyT[html.Heading]("h6")
-
-  def iframe = applyT[html.IFrame]("iframe")
-  def pre = applyT[html.Pre]("pre")
-  def br = applyT[html.BR]("br")
-  def canvas = applyT[html.Canvas]("canvas")
-  def form = applyT[html.Form]("form")
-
-  def button = applyT[html.Button]("button")
-  def input = applyT[html.Input]("input")
-  def textarea = applyT[html.TextArea]("textarea")
-
-  def ol = applyT[html.OList]("ol")
-  def ul = applyT[html.UList]("ul")
-  def li = applyT[html.LI]("li")
-
-  def table = applyT[html.Table]("table")
-  def thead = apply("thead")
-  def tbody = apply("tbody")
-  def tr = applyT[html.TableRow]("tr")
-  def th = applyT[html.TableCell]("th")
-  def td = applyT[html.TableCell]("td")
-
-  def svg = veautiful.svg.svg
-  def SVG = veautiful.svg.SVG
-
-}
-
-val el = HTML
-val < = HTML
-export HTML.*
 
 object ^ {
 

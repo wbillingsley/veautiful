@@ -1,8 +1,8 @@
 package com.wbillingsley.scatter
 
 import com.wbillingsley.scatter.Tile.{boxAndArc, logger}
-import com.wbillingsley.veautiful.html.{<, DElement, VHtmlDiffNode, VHtmlNode, ^, VDOMElement}
-import com.wbillingsley.veautiful.svg.{SVG, VSVGElement}
+import com.wbillingsley.veautiful.html.{<, DElement, VHtmlDiffNode, VHtmlNode, ^}
+import com.wbillingsley.veautiful.svg.{SVG, DSvgElement}
 import com.wbillingsley.veautiful.logging.Logger
 
 import scala.annotation.tailrec
@@ -56,7 +56,7 @@ class Socket[T](val within:Tile[T], acceptType:Option[String] = None, thin:Boole
     */
   def active:Boolean = tileSpace.activeSocket.contains(this)
 
-  def emptyPath:VSVGElement = {
+  def emptyPath:DSvgElement = {
     if (thin) {
       SVG.g(
         SVG.path(^.attr("d") := "M 0 0 l 20 0")

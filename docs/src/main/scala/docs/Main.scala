@@ -1,6 +1,6 @@
 package docs
 
-import com.wbillingsley.veautiful.html.{Attacher, StyleSuite, Styling}
+import com.wbillingsley.veautiful.html.{Attacher, StyleSuite, Styling, <}
 import com.wbillingsley.veautiful.doctacular.*
 
 import org.scalajs.dom
