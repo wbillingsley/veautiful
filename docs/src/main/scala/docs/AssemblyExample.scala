@@ -1,7 +1,7 @@
 package docs
 
 import com.wbillingsley.veautiful.html._
-import org.scalajs.dom.raw.HTMLTextAreaElement
+import org.scalajs.dom.HTMLTextAreaElement
 
 import scala.collection.immutable.ArraySeq
 
@@ -68,7 +68,7 @@ object AssemblyExample {
           <.tr(
             <.th(^.cls := "register-name", i.toHexString),
               toBits(b).map { bit => <.td(oneZero(bit)) },
-            <.td(^.cls := "hex", b.formatted("%02X"))
+            <.td(^.cls := "hex", "%02X".format(b))
           )
       }).toSeq
     )

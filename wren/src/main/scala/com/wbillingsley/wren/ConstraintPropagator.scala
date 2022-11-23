@@ -65,7 +65,10 @@ case class EqualityConstraint(name:String, values:Seq[Value]) extends Constraint
   override def failed: Boolean = {
     val set = values.filter(_.value.nonEmpty).map(_.value.map(_._1))
     // Error if there are two values that differ by more than 1%
-    set.zip(set.tail).exists{ case (Some(x), Some(y)) => Math.abs(x - y) > (x + y) / 100 }
+    set.zip(set.tail).exists{ 
+      case (Some(x), Some(y)) => Math.abs(x - y) > (x + y) / 100 
+      case _ => false
+    }
   }
 
 }

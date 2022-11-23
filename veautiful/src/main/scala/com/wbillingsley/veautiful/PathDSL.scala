@@ -164,7 +164,7 @@ object PathDSL {
     object start extends PathMarkers
 
     sealed trait Path[T] {
-      def unapply(o:Object):Option[(T, List[String])]
+      def unapply(o:List[String]):Option[(T, List[String])]
       def mkString(params:T):String
 
       def /(s:String) = PathString(s, this)
@@ -176,11 +176,8 @@ object PathDSL {
 
       def mkString(params: start.type) = "#"
 
-      def unapply(o:Object) = {
-        o match {
-          case a:List[String] => Some((start, a))
-          case _ => None
-        }
+      def unapply(o:List[String]) = {
+        Some((start, o))
       }
     }
     case class PathString[T](s:String, tail:Path[T]) extends Path[T] {
@@ -188,7 +185,7 @@ object PathDSL {
 
       def mkString(params:T) = tail.mkString(params) + "/" + s
 
-      def unapply(o:Object) = {
+      def unapply(o:List[String]) = {
         tail.unapply(o) match {
           case Some((found, remainder)) => remainder match {
             case h :: t if h == s => Some((found, t))
@@ -206,7 +203,7 @@ object PathDSL {
         tail.mkString(remainder) + "/" + p
       }
 
-      def unapply(o:Object) = {
+      def unapply(o:List[String]) = {
         logger.info(s"Checking on $this, with ${o.toString}")
         tail.unapply(o) match {
           case Some((found, h :: t)) => Some(((h, found), t))

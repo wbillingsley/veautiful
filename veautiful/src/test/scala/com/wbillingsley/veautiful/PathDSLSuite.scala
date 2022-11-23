@@ -12,6 +12,7 @@ class PathDSLSuite extends munit.FunSuite {
 
     val result = pl match {
       case path((start, remainder)) => "Matched"
+      case _ => "Didn't match"
     }
 
     assertEquals(result, "Matched")
@@ -22,11 +23,9 @@ class PathDSLSuite extends munit.FunSuite {
 
     val path = (/# / "hello" / stringParam)
 
-    val result = pathList match {
-      case path(((name, start), remainder)) => name
-    }
+    val path((name, start), remainder) = pathList
 
-    assertEquals(result, "world")
+    assertEquals(name, "world")
   }
 
   test ("PathDSL should make a path using a single string parameter") {

@@ -280,9 +280,9 @@ object Diffusion {
           Simulation.step()
           rerender()
 
-          if (ticking) dom.window.requestAnimationFrame(tick)
+          if (ticking) dom.window.requestAnimationFrame(tick(_))
       }
-      dom.window.requestAnimationFrame(tick)
+      dom.window.requestAnimationFrame(tick(_))
     }
 
     def stopTicking():Unit = {
