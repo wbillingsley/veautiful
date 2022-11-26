@@ -22,7 +22,7 @@ type VHtmlElement = VNode[dom.html.Element]
 type VHtmlDiffNode = DiffNode[dom.Element, dom.Node]
 
 /** A DiffComponent producing HTML */
-type DHtmlComponent = DiffComponent[dom.html.Element, dom.Node]
+type DHtmlComponent = DomDiffComponent[dom.html.Element]
 
 /** A DElement for HTML */
 type DHtmlElement = DElement[dom.html.Element]

@@ -322,7 +322,6 @@ class DElementBlueprint[+T <: dom.Element](name:String, ns:String = DElement.htm
 
 }
 
-
 /**
   * Trait implemented by the HTML and SVG objects
   *
@@ -347,7 +346,7 @@ trait ModifierDSL {
 
   import PredefinedElementChild.*
 
-  case class Attrable(n:String) {
+  class Attrable(n:String) {
     def :=(s:String) = AttrVal(n, s)
 
     def :=(i:Int) = AttrVal(n, i.toString)
@@ -388,6 +387,10 @@ trait ModifierDSL {
 
     def ==>(f: (T) => Unit) = {
       EventListener(n, f, false)
+    }
+
+    def pushValue(sv:com.wbillingsley.veautiful.html.StateVariable[String]) = {
+      EventListener(n, (e) => for v <- e.inputValue do sv.value = v, false)
     }
   }
 
@@ -435,3 +438,5 @@ trait ModifierDSL {
   def backgroundImage = InlineStylable("background-image")
 
 }
+
+def getTargetValue = PushBuilder[dom.Event, String](_.inputValue)

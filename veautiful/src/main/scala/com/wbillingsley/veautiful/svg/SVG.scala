@@ -13,7 +13,7 @@ type DSvgElement = html.DElement[dom.svg.Element]
 type DSvgModifier = html.ElementChild[dom.svg.Element]
 
 /** A DiffComponent producing DSvgContent */
-type DSvgComponent = veautiful.DiffComponent[dom.svg.Element, dom.Node]
+type DSvgComponent = veautiful.html.DomDiffComponent[dom.svg.Element]
 
 /** A Blueprint for a DSvgElement */
 type DSvgBlueprint = veautiful.Blueprint[DSvgElement]

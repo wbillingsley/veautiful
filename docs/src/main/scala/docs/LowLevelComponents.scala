@@ -123,9 +123,6 @@ def advancedComponents = <.div(Common.markdown(
     |* *Attached* - that is, it is controlling a DOM node 
     |* *Umattached* - it's not controlling a DOM node in the tree, and can be passed around like a cheap object
     |
-    |Effectively, this gives us a tree of View Controllers. But we can pass around trees of *unattached* View Controllers
-    |as if they were a virtual DOM whenever we want.
-    |
     |`VNode`s go through a very traditional UI lifecycle:
     |
     |1. creation
@@ -135,6 +132,11 @@ def advancedComponents = <.div(Common.markdown(
     |5. before detach / unmount
     |6. detach / unmount
     |7. after detach / unmount
+    |
+    |We can reattach them if we want too, of course.
+    |
+    |Effectively, this gives us a tree of View Controllers. But we can pass around trees of *unattached* View Controllers
+    |as if they were a virtual DOM whenever we want.
     |
     |## Manually implementing a Veautiful node
     |
