@@ -97,7 +97,7 @@ case class ScatterPlot(plotWidth:Int, plotHeight:Int, xName:String, yName:String
       )
     }
 
-    <.svg.attrs(
+    <.svg(
       ^.cls := "scatterplot",
       ^.attr("viewBox") := viewBox,
       ^.attr("width") := plotWidth,

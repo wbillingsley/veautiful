@@ -19,7 +19,7 @@ object ReactLike {
   /**
     * The SVG that will contain the asteroid field
     */
-  def svg:DSvgElement = <.svg.attrs(
+  def svg:DSvgElement = <.svg(
     ^.attr("viewbox") := "0 0 640 480",
     ^.attr("width") := "100%",
     ^.attr("height") := "480"
