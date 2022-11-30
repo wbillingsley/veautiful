@@ -61,121 +61,140 @@ type HTMLAppliable = DHtmlModifier
 @deprecated("This has been renamed to DHtmlElement since 0.3-M2")
 type VHTMLElement = DHtmlElement
 
-object HTML extends DElementBuilder[dom.HTMLElement]("html", NS) {
+/**
+ * Gives us a method for creating C[T]s for subtypes of DOM elements.
+ * Used by the HTML and SVG DSLs so that we can use the same DSL to build
+ * DElementBlueprint[T]s or DynamicElementBlueprint[T]s or any other such type.
+ */
+trait DSLFactory[C[_ <: Base], Base <: dom.Element] {
+  def applyT[T <: Base](name:String):C[T]
+}
 
-  def a = applyT[dom.html.Anchor]("a")
-  def abbr = applyT[dom.html.Anchor]("abbr")
-  def audio = applyT[dom.html.Audio]("audio")
-  def area = applyT[dom.html.Area]("area")
-  def article = applyT[dom.html.Element]("article")
-  def aside = applyT[dom.html.Element]("aside")
-  def b = applyT[dom.html.Element]("b")
-  def base = applyT[dom.html.Base]("base")
-  def bdi = applyT[dom.html.Element]("bdi")
-  def bdo = applyT[dom.html.Element]("bdo")
-  def blockquote = applyT[dom.html.Quote]("blockquote")
-  def body = applyT[dom.html.Body]("body")
-  def br = applyT[dom.html.BR]("br")
-  def button = applyT[dom.html.Button]("button")
-  def canvas = applyT[dom.html.Canvas]("canvas")
-  def caption = applyT[dom.html.TableCaption]("caption")
-  def cite = applyT[dom.html.Element]("cite")
-  def code = applyT[dom.html.Element]("code")
-  def col = applyT[dom.html.TableCol]("col")
-  def colgroup = applyT[dom.html.TableCol]("colgroup")
-  def data = applyT[dom.html.Element]("data") // need a Data type, but there's only DataList
-  def datalist = applyT[dom.html.DataList]("datalist") 
-  def dd = applyT[dom.html.Element]("dd")
-  def del = applyT[dom.html.Mod]("del")
-  def details = applyT[dom.html.Element]("details") // need Details type
-  def dfn = applyT[dom.html.Element]("dfn")
-  def dialog = applyT[dom.html.Element]("dialog") // need Dialog type
-  def div = applyT[dom.html.Div]("div")
-  def dl = applyT[dom.html.DList]("dl")
-  def dt = applyT[dom.html.Element]("dt")
-  def em = applyT[dom.html.Element]("em")
-  def embed = applyT[dom.html.Embed]("embed")
-  def fieldset = applyT[dom.html.FieldSet]("fieldset")
-  def figcaption = applyT[dom.html.Element]("figcaption")
-  def figure = applyT[dom.html.Element]("figure")
-  def footer = applyT[dom.html.Element]("footer")
-  def form = applyT[dom.html.Form]("form")
-  def h1 = applyT[dom.html.Heading]("h1")
-  def h2 = applyT[dom.html.Heading]("h2")
-  def h3 = applyT[dom.html.Heading]("h3")
-  def h4 = applyT[dom.html.Heading]("h4")
-  def h5 = applyT[dom.html.Heading]("h5")
-  def h6 = applyT[dom.html.Heading]("h6")
-  def head = applyT[dom.html.Head]("head")
-  def header = applyT[dom.html.Element]("header")
-  def hgroup = applyT[dom.html.Element]("hgroup")
-  def hr = applyT[dom.html.HR]("hr")
-  def html = applyT[dom.html.Html]("html")
-  def i = applyT[dom.html.Element]("i")
-  def iframe = applyT[dom.html.IFrame]("iframe")
-  def img = applyT[dom.html.Image]("img")
-  def input = applyT[dom.html.Input]("input")
-  def ins = applyT[dom.html.Mod]("ins")
-  def kbd = applyT[dom.html.Element]("kbd")
-  def label = applyT[dom.html.Label]("label")
-  def legend = applyT[dom.html.Legend]("legend")
-  def li = applyT[dom.html.LI]("li")
-  def link = applyT[dom.html.Link]("link")
-  def main = applyT[dom.html.Element]("main")
-  def map = applyT[dom.html.Map]("map")
-  def mark = applyT[dom.html.Element]("mark")
-  def menu = applyT[dom.html.Menu]("menu")
-  def meta = applyT[dom.html.Meta]("meta")
-  def meter = applyT[dom.html.Element]("meter") // Need a Meter type
-  def noscript = applyT[dom.html.Element]("noscript") 
-  def `object` = applyT[dom.html.Object]("object") // Need a Meter type
+/**
+ * Provides a DSL for constructing objects reprsenting HTML elements
+ */
+trait HTMLDSL[C[_ <: dom.html.Element]](factory: DSLFactory[C, dom.html.Element]) {
+
+  def a = factory.applyT[dom.html.Anchor]("a")
+  def abbr = factory.applyT[dom.html.Anchor]("abbr")
+  def audio = factory.applyT[dom.html.Audio]("audio")
+  def area = factory.applyT[dom.html.Area]("area")
+  def article = factory.applyT[dom.html.Element]("article")
+  def aside = factory.applyT[dom.html.Element]("aside")
+  def b = factory.applyT[dom.html.Element]("b")
+  def base = factory.applyT[dom.html.Base]("base")
+  def bdi = factory.applyT[dom.html.Element]("bdi")
+  def bdo = factory.applyT[dom.html.Element]("bdo")
+  def blockquote = factory.applyT[dom.html.Quote]("blockquote")
+  def body = factory.applyT[dom.html.Body]("body")
+  def br = factory.applyT[dom.html.BR]("br")
+  def button = factory.applyT[dom.html.Button]("button")
+  def canvas = factory.applyT[dom.html.Canvas]("canvas")
+  def caption = factory.applyT[dom.html.TableCaption]("caption")
+  def cite = factory.applyT[dom.html.Element]("cite")
+  def code = factory.applyT[dom.html.Element]("code")
+  def col = factory.applyT[dom.html.TableCol]("col")
+  def colgroup = factory.applyT[dom.html.TableCol]("colgroup")
+  def data = factory.applyT[dom.html.Element]("data") // need a Data type, but there's only DataList
+  def datalist = factory.applyT[dom.html.DataList]("datalist") 
+  def dd = factory.applyT[dom.html.Element]("dd")
+  def del = factory.applyT[dom.html.Mod]("del")
+  def details = factory.applyT[dom.html.Element]("details") // need Details type
+  def dfn = factory.applyT[dom.html.Element]("dfn")
+  def dialog = factory.applyT[dom.html.Element]("dialog") // need Dialog type
+  def div = factory.applyT[dom.html.Div]("div")
+  def dl = factory.applyT[dom.html.DList]("dl")
+  def dt = factory.applyT[dom.html.Element]("dt")
+  def em = factory.applyT[dom.html.Element]("em")
+  def embed = factory.applyT[dom.html.Embed]("embed")
+  def fieldset = factory.applyT[dom.html.FieldSet]("fieldset")
+  def figcaption =factory.applyT[dom.html.Element]("figcaption")
+  def figure = factory.applyT[dom.html.Element]("figure")
+  def footer = factory.applyT[dom.html.Element]("footer")
+  def form = factory.applyT[dom.html.Form]("form")
+  def h1 = factory.applyT[dom.html.Heading]("h1")
+  def h2 = factory.applyT[dom.html.Heading]("h2")
+  def h3 = factory.applyT[dom.html.Heading]("h3")
+  def h4 = factory.applyT[dom.html.Heading]("h4")
+  def h5 = factory.applyT[dom.html.Heading]("h5")
+  def h6 = factory.applyT[dom.html.Heading]("h6")
+  def head = factory.applyT[dom.html.Head]("head")
+  def header = factory.applyT[dom.html.Element]("header")
+  def hgroup = factory.applyT[dom.html.Element]("hgroup")
+  def hr = factory.applyT[dom.html.HR]("hr")
+  def html = factory.applyT[dom.html.Html]("html")
+  def i = factory.applyT[dom.html.Element]("i")
+  def iframe = factory.applyT[dom.html.IFrame]("iframe")
+  def img = factory.applyT[dom.html.Image]("img")
+  def input = factory.applyT[dom.html.Input]("input")
+  def ins = factory.applyT[dom.html.Mod]("ins")
+  def kbd = factory.applyT[dom.html.Element]("kbd")
+  def label = factory.applyT[dom.html.Label]("label")
+  def legend = factory.applyT[dom.html.Legend]("legend")
+  def li = factory.applyT[dom.html.LI]("li")
+  def link = factory.applyT[dom.html.Link]("link")
+  def main = factory.applyT[dom.html.Element]("main")
+  def map = factory.applyT[dom.html.Map]("map")
+  def mark = factory.applyT[dom.html.Element]("mark")
+  def menu = factory.applyT[dom.html.Menu]("menu")
+  def meta = factory.applyT[dom.html.Meta]("meta")
+  def meter = factory.applyT[dom.html.Element]("meter") // Need a Meter type
+  def noscript = factory.applyT[dom.html.Element]("noscript") 
+  def `object` = factory.applyT[dom.html.Object]("object") // Need a Meter type
   def Object = `object`
-  def ol = applyT[dom.html.OList]("ol")
-  def optgroup = applyT[dom.html.OptGroup]("optgroup")
-  def option = applyT[dom.html.Option]("option")
-  def output = applyT[dom.html.Element]("output") // Need an Output type
-  def p = applyT[dom.html.Paragraph]("p")
-  def picture = applyT[dom.html.Element]("picture") // Need a Picture type
-  def pre = applyT[dom.html.Pre]("pre")
-  def progress = applyT[dom.html.Progress]("progress")
-  def q = applyT[dom.html.Quote]("q")
-  def rp = applyT[dom.html.Element]("rp")
-  def rt = applyT[dom.html.Element]("rt")
-  def ruby = applyT[dom.html.Element]("ruby")
-  def s = applyT[dom.html.Element]("s")
-  def samp = applyT[dom.html.Element]("samp")
-  def script = applyT[dom.html.Script]("script")
-  def section = applyT[dom.html.Element]("section")
-  def select = applyT[dom.html.Select]("select")
-  def slot = applyT[dom.html.Element]("slot") // Need a Slot type
-  def small = applyT[dom.html.Element]("small")
-  def source = applyT[dom.html.Source]("source")
-  def span = applyT[dom.html.Span]("span")
-  def strong = applyT[dom.html.Element]("strong")
-  def style = applyT[dom.html.Style]("style")
-  def sub = applyT[dom.html.Element]("sub")
-  def summary = applyT[dom.html.Element]("summary")
-  def sup = applyT[dom.html.Element]("sup")
-  def table = applyT[dom.html.Table]("table")
-  def tbody = applyT[dom.html.TableSection]("tbody")
-  def td = applyT[dom.html.TableCell]("td")
-  def template = applyT[dom.html.Element]("template") // Need a Template type
-  def textarea = applyT[dom.html.TextArea]("textarea")
-  def tfoot = applyT[dom.html.TableSection]("tfoot")
-  def th = applyT[dom.html.TableCell]("th")
-  def thead = applyT[dom.html.TableSection]("thead")
-  def time = applyT[dom.html.Element]("time") // Need a Time type
-  def title = applyT[dom.html.Title]("title")
-  def tr = applyT[dom.html.TableRow]("tr")
-  def track = applyT[dom.html.Track]("track")
-  def u = applyT[dom.html.Element]("u")
-  def ul = applyT[dom.html.UList]("ul")
-  def `var` = applyT[dom.html.Element]("var")
+  def ol = factory.applyT[dom.html.OList]("ol")
+  def optgroup = factory.applyT[dom.html.OptGroup]("optgroup")
+  def option = factory.applyT[dom.html.Option]("option")
+  def output = factory.applyT[dom.html.Element]("output") // Need an Output type
+  def p = factory.applyT[dom.html.Paragraph]("p")
+  def picture = factory.applyT[dom.html.Element]("picture") // Need a Picture type
+  def pre = factory.applyT[dom.html.Pre]("pre")
+  def progress = factory.applyT[dom.html.Progress]("progress")
+  def q = factory.applyT[dom.html.Quote]("q")
+  def rp = factory.applyT[dom.html.Element]("rp")
+  def rt = factory.applyT[dom.html.Element]("rt")
+  def ruby = factory.applyT[dom.html.Element]("ruby")
+  def s = factory.applyT[dom.html.Element]("s")
+  def samp = factory.applyT[dom.html.Element]("samp")
+  def script = factory.applyT[dom.html.Script]("script")
+  def section = factory.applyT[dom.html.Element]("section")
+  def select = factory.applyT[dom.html.Select]("select")
+  def slot = factory.applyT[dom.html.Element]("slot") // Need a Slot type
+  def small = factory.applyT[dom.html.Element]("small")
+  def source = factory.applyT[dom.html.Source]("source")
+  def span = factory.applyT[dom.html.Span]("span")
+  def strong = factory.applyT[dom.html.Element]("strong")
+  def style = factory.applyT[dom.html.Style]("style")
+  def sub = factory.applyT[dom.html.Element]("sub")
+  def summary = factory.applyT[dom.html.Element]("summary")
+  def sup = factory.applyT[dom.html.Element]("sup")
+  def table = factory.applyT[dom.html.Table]("table")
+  def tbody = factory.applyT[dom.html.TableSection]("tbody")
+  def td = factory.applyT[dom.html.TableCell]("td")
+  def template = factory.applyT[dom.html.Element]("template") // Need a Template type
+  def textarea = factory.applyT[dom.html.TextArea]("textarea")
+  def tfoot = factory.applyT[dom.html.TableSection]("tfoot")
+  def th = factory.applyT[dom.html.TableCell]("th")
+  def thead = factory.applyT[dom.html.TableSection]("thead")
+  def time = factory.applyT[dom.html.Element]("time") // Need a Time type
+  def title = factory.applyT[dom.html.Title]("title")
+  def tr = factory.applyT[dom.html.TableRow]("tr")
+  def track = factory.applyT[dom.html.Track]("track")
+  def u = factory.applyT[dom.html.Element]("u")
+  def ul = factory.applyT[dom.html.UList]("ul")
+  def `var` = factory.applyT[dom.html.Element]("var")
   def Var = `var`
-  def video = applyT[dom.html.Video]("video")
-  def wbr = applyT[dom.html.Element]("wbr")
+  def video = factory.applyT[dom.html.Video]("video")
+  def wbr = factory.applyT[dom.html.Element]("wbr")
 
+}
+
+val htmlDElementBuilder = DElementBuilder[dom.html.Element]("html", NS) 
+
+object HTML extends DElementBuilder[dom.HTMLElement]("html", NS) with HTMLDSL(htmlDElementBuilder) {
   def svg = veautiful.svg.svg
+
+  object dynamic extends HTMLDSL(DEBlueprintBuilder[dom.html.Element](NS))
 }
 
 val el = HTML

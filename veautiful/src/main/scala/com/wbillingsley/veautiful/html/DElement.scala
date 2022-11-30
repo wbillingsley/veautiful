@@ -32,7 +32,7 @@ object DElement {
   * 
   * <.button(^.onClick --> println("bang"), "Hello ", <.b("World"))
   */
-type SingleElementChild[-T <: dom.Element] = String | VNode[dom.Node] | PredefinedElementChild | CustomElementChild[T]
+type SingleElementChild[-T <: dom.Element] = String | VNode[dom.Node] | Blueprint[VNode[dom.Node]] | PredefinedElementChild | CustomElementChild[T]
 
 /**
   * Things that can be arguments to the DElement's apply method. 
@@ -233,6 +233,7 @@ class DElement[+T <: dom.Element](name:String, var uniqEl:Option[Any] = None, ns
     // types of VNode in the type union.
     for child <- ac do child match
       case n:VNode[dom.Node] @unchecked => addChildren(n)
+      case b:Blueprint[VNode[dom.Node]] @unchecked => addChildren(b.build())
       case s:String => addChildren(Text(s))
       case a:AttrVal => attrs(a)
       case p:PropVal => prop(p)
@@ -249,7 +250,7 @@ class DElement[+T <: dom.Element](name:String, var uniqEl:Option[Any] = None, ns
   }
 
 
-  def create() = {
+  def create():T = {
     val e = dom.document.createElementNS(ns, name).asInstanceOf[T]
 
     for { AttrVal(a, value) <- attributes.values } {
@@ -328,7 +329,7 @@ class DElementBlueprint[+T <: dom.Element](name:String, ns:String = DElement.htm
   * @param defaultTag
   * @param defaultNS
   */
-trait DElementBuilder[T <: dom.Element](defaultTag:String, defaultNS:String) {
+class DElementBuilder[T <: dom.Element](defaultTag:String, defaultNS:String) extends DSLFactory[DElement, T] {
 
   def apply(n:String):DElement[T] = DElement[T](n, ns=defaultNS)
 
