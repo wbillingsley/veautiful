@@ -3,6 +3,8 @@ package com.wbillingsley.veautiful.html
 import scala.collection.mutable
 import org.scalajs.dom
 
+import com.wbillingsley.veautiful.DynamicValue
+
 /**
   * The Animator will queue a batch of callback animation functions to be run via requestanimationframe
   * with the same timestamp. This gives a rerender an easy way to check if it has already been called
@@ -33,6 +35,11 @@ object Animator {
         if !_scheduled then 
           dom.window.requestAnimationFrame(callback)
           _scheduled = true
+    }
+
+    val now:DynamicValue[Double] = DynamicValue {
+        dom.window.requestAnimationFrame(_ => now.clear())
+        dom.window.performance.now()
     }
 
 }

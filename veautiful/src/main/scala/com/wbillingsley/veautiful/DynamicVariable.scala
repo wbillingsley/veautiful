@@ -22,7 +22,7 @@ object DynamicSource {
  * 
  * Dependent values can unsubscribe early instead if they wish.
  */
-trait DynamicSource[T] {
+trait DynamicSource[+T] {
 
   def ready:Boolean 
   
@@ -65,7 +65,7 @@ trait StateVariable[T] extends Receiver[T] {
   * @param op
   * @param parents
   */
-class DynamicValue[T](op: => T, parents:Seq[DynamicSource[_]] = Seq.empty)(using onClear: () => Unit = () => {}) extends DynamicSource[T] {
+class DynamicValue[T](op: => T, parents:Seq[DynamicSource[_]] = Seq.empty)(using onClear: DynamicSource.ClearListener = _ => {}) extends DynamicSource[T] {
 
   private val listeners: mutable.Set[DynamicSource.ClearListener] = mutable.Set.empty
 
@@ -100,6 +100,14 @@ class DynamicValue[T](op: => T, parents:Seq[DynamicSource[_]] = Seq.empty)(using
     notifyClear()    
   }
 
+  /**
+    * Forcibly de-registers everything
+    */
+  def tearDown() = {
+    parents.foreach(_.unsubscribe(parentListener))
+    listeners.clear()
+  }
+
   protected def notifyClear() = {
     parents.foreach(_.unsubscribe(parentListener))
     val notify = listeners.toSet
@@ -132,7 +140,9 @@ class DynamicValue[T](op: => T, parents:Seq[DynamicSource[_]] = Seq.empty)(using
   protected def value: T = {
     cached match {
       case Some(x) => x
-      case _ => fill(op)
+      case _ => 
+        for p <- parents do p.subscribe(parentListener)
+        fill(op)
     }
   }
 
@@ -164,6 +174,9 @@ class DynamicValue[T](op: => T, parents:Seq[DynamicSource[_]] = Seq.empty)(using
   def flatMap[B](t: T => DynamicValue[B]): DynamicValue[B] = {
     new DynamicValue(t(value).value, Seq(this))
   }
+
+  /** The value as it happens to be right now */
+  def immediateValue = value
 
 }
 
