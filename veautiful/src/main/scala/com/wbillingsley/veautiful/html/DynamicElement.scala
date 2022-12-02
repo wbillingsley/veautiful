@@ -1,7 +1,28 @@
 package com.wbillingsley.veautiful.html
 
-import com.wbillingsley.veautiful.{DiffNode, Blueprint}
+import com.wbillingsley.veautiful.{DiffNode, Blueprint, DynamicValue}
 import org.scalajs.dom
+
+sealed trait PredefinedDynamicModifier
+
+object DynamicModifier {
+  case class DynamicAttr[T](name:String, dynamicValue:DynamicValue[T]) extends PredefinedDynamicModifier
+  case class DynamicProp[T](name:String, dynamicValue:DynamicValue[T]) extends PredefinedDynamicModifier
+}
+
+/**
+  * An individual item that can be passed into the `apply` method of a DElement. e.g. in
+  * 
+  * <.button(^.onClick --> println("bang"), "Hello ", <.b("World"))
+  */
+type SingleDynamicModifier[-T <: dom.Element] = SingleElementChild[T] | PredefinedDynamicModifier 
+
+/**
+  * Things that can be arguments to the DElement's apply method. 
+  * This allows Sequences, Options, etc of SingleChild to be included, simplifying the syntax
+  */
+type DynamicModifier[-T <: dom.Element] = SingleDynamicModifier[T] | Iterable[SingleDynamicModifier[T]]
+
 
 /**
  * A DynamicElement can take dynamic values in its modifiers.
@@ -28,27 +49,52 @@ class DynamicElement[+T <: dom.Element](bp0:DEBlueprint[T]) extends DiffNode[T, 
   export inner.nodeOps
   export inner.domNode
 
-  def applyInner(modifiers:ElementChild[T]*) = 
-    inner.apply(modifiers*)
+  def applyInner(modifier:DynamicModifier[T]):Unit = modifier match {
+    case attr:DynamicModifier.DynamicAttr[_] =>
+      def updateValue():Unit = {
+        val v = attr.dynamicValue.subscribe(_ => Animator.queue((_) => if isAttached then resync()))
+        println(s"Attached is ${this.isAttached} and v is $v")
+        inner.setAttribute(PredefinedElementChild.AttrVal(attr.name, v.toString()))
+      }
+      updateValue()
 
-  override def makeItSo = {
-    case de:DynamicElement[T] @unchecked if de.name == name && de.ns == ns =>
+    case attr:DynamicModifier.DynamicProp[_] =>
+      def updateValue():Unit = {
+        val v = attr.dynamicValue.subscribe(_ => Animator.queue((_) => if isAttached then resync()))
+        println(s"Attached is ${this.isAttached} and v is $v")
+        inner.setProperty(PredefinedElementChild.PropVal(attr.name, v.toString()))
+      }
+      updateValue()
+    
+    case it:Iterable[DynamicModifier[T]] @unchecked => it.foreach(applyInner)
 
-
+    case m:ElementChild[T] @unchecked => inner.apply(m) // TODO: fix hack
   }
 
 
-  // The first time we are built, we need to apply the blueprint's modifiers
-  applyInner(blueprint.modifiersFor(this)*)
+  override def beforeAttach(): Unit = resync()
+
+  def resync():Unit = 
+    blueprint.modifiersFor(this).foreach(applyInner)
+    inner.makeItSo(inner)
+
+  override def makeItSo = {
+    case de:DynamicElement[T] @unchecked if de.name == name && de.ns == ns =>
+      _blueprint = de.blueprint
+      if isAttached then resync()
+
+  }
+  
+
 }
 
 
-class DEBlueprint[+T <: dom.Element](val name:String, val ns:String=NS, modifiers:Seq[ElementChild[T]] = Seq.empty) extends Blueprint[DynamicElement[T]](classOf[DynamicElement[T]]) {
+class DEBlueprint[+T <: dom.Element](val name:String, val ns:String=NS, modifiers:Seq[DynamicModifier[T]] = Seq.empty) extends Blueprint[DynamicElement[T]](classOf[DynamicElement[T]]) {
 
-  def apply(modifiers:ElementChild[T]*):DEBlueprint[T] = DEBlueprint[T](name, ns, this.modifiers ++ modifiers)
+  def apply(modifiers:DynamicModifier[T]*):DEBlueprint[T] = DEBlueprint[T](name, ns, this.modifiers ++ modifiers)
 
   def modifiersFor[TT <: dom.Element](de:DynamicElement[TT]) = 
-    if name == de.name && ns == de.ns then modifiers.asInstanceOf[Seq[ElementChild[TT]]]
+    if name == de.name && ns == de.ns then modifiers.asInstanceOf[Seq[DynamicModifier[TT]]]
     else Seq.empty // TODO: throw an error here.
 
   def build() = DynamicElement(this)

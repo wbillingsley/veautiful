@@ -2,6 +2,56 @@ package com.wbillingsley.veautiful
 
 import scala.collection.mutable
 
+object DynamicSource {
+  type ClearListener = Unit => Unit
+}
+
+/**
+ * A DynamicSource can be subscribed to in a particularly transient way.
+ * 
+ * You provide a listener to the DynamicSource and it gives you the value.
+ * When the value changes, it will notify and unsubscribe you. Re-subscribe
+ * to get the new value.
+ * 
+ * The observation here is that a lazy calculation only has a dependency on
+ * upstream values when it *has* a derived value. In any period where it is
+ * uncalculated, it does not need to listen to them. This also helps with
+ * memory management as any dangling dependent values that have gone out of
+ * scope are likely to become eligible for garbage collection the next time
+ * the value changes.
+ * 
+ * Dependent values can unsubscribe early instead if they wish.
+ */
+trait DynamicSource[T] {
+
+  def ready:Boolean 
+  
+  def subscribe(l:DynamicSource.ClearListener):T
+
+  def unsubscribe(l:DynamicSource.ClearListener):Unit
+
+  def map[B](t: T => B): DynamicSource[B]
+
+}
+
+/**
+  * Something that can receive a value
+  */
+trait Receiver[T] {
+  def receive(v:T):Unit
+}
+
+/**
+  * A trait for state variables within components.
+  */
+trait StateVariable[T] extends Receiver[T] {
+  def value:T
+  def value_=(v:T):Unit
+
+  def receive(v:T) = value_=(v)
+}
+
+
 /**
   * Represents a synchronous changeable value.
   * 
@@ -15,16 +65,16 @@ import scala.collection.mutable
   * @param op
   * @param parents
   */
-class DynamicVariable[T](op: => T, parents:Seq[DynamicVariable[_]] = Seq.empty)(using onClear: () => Unit = () => {}) {
+class DynamicValue[T](op: => T, parents:Seq[DynamicSource[_]] = Seq.empty)(using onClear: () => Unit = () => {}) extends DynamicSource[T] {
 
-  private val listeners: mutable.Set[DynamicVariable.Listener[T]] = mutable.Set.empty
+  private val listeners: mutable.Set[DynamicSource.ClearListener] = mutable.Set.empty
 
   /**
     * A listener that detects whether the "parent" Latch has cleared (or changed), and clears this one.
     * This should be registered while this Latch has a Future value, but not when it is clear.
     */
-  private val parentListener: DynamicVariable.Listener[Any] = {
-    case _ => clear()
+  private val parentListener: DynamicSource.ClearListener = {
+    _ => clear()
   }
 
   /**
@@ -32,17 +82,12 @@ class DynamicVariable[T](op: => T, parents:Seq[DynamicVariable[_]] = Seq.empty)(
     */
   private var cached: Option[T] = None
 
-  private def addListener(l: DynamicVariable.Listener[T]) = synchronized {
+  private def addListener(l: DynamicSource.ClearListener) = synchronized {
     listeners.add(l)
   }
 
-  private def removeListener(l: DynamicVariable.Listener[T]) = synchronized {
+  private def removeListener(l: DynamicSource.ClearListener) = synchronized {
     listeners.remove(l)
-  }
-
-  private def propagateClear(l: DynamicVariable.Listener[T]):Unit = synchronized {
-    removeListener(l)
-    if listeners.isEmpty then clear()
   }
 
   /**
@@ -52,8 +97,14 @@ class DynamicVariable[T](op: => T, parents:Seq[DynamicVariable[_]] = Seq.empty)(
     */
   def clear():Unit = synchronized {
     cached = None
-    parents.foreach(_.propagateClear(parentListener))
-    listeners.foreach {
+    notifyClear()    
+  }
+
+  protected def notifyClear() = {
+    parents.foreach(_.unsubscribe(parentListener))
+    val notify = listeners.toSet
+    listeners.clear()
+    notify.foreach {
       _ (None)
     }
   }
@@ -64,12 +115,13 @@ class DynamicVariable[T](op: => T, parents:Seq[DynamicVariable[_]] = Seq.empty)(
     * Can be called to manually fill the Latch with a value.
     * In this case it will not register a listener with any parent (but beware that one might already be in place)
     */
-  def fill(v: T):T = synchronized {
-    if ready then clear()
-    cached = Some(v)
-    listeners.foreach {
-      _ (Some(v))
-    }
+  protected def fill(v: T):T = synchronized {
+    if ready then 
+      cached = Some(v)
+      notifyClear()
+    else 
+      cached = Some(v)
+
     v
   }
 
@@ -77,18 +129,28 @@ class DynamicVariable[T](op: => T, parents:Seq[DynamicVariable[_]] = Seq.empty)(
     * Called to get a Future value from the latch, which might already have been completed.
     * This is usually what triggers the computation.
     */
-  def value: T = {
+  protected def value: T = {
     cached match {
       case Some(x) => x
       case _ => fill(op)
     }
   }
 
+  override def subscribe(l:DynamicSource.ClearListener):T = synchronized {
+    addListener(l)
+    value
+  }
+
+  override def unsubscribe(l: DynamicSource.ClearListener): Unit = synchronized {
+    removeListener(l)
+    if listeners.isEmpty then clear()
+  }
+
   /**
     * Produces a dependent Latch, that uses "lazy observation" to keep itself up-to-date with this latch.
     */
-  def map[B](t: T => B): DynamicVariable[B] = {
-    new DynamicVariable(t(value), Seq(this))
+  def map[B](t: T => B): DynamicValue[B] = {
+    new DynamicValue(t(value), Seq(this))
   }
 
   /**
@@ -99,34 +161,28 @@ class DynamicVariable[T](op: => T, parents:Seq[DynamicVariable[_]] = Seq.empty)(
     * A flatMap taking T => Latch[B] would be of limited use, as it would not have the "lazy observer"
     * listener set up.
     */
-  def flatMap[B](t: T => DynamicVariable[B]): DynamicVariable[B] = {
-    new DynamicVariable(t(value).value, Seq(this))
+  def flatMap[B](t: T => DynamicValue[B]): DynamicValue[B] = {
+    new DynamicValue(t(value).value, Seq(this))
   }
 
 }
 
-object DynamicVariable {
+/** 
+ * A PushVariable is a variable we can push variables into; as opposed to DynamicValues, which
+ * pull values.
+ */
+class PushVariable[T](initial:T)(onUpdate: T => Unit = (x:T) => ()) extends StateVariable[T] {
+  var _value:T = initial
 
-  type Listener[T] = (Option[T] => Unit)
+  def value = _value
 
-  private val listeners:mutable.Set[DynamicVariable.Listener[Any]] = mutable.Set.empty
+  val dynamic = DynamicValue[T](value)
 
-  /**
-    * Called whenever any Latch changes state
-    */
-  def globalNotify(evt:Option[Any]) = listeners.foreach(_.apply(evt))
-
-  /**
-    * Adds a listener function that will be called whenever any Latch changes state. This is useful, for example,
-    * for wiring up declarative view re-rendering so that whenever any cached state in the program changes a
-    * re-render is called.
-    */
-  def addGlobalListener(l:DynamicVariable.Listener[Any]) = synchronized {
-    listeners.add(l)
+  def value_=(v:T):Unit = {
+    _value = v
+    dynamic.clear()
   }
 
-  def removeGlobalListener(l:DynamicVariable.Listener[Any]) = synchronized {
-    listeners.remove(l)
-  }
-
+  /** As it's very easy to forget to put `.value` in a string interpolation, we toString the value */
+  override def toString = value.toString
 }
