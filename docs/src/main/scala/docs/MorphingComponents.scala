@@ -9,22 +9,22 @@ import Common._
 case class MyMorphingComponent()(initialName:String) extends DHtmlComponent with Morphing(initialName) {
   val morpher = createMorpher(this)
   
-  var count = 0
+  val count = stateVariable(0)
   
   def render = <.div(
-    s"I'm a counter that's been clicked $count times and my property is $prop ",
-    <.button(^.onClick --> { count += 1; rerender() }, "Increment count")
+    s"I'm a counter that's been clicked ${count.value} times and my property is $prop ",
+    <.button(^.onClick --> { count.value = count.value + 1 }, "Increment count")
   )
   
 }
 
 case class BobOrSusan() extends DHtmlComponent {
-  var toggle = true
+  val toggle = stateVariable(true)
   
   def render = <.div(
     "Switch the counter name to ", 
-    <.button(^.onClick --> { toggle = !toggle; rerender() }, (if toggle then "Susan" else "Bob")),
-    MyMorphingComponent()(if toggle then "Bob" else "Susan")
+    <.button(^.onClick --> { toggle.value = !toggle.value }, (if toggle.value then "Susan" else "Bob")),
+    MyMorphingComponent()(if toggle.value then "Bob" else "Susan")
   )
 }
 
@@ -108,22 +108,22 @@ def morphingComponents = <.div(
         |case class MyMorphingComponent()(initialName:String) extends DHtmlComponent with Morphing(initialName) {
         |  val morpher = createMorpher(this)
         |  
-        |  var count = 0
+        |  val count = stateVariable(0)
         |  
         |  def render = <.div(
-        |    s"I'm a counter that's been clicked $count times and my property is $prop ",
-        |    <.button(^.onClick --> { count += 1; rerender() }, "Increment count")
+        |    s"I'm a counter that's been clicked ${count.value} times and my property is $prop ",
+        |    <.button(^.onClick --> { count.value = count.value + 1 }, "Increment count")
         |  )
         |  
         |}
         |
         |case class BobOrSusan() extends DHtmlComponent {
-        |  var toggle = true
+        |  val toggle = stateVariable(true)
         |  
         |  def render = <.div(
         |    "Switch the counter name to ", 
-        |    <.button(^.onClick --> { toggle = !toggle; rerender() }, (if toggle then "Susan" else "Bob")),
-        |    MyMorphingComponent()(if toggle then "Bob" else "Susan")
+        |    <.button(^.onClick --> { toggle.value = !toggle.value }, (if toggle.value then "Susan" else "Bob")),
+        |    MyMorphingComponent()(if toggle.value then "Bob" else "Susan")
         |  )
         |}
         |""".stripMargin)

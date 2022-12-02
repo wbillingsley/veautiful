@@ -4,7 +4,7 @@ import com.wbillingsley.veautiful
 import veautiful.html
 import org.scalajs.dom
 import org.scalajs.dom.{Element, Event, Node}
-import html.{DElementBuilder, ModifierDSL}
+import html.{DElementBuilder, ModifierDSL, DSLFactory, DEBlueprintBuilder}
 
 /** A DElement for SVG */
 type DSvgElement = html.DElement[dom.svg.Element]
@@ -13,7 +13,7 @@ type DSvgElement = html.DElement[dom.svg.Element]
 type DSvgModifier = html.ElementChild[dom.svg.Element]
 
 /** A DiffComponent producing DSvgContent */
-type DSvgComponent = veautiful.DiffComponent[dom.svg.Element, dom.Node]
+type DSvgComponent = veautiful.html.DomDiffComponent[dom.svg.Element]
 
 /** A Blueprint for a DSvgElement */
 type DSvgBlueprint = veautiful.Blueprint[DSvgElement]
@@ -24,97 +24,105 @@ type DSvgContent = DSvgElement | DSvgBlueprint
 /** The namespace for SVG nodes */
 val NS = "http://www.w3.org/2000/svg"
 
-object SVG extends DElementBuilder[dom.SVGElement]("svg", NS) {
+trait SVGDSL[C[_ <: dom.svg.Element]](factory: DSLFactory[C, dom.svg.Element]) {
 
-  def a = applyT[dom.svg.A]("a")
+  def a = factory.applyT[dom.svg.A]("a")
 
-  def circle = applyT[dom.svg.Circle]("circle")
+  def circle = factory.applyT[dom.svg.Circle]("circle")
 
-  def clipPath = applyT[dom.svg.ClipPath]("clipPath")
+  def clipPath = factory.applyT[dom.svg.ClipPath]("clipPath")
 
-  def defs = applyT[dom.svg.Defs]("defs")
+  def defs = factory.applyT[dom.svg.Defs]("defs")
 
-  def desc = applyT[dom.svg.Desc]("desc")
+  def desc = factory.applyT[dom.svg.Desc]("desc")
 
-  def ellipse = applyT[dom.svg.Ellipse]("ellipse")
+  def ellipse = factory.applyT[dom.svg.Ellipse]("ellipse")
 
-  def feBlend = applyT[dom.svg.FEBlend]("feBlend")
-  def feColorMatrix = applyT[dom.svg.FEColorMatrix]("feColorMatrix")
-  def feComponentTransfer = applyT[dom.svg.FEComponentTransfer]("feComponentTransfer")
-  def feConvolveMatrix = applyT[dom.svg.FEConvolveMatrix]("feConvolveMatrix")
-  def feDiffuseLighting = applyT[dom.svg.FEDiffuseLighting]("feDiffuseLighting")
-  def feDisplacementMap = applyT[dom.svg.FEDisplacementMap]("feDisplacementMap")
-  def feFlood = applyT[dom.svg.FEFlood]("feFlood")
-  def feFuncA = applyT[dom.svg.FEFuncA]("feFuncA")
-  def feFuncB = applyT[dom.svg.FEFuncB]("feFuncB")
-  def feFuncG = applyT[dom.svg.FEFuncG]("feFuncG")
-  def feFuncR = applyT[dom.svg.FEFuncR]("feFuncR")
-  def feGaussianBlur = applyT[dom.svg.FEGaussianBlur]("feGaussianBlur")
-  def feImage = applyT[dom.svg.FEImage]("feImage")
-  def feMerge = applyT[dom.svg.FEMerge]("feMerge")
-  def feMergeNode = applyT[dom.svg.FEMergeNode]("feMergeNode")
-  def feMorphology = applyT[dom.svg.FEMorphology]("feMorphology")
-  def feOffset = applyT[dom.svg.FEOffset]("feOffset")
-  def fePointLight = applyT[dom.svg.FEPointLight]("fePointLight")
-  def feSpecularLighting = applyT[dom.svg.FESpecularLighting]("feSpecularLighting")
-  def feSpotlight = applyT[dom.svg.FESpotLight]("feSpotlight")
-  def feTile = applyT[dom.svg.FETile]("feTile")
-  def feTurbulence = applyT[dom.svg.FETurbulence]("feTurbulence")
+  def feBlend = factory.applyT[dom.svg.FEBlend]("feBlend")
+  def feColorMatrix = factory.applyT[dom.svg.FEColorMatrix]("feColorMatrix")
+  def feComponentTransfer = factory.applyT[dom.svg.FEComponentTransfer]("feComponentTransfer")
+  def feConvolveMatrix = factory.applyT[dom.svg.FEConvolveMatrix]("feConvolveMatrix")
+  def feDiffuseLighting = factory.applyT[dom.svg.FEDiffuseLighting]("feDiffuseLighting")
+  def feDisplacementMap = factory.applyT[dom.svg.FEDisplacementMap]("feDisplacementMap")
+  def feFlood = factory.applyT[dom.svg.FEFlood]("feFlood")
+  def feFuncA = factory.applyT[dom.svg.FEFuncA]("feFuncA")
+  def feFuncB = factory.applyT[dom.svg.FEFuncB]("feFuncB")
+  def feFuncG = factory.applyT[dom.svg.FEFuncG]("feFuncG")
+  def feFuncR = factory.applyT[dom.svg.FEFuncR]("feFuncR")
+  def feGaussianBlur = factory.applyT[dom.svg.FEGaussianBlur]("feGaussianBlur")
+  def feImage = factory.applyT[dom.svg.FEImage]("feImage")
+  def feMerge = factory.applyT[dom.svg.FEMerge]("feMerge")
+  def feMergeNode = factory.applyT[dom.svg.FEMergeNode]("feMergeNode")
+  def feMorphology = factory.applyT[dom.svg.FEMorphology]("feMorphology")
+  def feOffset = factory.applyT[dom.svg.FEOffset]("feOffset")
+  def fePointLight = factory.applyT[dom.svg.FEPointLight]("fePointLight")
+  def feSpecularLighting = factory.applyT[dom.svg.FESpecularLighting]("feSpecularLighting")
+  def feSpotlight = factory.applyT[dom.svg.FESpotLight]("feSpotlight")
+  def feTile = factory.applyT[dom.svg.FETile]("feTile")
+  def feTurbulence = factory.applyT[dom.svg.FETurbulence]("feTurbulence")
   
-  def filter = applyT[dom.svg.Filter]("filter")
+  def filter = factory.applyT[dom.svg.Filter]("filter")
 
-  def foreignObject = applyT[dom.svg.Element]("foreignObject") // need ForeignObject type?
+  def foreignObject = factory.applyT[dom.svg.Element]("foreignObject") // need ForeignObject type?
 
-  def g = applyT[dom.svg.G]("g")
+  def g = factory.applyT[dom.svg.G]("g")
   
-  def image = applyT[dom.svg.Image]("image")
+  def image = factory.applyT[dom.svg.Image]("image")
 
-  def line = applyT[dom.svg.Line]("line")
+  def line = factory.applyT[dom.svg.Line]("line")
 
-  def linearGradient = applyT[dom.svg.LinearGradient]("linearGradient")
+  def linearGradient = factory.applyT[dom.svg.LinearGradient]("linearGradient")
 
-  def marker = applyT[dom.svg.Marker]("marker")
+  def marker = factory.applyT[dom.svg.Marker]("marker")
 
-  def mask = applyT[dom.svg.Mask]("mask")
+  def mask = factory.applyT[dom.svg.Mask]("mask")
 
-  def metadata = applyT[dom.svg.Metadata]("metadata")
+  def metadata = factory.applyT[dom.svg.Metadata]("metadata")
 
-  def path = applyT[dom.svg.Path]("path")
+  def path = factory.applyT[dom.svg.Path]("path")
 
-  def pattern = applyT[dom.svg.Pattern]("pattern")
+  def pattern = factory.applyT[dom.svg.Pattern]("pattern")
 
-  def polygon = applyT[dom.svg.Polygon]("polygon")
+  def polygon = factory.applyT[dom.svg.Polygon]("polygon")
 
-  def polyline = applyT[dom.svg.Polyline]("polyline")
+  def polyline = factory.applyT[dom.svg.Polyline]("polyline")
 
-  def radialGradient = applyT[dom.svg.RadialGradient]("radialGradient")
+  def radialGradient = factory.applyT[dom.svg.RadialGradient]("radialGradient")
 
-  def rect = applyT[dom.svg.Element]("rect")
+  def rect = factory.applyT[dom.svg.Element]("rect")
 
-  def script = applyT[dom.svg.Script]("script")
+  def script = factory.applyT[dom.svg.Script]("script")
 
-  def stop = applyT[dom.svg.Stop]("stop")
+  def stop = factory.applyT[dom.svg.Stop]("stop")
 
-  def style = applyT[dom.svg.Style]("style")
+  def style = factory.applyT[dom.svg.Style]("style")
 
-  def svg = applyT[dom.svg.SVG]("svg")
+  def svg = factory.applyT[dom.svg.SVG]("svg")
 
-  def switch = applyT[dom.svg.Switch]("switch")
+  def switch = factory.applyT[dom.svg.Switch]("switch")
 
-  def symbol = applyT[dom.svg.Symbol]("symbol")
+  def symbol = factory.applyT[dom.svg.Symbol]("symbol")
 
-  def text = applyT[dom.svg.Text]("text")
+  def text = factory.applyT[dom.svg.Text]("text")
 
-  def textPath = applyT[dom.svg.TextPath]("textPath")
+  def textPath = factory.applyT[dom.svg.TextPath]("textPath")
 
-  def title = applyT[dom.svg.Title]("title")
+  def title = factory.applyT[dom.svg.Title]("title")
 
-  def tspan = applyT[dom.svg.TSpan]("tspan")
+  def tspan = factory.applyT[dom.svg.TSpan]("tspan")
 
-  def use = applyT[dom.svg.Use]("use")
+  def use = factory.applyT[dom.svg.Use]("use")
 
-  def view = applyT[dom.svg.View]("view")
+  def view = factory.applyT[dom.svg.View]("view")
 }
+
+val svgDElementBuilder = DElementBuilder[dom.svg.Element]("html", NS) 
+
+object SVG extends DElementBuilder[dom.svg.Element]("svg", NS) with SVGDSL(svgDElementBuilder) {
+
+  object dynamic extends SVGDSL(DEBlueprintBuilder[dom.svg.Element](NS))
+}
+
 
 val < = SVG
 val el = SVG

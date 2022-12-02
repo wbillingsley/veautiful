@@ -2,7 +2,7 @@ package com.wbillingsley.veautiful.html
 
 import com.wbillingsley.veautiful
 import com.wbillingsley.veautiful.reconcilers.Reconciler
-import com.wbillingsley.veautiful.{DefaultNodeOps, DiffNode, NodeOps, VNode, Blueprint}
+import com.wbillingsley.veautiful.{DefaultNodeOps, DiffNode, NodeOps, VNode, Blueprint, StateVariable, DynamicValue}
 import org.scalajs.dom
 import org.scalajs.dom.{Element, Event, Node, html}
 
@@ -32,7 +32,7 @@ object DElement {
   * 
   * <.button(^.onClick --> println("bang"), "Hello ", <.b("World"))
   */
-type SingleElementChild[-T <: dom.Element] = String | VNode[dom.Node] | PredefinedElementChild | CustomElementChild[T]
+type SingleElementChild[-T <: dom.Element] = String | VNode[dom.Node] | Blueprint[VNode[dom.Node]] | PredefinedElementChild | CustomElementChild[T]
 
 /**
   * Things that can be arguments to the DElement's apply method. 
@@ -83,11 +83,11 @@ class DElement[+T <: dom.Element](name:String, var uniqEl:Option[Any] = None, ns
 
   private var attributes:mutable.Map[String, PredefinedElementChild.AttrVal] = mutable.Map.empty
 
+  private var properties:mutable.Map[String, PropVal] = mutable.Map.empty
+
   private var _children:collection.Seq[VNode[dom.Node]] = Seq.empty
 
   override def children = _children
-
-  var properties:Map[String, PropVal] = Map.empty
 
   var listeners:Map[String, EventListener[_ <: Event]] = Map.empty
 
@@ -143,7 +143,7 @@ class DElement[+T <: dom.Element](name:String, var uniqEl:Option[Any] = None, ns
 
       // Update properties
       properties = el.properties
-      applyPropsToNode(properties.values)
+      for v <- properties.values do applyPropToNode(v)
 
       removeStylesFromNode(styles)
       styles = el.styles
@@ -158,13 +158,9 @@ class DElement[+T <: dom.Element](name:String, var uniqEl:Option[Any] = None, ns
       reconciler = el.reconciler
   }
 
-  def applyPropsToNode(props:Iterable[PropVal]):Unit = {
-    for {
-      n <- domNode
-      p <- props
-    } {
+  private def applyPropToNode(p:PropVal):Unit = {
+    for n <- domNode do
       n.asInstanceOf[js.Dynamic].updateDynamic(p.name)(p.value)
-    }
   }
 
   def applyAttrsToNode(as:Iterable[AttrVal]):Unit = {
@@ -233,6 +229,7 @@ class DElement[+T <: dom.Element](name:String, var uniqEl:Option[Any] = None, ns
     // types of VNode in the type union.
     for child <- ac do child match
       case n:VNode[dom.Node] @unchecked => addChildren(n)
+      case b:Blueprint[VNode[dom.Node]] @unchecked => addChildren(b.build())
       case s:String => addChildren(Text(s))
       case a:AttrVal => attrs(a)
       case p:PropVal => prop(p)
@@ -249,7 +246,7 @@ class DElement[+T <: dom.Element](name:String, var uniqEl:Option[Any] = None, ns
   }
 
 
-  def create() = {
+  def create():T = {
     val e = dom.document.createElementNS(ns, name).asInstanceOf[T]
 
     for { AttrVal(a, value) <- attributes.values } {
@@ -263,6 +260,20 @@ class DElement[+T <: dom.Element](name:String, var uniqEl:Option[Any] = None, ns
     applyStylesToNode(styles)
 
     e
+  }
+
+  /** Sets an attribute on this DElement and (if attached) its node */
+  def setAttribute(value:AttrVal):Unit = {
+    if !attributes.get(value.name).contains(value) then
+      attributes(value.name) = value
+      for n <- domNode do n.setAttribute(value.name, value.value)
+  }
+
+  /** Sets a property on this DElement and (if attached) its node. */
+  def setProperty(value:PropVal):Unit = {
+    if !properties.get(value.name).contains(value) then
+      properties(value.name) = value
+      applyPropToNode(value)
   }
 
   def updateChildren(to:collection.Seq[VNode[dom.Node]]):Unit = 
@@ -322,14 +333,13 @@ class DElementBlueprint[+T <: dom.Element](name:String, ns:String = DElement.htm
 
 }
 
-
 /**
   * Trait implemented by the HTML and SVG objects
   *
   * @param defaultTag
   * @param defaultNS
   */
-trait DElementBuilder[T <: dom.Element](defaultTag:String, defaultNS:String) {
+class DElementBuilder[T <: dom.Element](defaultTag:String, defaultNS:String) extends DSLFactory[DElement, T] {
 
   def apply(n:String):DElement[T] = DElement[T](n, ns=defaultNS)
 
@@ -347,7 +357,7 @@ trait ModifierDSL {
 
   import PredefinedElementChild.*
 
-  case class Attrable(n:String) {
+  class Attrable(n:String) {
     def :=(s:String) = AttrVal(n, s)
 
     def :=(i:Int) = AttrVal(n, i.toString)
@@ -355,12 +365,16 @@ trait ModifierDSL {
     def :=(d:Double) = AttrVal(n, d.toString)
 
     def ?=(o:Option[String]) = o.map(:=)
+
+    def <--[T] (dv:DynamicValue[T]) = DynamicModifier.DynamicAttr(n, dv)
   }
 
   case class Propable(n:String) {
     def :=(j:String) = PropVal(n, j)
 
     def ?=(j:Option[String]) = PropVal(n, j.orNull[String])
+
+    def <--[T] (dv:DynamicValue[T]) = DynamicModifier.DynamicProp(n, dv)
   }
 
   object reconciler {
@@ -388,6 +402,10 @@ trait ModifierDSL {
 
     def ==>(f: (T) => Unit) = {
       EventListener(n, f, false)
+    }
+
+    def pushValue(sv:StateVariable[String]) = {
+      EventListener(n, (e) => for v <- e.inputValue do sv.value = v, false)
     }
   }
 
@@ -435,3 +453,5 @@ trait ModifierDSL {
   def backgroundImage = InlineStylable("background-image")
 
 }
+
+def getTargetValue = PushBuilder[dom.Event, String](_.inputValue)

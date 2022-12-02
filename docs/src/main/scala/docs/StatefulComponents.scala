@@ -1,17 +1,17 @@
 package docs
 
-import com.wbillingsley.veautiful.html.{<, DHtmlComponent, ^, EventMethods}
+import com.wbillingsley.veautiful.html.{<, DHtmlComponent, ^, EventMethods, getTargetValue}
 
 case class Greeter() extends DHtmlComponent {
 
-  private var name:String = ""
+  private val name = stateVariable("")
 
   override def render = <.div(^.cls := "hello-world",
     <.input(
-      ^.prop("value") := name,
-      ^.attr("placeholder") := "Hello who?", ^.on("input") ==> { e => e.inputValue.foreach(name = _); rerender() }
+      ^.prop("value") := name.value,
+      ^.attr("placeholder") := "Hello who?", ^.onInput ==> getTargetValue.pushTo(name)
     ),
-    <.span(s" Hello ${ (if (name.isEmpty) "World" else name) }"),
+    <.span(s" Hello ${ (if name.value.isEmpty then "World" else name.value) }"),
   )
 
 }
@@ -19,15 +19,15 @@ case class Greeter() extends DHtmlComponent {
 def statefulComponents = <.div(Common.markdown("""
     |# Stateful components
     |
-    |If your component needs to keep some ephemeral local state, implementing it as a class extending 
-    |`DHtmlComponent`. Usually a case class.
+    |If your component needs to keep some ephemeral local state, implement it as a class extending 
+    |`DHtmlComponent`. Usually a case class. 
     |
     |`DHtmlComponent` requires you to implement a `render` method to describe the tree your component should produce. 
     |This should produce a consistent outer element (e.g. a `<.div()` or a `<.span()`), but its contents can then be
     |whatever you want.
     |
-    |You can then keep local state inside your class, and your component can ask itself to rerender at any time using
-    |the component's `rerender` method.
+    |If you want to handle updates somewhat manually, you can then keep local state inside your class, and your component 
+    |can ask itself to rerender at any time using the component's `rerender` method.
     |
     |For example:
     |
@@ -60,9 +60,10 @@ def statefulComponents = <.div(Common.markdown("""
   Common.markdown(
     """ 
     |This will use the default reconciliation strategy to update its DOM tree in the page. This example has been written just
-    |to re-render *this component*. We could go all the way up to re-rendering the Attacher if we want, however. Usually,
-    |there's some component in the tree where it's obvious you'll want to trigger a re-renders &mdash; even if only the
-    |site's router.
+    |to re-render *this component*. We could go all the way up to re-rendering the Attacher if we want. However, usually that's
+    |not necessary. Veautiful is designed so that updates tend to be local and more efficient.
+    |
+    |### Case classes versus Keep
     |
     |Often, components are implemented as `case classes`. This tells the reconciler when to try to retain your component and
     |when to replace it. The default strategy is to try to keep your component if it equals the target, and replace it if it doesn't.
@@ -83,14 +84,66 @@ def statefulComponents = <.div(Common.markdown("""
     |}
     |```
     |
-    |## Using external state
+    |### State variables and the Animator
     |
-    |You can also define `DHtmlComponents` that use external state - for instance, if your state is kept in a reactive
-    |date store. In this case, you can just hook the `rerender` method to be triggered by your data store's event notification.
+    |Rather than keep our state in an ordinary var, and asking for an immediate rerender manually, we could keep our state in *state variablse*. 
     |
-    |Override the `afterAttach` method to install your event hook, and override `beforeDetach` to remove it.
+    |These are designed to work in a very simple manner. When they receive a new value, they ask the `Animator` to queue a re-render of the component.
+    |To create a state variable, inside your component initialise it with
     |
-    |You should put some thought into your site's update strategy, however. It is, for instance, often feasible just to 
-    |define function components, and trigger a top-level re-render (usually on the router) when data changes.
+    |```scala
+    |val myState = stateVariable("") // Produces a StateVariable[String]
+    |```
+    |
+    |The value could be manually updated either via `value =` or via `receive`
+    |
+    |```scala
+    |// Either of these would update the value and request a rerender
+    |myState.value = "new value"
+    |myState.receive("new value")
+    |```
+    |
+    |We can tie these to events using ordinary functions, e.g. 
+    |
+    |```scala
+    |^.onInput ==> { (e) => e.inputValue.foreach(myState.value = _) }
+    |```
+    |
+    |or there are some function builders that can let you write that in a more fluid way. But note you are still just building an ordinary
+    |function and passing it to the event hander; there's no special sauce going on here.
+    |
+    |```
+    |^.onInput ==> getTargetValue.pushTo(myState)
+    |```
+    |
+    |The `Animator` is an object whose job is simply to call requestAnimationFrame when it has a batch of renders to make. It calls all its 
+    |queued tasks with *the same timestamp*, so if a component has already re-rendered in this animation frame it won't do it again. That lets
+    |us have a bunch of state variables and not worry about whether anything's getting rerendered multiple times.
+    |
+    |Here's that component using this style of code
+    |
+    |```scala
+    |case class Greeter() extends DHtmlComponent {
+    |
+    |  private val name = stateVariable("")
+    |
+    |  override def render = <.div(^.cls := "hello-world",
+    |    <.input(
+    |      ^.prop("value") := name.value,
+    |      ^.attr("placeholder") := "Hello who?", ^.onInput ==> getTargetValue.pushTo(name)
+    |    ),
+    |    <.span(s" Hello ${ (if name.value.isEmpty then "World" else name.value) }"),
+    |  )
+    |
+    |}
+    |```
+    |
+    |### Queueing your own animation frames
+    |
+    |If you want to queue a rerender on the next animation frame (without using a state variable), call `requestUpate()` on the component.
+    |
+    |There is also an `update()` method that would produce an immediate update. However, usually if you're using the Animator, it's cleaner
+    |to put all the updates for the component through it.
+    |
     """.stripMargin)
 )
