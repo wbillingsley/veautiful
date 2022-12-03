@@ -2,12 +2,13 @@ package com.wbillingsley.veautiful.html
 
 import com.wbillingsley.veautiful.{DiffNode, Blueprint, DynamicSource, DynamicValue}
 import org.scalajs.dom
+import scalajs.js
 
 sealed trait PredefinedDynamicModifier
 
 object DynamicModifier {
   case class DynamicAttr[T](name:String, dynamicValue:DynamicValue[T]) extends PredefinedDynamicModifier
-  case class DynamicProp[T](name:String, dynamicValue:DynamicValue[T]) extends PredefinedDynamicModifier
+  case class DynamicProp[T <: js.Any](name:String, dynamicValue:DynamicValue[T]) extends PredefinedDynamicModifier
 }
 
 /**
@@ -51,10 +52,26 @@ class DynamicElement[+T <: dom.Element](bp0:DEBlueprint[T]) extends DiffNode[T, 
   export inner.nodeOps
   export inner.domNode
 
-  def applyInner(modifier:DynamicModifier[T]):Unit = modifier match {
+
+  var lastAnimation:Double = Double.MinValue
+
+  def animationUpdate(now:Double, dt:Double):Unit = 
+    if isAttached then resync()
+
+  val dynamicListener: DynamicSource.ClearListener = _ => 
+    Animator.queue(animationCallback(_))
+
+  def animationCallback(d:Double):Unit = {
+    if d > lastAnimation then
+      val dt = d - lastAnimation
+      lastAnimation = d
+      this.animationUpdate(d, dt)
+  }
+
+  private def applyInner(modifier:DynamicModifier[T]):Unit = modifier match {
     case attr:DynamicModifier.DynamicAttr[_] =>
       def updateValue():Unit = {
-        val v = attr.dynamicValue.subscribe(_ => Animator.queue((_) => if isAttached then resync()))
+        val v = attr.dynamicValue.subscribe(dynamicListener)
         println(s"Attached is ${this.isAttached} and v is $v")
         inner.setAttribute(PredefinedElementChild.AttrVal(attr.name, v.toString()))
       }
@@ -62,7 +79,7 @@ class DynamicElement[+T <: dom.Element](bp0:DEBlueprint[T]) extends DiffNode[T, 
 
     case attr:DynamicModifier.DynamicProp[_] =>
       def updateValue():Unit = {
-        val v = attr.dynamicValue.subscribe(_ => Animator.queue((_) => if isAttached then resync()))
+        val v = attr.dynamicValue.subscribe(dynamicListener)
         inner.setProperty(PredefinedElementChild.PropVal(attr.name, v.toString()))
       }
       updateValue()
@@ -70,6 +87,9 @@ class DynamicElement[+T <: dom.Element](bp0:DEBlueprint[T]) extends DiffNode[T, 
     case it:Iterable[DynamicModifier[T]] @unchecked => it.foreach(applyInner)
 
     case m:ElementChild[T] @unchecked => inner.apply(m) // TODO: fix hack
+
+    // TODO: what happens if somehow we do get a DynamicSource passed into this method?
+
   }
 
 
@@ -83,16 +103,26 @@ class DynamicElement[+T <: dom.Element](bp0:DEBlueprint[T]) extends DiffNode[T, 
     def proc(in:(Seq[DynamicValue[_]], DElement[T]), m:DynamicModifier[T]):(Seq[DynamicValue[_]], DElement[T]) = {
       val (soFar, el) = in 
       m match {
-        case v:DynamicValue[ElementChild[T]] => 
+        case v:DynamicSource[_ <: ElementChild[T]] => 
           // derive dynamic variables that would trigger a resync
           val derived = v.map(identity)
-          val nowVal = derived.subscribe(_ => Animator.queue(_ => if isAttached then resync()))
+          val nowVal = derived.subscribe(dynamicListener)
           (soFar :+ derived, el(nowVal))
 
-        case it:Iterator[SingleDynamicModifier[T]] => 
+        case p:DynamicModifier.DynamicProp[_ <: js.Any] @unchecked => 
+          val derived = p.dynamicValue.map(identity)
+          val nowVal = derived.subscribe(dynamicListener)
+          (soFar :+ derived, el(PredefinedElementChild.PropVal(name, nowVal)))
+          
+        case p:DynamicModifier.DynamicAttr[_] => 
+          val derived = p.dynamicValue.map(identity)
+          val nowVal = derived.subscribe(dynamicListener).toString
+          (soFar :+ derived, el(PredefinedElementChild.AttrVal(name, nowVal)))
+
+        case it:Iterable[_ <: SingleDynamicModifier[T]] => 
           it.foldLeft((soFar, el))(proc)
         
-        case ec:ElementChild[T] => (soFar, el(ec))
+        case ec:ElementChild[_ >: T] => (soFar, el(ec))
       }
     }
 
@@ -123,7 +153,6 @@ class DynamicElement[+T <: dom.Element](bp0:DEBlueprint[T]) extends DiffNode[T, 
 
   }
   
-
 }
 
 

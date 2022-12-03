@@ -1,6 +1,7 @@
 package com.wbillingsley.veautiful.html
 
-import com.wbillingsley.veautiful.{DiffComponent, DynamicValue, Receiver, PushVariable}
+import com.wbillingsley.veautiful.{DiffComponent, DynamicValue, DynamicSource, Receiver, PushVariable, ValueMethod}
+import scala.collection.mutable
 import org.scalajs.dom
 
 
@@ -8,25 +9,39 @@ import org.scalajs.dom
 /** Helps us build a little DSL for things to push events through */
 class PushBuilder[A, B](f:A => Option[B]) {
   def map[C](g: B=>C) = PushBuilder((a:A) => f(a).map(g))
-  def pushTo(sv:Receiver[B]): A => Unit = (a:A) => f(a).foreach(sv.receive)
+  def pushTo(sv:Receiver[B]): A => Unit = (a:A) => {
+    f(a).foreach(sv.receive)
+  }
 }
 
 /**
   * A DiffComponent that makes use of some of the facilities we have available in a browser environment, e.g. 
   * use of requestAnimationFrame
   */
-trait DomDiffComponent[N <: dom.Element] extends DiffComponent[N, dom.Node] {
+trait DomDiffComponent[N <: dom.Element] extends DiffComponent[N, dom.Node] with AnimationAdapter {
 
-  var _lastAnimated:Double = 0d
+  private val dynamics:mutable.Buffer[DynamicValue[_]] = mutable.Buffer.empty
 
-  def animationUpdate(now:Double):Unit = {
-    if now > _lastAnimated then
-      _lastAnimated = now
-      rerender()
+  class DynVal[T](dv:DynamicValue[T]) extends ValueMethod[T] {
+    def value = dv.subscribe(dynamicListener)
   }
 
-  def stateVariable[T](initial:T) = PushVariable(initial) { _ => requestUpdate() }
+  override def animationUpdate(now:Double, dt:Double):Unit = {
+    rerender()
+  }
 
-  def requestUpdate() = Animator.queue(animationUpdate(_))
+  def stateVariable[T](initial:T) = PushVariable(initial) { value => 
+    requestUpdate() 
+  }
+
+  def dynamicState[T](source:DynamicSource[T]):ValueMethod[T] = {
+    val derived = source.map(identity)
+    dynamics.append(derived)
+    DynVal(derived)
+  }
+
+  def requestUpdate() = Animator.queue(this)
+
+  override def afterDetach() = for d <- dynamics do d.clear()
 
 }

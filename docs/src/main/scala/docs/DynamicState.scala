@@ -2,12 +2,29 @@ package docs
 
 
 import com.wbillingsley.veautiful.{PushVariable, DynamicValue}
-import com.wbillingsley.veautiful.html.{HTML, <, ^, Animator}
+import com.wbillingsley.veautiful.html.{HTML, <, ^, Animator, DHtmlComponent, getTargetValue}
 import HTML.*
 import scalajs.js
 import org.scalajs.dom
 
 val time = for _ <- Animator.now yield (new js.Date()).toLocaleTimeString()
+
+object HelloMyNameIs extends DHtmlComponent {
+  val name = stateVariable("Fred")
+
+  def render = div(
+    label("My name is "),
+    input(
+      ^.prop("value") := name.value, ^.onInput ==> getTargetValue.pushTo(name)
+    )   
+  )
+}
+
+object GreetHMNIS extends DHtmlComponent {
+
+  val name = dynamicState(HelloMyNameIs.name.dynamic)
+  def render = div(s"Hello ${name.value}")
+}
 
 def dynamicState = <.div(Common.markdown(
   """# Dynamic state
@@ -36,6 +53,41 @@ def dynamicState = <.div(Common.markdown(
     |
     |Dynamic variables have `map` so you can derive other values from them, but very few other methods. (Mostly because I haven't needed many other methods
     |from them.) 
+    |
+    |### Dynamic state in components
+    |
+    |In an earlier example, we called `stateVariable` to create a variable that we could push to, and it would trigger a re-render of that component.
+    |We can also use `dynamicState` to hook a component up so that it will rerender if a dynamic value changes.
+    |
+    |Let's do the terribly contrived example of having one component with a push variable and another component that rerenders dynamically based on
+    |its value.
+    |
+    |```
+    |object HelloMyNameIs extends DHtmlComponent {
+    |  val name = stateVariable("Fred")
+    |
+    |  def render = div(
+    |    label("My name is "),
+    |    input(
+    |      ^.prop("value") := name.value, ^.onInput ==> getTargetValue.pushTo(name)
+    |    )   
+    |  )
+    |}
+    |
+    |object GreetHMNIS extends DHtmlComponent {
+    |  val name = dynamicState(HelloMyNameIs.name.dynamic)
+    |  def render = div(s"Hello ${name.value}")
+    |}
+    |```
+    |
+    |""".stripMargin),
+  <.div(^.cls := embeddedExampleStyle.className,
+    HelloMyNameIs
+  ),
+  <.div(^.cls := embeddedExampleStyle.className,
+    GreetHMNIS
+  ),
+  Common.markdown("""
     |
     |### Dynamic HTML
     |
