@@ -10,15 +10,15 @@ def gettingStarted:VDomNode = Common.markdown(
     |doctacular (a system for publishing docs or teaching sites) are published to Maven Central.
     |
     |```
-    |"com.wbillingsley" %%% "veautiful" % "0.3-M1" // just the core toolkit, latest milestone
-    |"com.wbillingsley" %%% "veautiful" % "0.3-SNAPSHOT" // just the core toolkit, latest snapshot
+    |"com.wbillingsley" %%% "veautiful" % "0.3-M3" // just the core toolkit, latest milestone
+    |"com.wbillingsley" %%% "veautiful" % "0.0-SNAPSHOT" // just the core toolkit, latest snapshot
     |```
     |
     |or
     |
     |```
-    |"com.wbillingsley" %%% "doctacular" % "0.3-M1" // also includes some components and the site system, latest milestone
-    |"com.wbillingsley" %%% "doctacular" % "0.3-SNAPSHOT" // also includes some components and the site system, latest snapshot
+    |"com.wbillingsley" %%% "doctacular" % "0.3-M3" // also includes some components and the site system, latest milestone
+    |"com.wbillingsley" %%% "doctacular" % "0.0-SNAPSHOT" // also includes some components and the site system, latest snapshot
     |```
     |
     |## Here's some I made earlier

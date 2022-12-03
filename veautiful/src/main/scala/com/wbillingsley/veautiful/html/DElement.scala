@@ -374,7 +374,7 @@ trait ModifierDSL {
 
     def ?=(j:Option[String]) = PropVal(n, j.orNull[String])
 
-    def <--[T] (dv:DynamicValue[T]) = DynamicModifier.DynamicProp(n, dv)
+    def <--[T <: js.Any] (dv:DynamicValue[T]) = DynamicModifier.DynamicProp(n, dv)
   }
 
   object reconciler {

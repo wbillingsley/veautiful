@@ -34,9 +34,9 @@ def pureFunctions = <.div(
       |)
       |```
       |
-      |### Until 0.3-M3, prefer functions to values 
+      |### Until 0.3-M4, prefer functions to values 
       |
-      |**Until 0.3-M3**, you should define these as functions, rather than values. 
+      |**Until 0.3-M4**, you should define these as functions, rather than values. 
       |
       |Each `DHtmlElement`, when it is mounted in the page, "owns" a single DOM element. That means it can only appear once in the DOM tree.
       |It's also intentionally mutable. A `DHtmlElement`'s key skill is that it can morph itself to match a target. This helps us to 
@@ -63,11 +63,11 @@ def pureFunctions = <.div(
       |))
       |```
       |
-      |### From 0.3-M3, you can just use `val`
+      |### From 0.3-M4, you can just use `val`
       |
       |The next release will switch the HTML DSL over so that instead of producing real `DHtmlElement`s, it 
       |produces immutable `Blueprint`s for them (`DHtmlBlueprint`). As of 0.3-M2, we can ask elements
-      |to morph themselves to match either another element or a blueprint for one. In 0.3-M3, the HTML
+      |to morph themselves to match either another element or a blueprint for one. In 0.3-M4, the HTML
       |DSL will produce Blueprints by default.
       |
       |This is not a source compatible change. In the locations where you have put a `DHtmlElement` into a 

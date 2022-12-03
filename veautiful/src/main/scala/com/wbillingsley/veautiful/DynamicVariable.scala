@@ -30,8 +30,12 @@ trait DynamicSource[+T] {
 
   def unsubscribe(l:DynamicSource.ClearListener):Unit
 
-  def map[B](t: T => B): DynamicSource[B]
+  def map[B](t: T => B): DynamicValue[B]
 
+}
+
+trait ValueMethod[+T] {
+  def value:T
 }
 
 /**
@@ -193,6 +197,7 @@ class PushVariable[T](initial:T)(onUpdate: T => Unit = (x:T) => ()) extends Stat
 
   def value_=(v:T):Unit = {
     _value = v
+    onUpdate(v)
     dynamic.clear()
   }
 
