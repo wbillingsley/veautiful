@@ -64,13 +64,13 @@ object VSlidesExample {
     ))
     .renderSlides
 
-  def page1(i:Int):VDomNode = {
+  def page1(i:Int) = {
     <.div(^.cls := "resizable",
       DefaultVSlidesPlayer(deck)(i)
     )
   }
 
-  def page(i:Int):VDomNode = {
+  def page(i:Int) = {
       <.div(
         Common.markdown(
           s"""

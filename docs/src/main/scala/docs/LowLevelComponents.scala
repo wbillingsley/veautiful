@@ -22,7 +22,7 @@ case class MouseTrails() extends VDomNode {
       ^.on("mousemove") ==> { case e:MouseEvent =>
         update((e.clientX.toInt, e.clientY.toInt))
       }
-    ).create()
+    ).build().create()
     _domNode = Some(el)
     el
   }
@@ -86,9 +86,9 @@ object Particles extends DHtmlComponent {
     <.svg(
       ^.attr("style") := "background: white; border-radius: 10px; margin-right: 15px;",
       ^.attr("width") := 100, ^.attr("height") := 100, ^.cls := "particles"
-    ), particles
+    ).build(), particles
   )(
-    onEnter = { (d:(Double, Double), _) => SVG.circle(^.cls := "particle", ^.attr("r") := "1") },
+    onEnter = { (d:(Double, Double), _) => SVG.circle(^.cls := "particle", ^.attr("r") := "1").build() },
     onUpdate = { (d:(Double, Double), i, v) =>
       for { circle <- v.domNode } {
         circle.setAttribute("cx", d._1.toInt.toString)

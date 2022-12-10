@@ -4,14 +4,15 @@ import com.wbillingsley.veautiful.html.{<, ElementComponent, VDomNode}
 import com.wbillingsley.veautiful.logging.Logger
 import org.scalajs.dom
 import org.scalajs.dom.Event
+import com.wbillingsley.veautiful.Blueprint
 
-abstract class HistoryRouter[Route] extends ElementComponent(<.div) {
+abstract class HistoryRouter[Route] extends ElementComponent(<.div.build()) {
 
   private val logger = Logger.getLogger("com.wbillingsley.veautiful.templates.HistoryRouter")
 
   var route:Route
 
-  def render:VDomNode
+  def render:VDomNode | Blueprint[VDomNode]
 
   def path(route:Route):String
 

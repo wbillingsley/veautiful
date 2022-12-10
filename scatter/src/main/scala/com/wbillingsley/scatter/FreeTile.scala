@@ -2,7 +2,7 @@ package com.wbillingsley.scatter
 
 import com.wbillingsley.veautiful.OnScreen
 import com.wbillingsley.veautiful.html.^
-import com.wbillingsley.veautiful.svg.{DSvgElement, SVG, DSvgComponent}
+import com.wbillingsley.veautiful.svg.{DSvgContent, SVG, DSvgComponent}
 import org.scalajs.dom.{MouseEvent, SVGElement}
 
 /**
@@ -15,7 +15,7 @@ import org.scalajs.dom.{MouseEvent, SVGElement}
   */
 case class FreeTile[T](tile:Tile[T]) extends DSvgComponent with OnScreen {
   
-  val tileBoundary:DSvgElement = SVG.path(^.cls := "tile-path")
+  val tileBoundary:DSvgContent = SVG.path(^.cls := "tile-path")
   
   export tile.ts
   export tile.layout

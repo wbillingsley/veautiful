@@ -1,8 +1,8 @@
 package com.wbillingsley.veautiful.doctacular
 
-import com.wbillingsley.veautiful.PathDSL
+import com.wbillingsley.veautiful.{PathDSL, Blueprint}
 import PathDSL.Compose._
-import com.wbillingsley.veautiful.html.{<, Attacher, VDomNode, ^}
+import com.wbillingsley.veautiful.html.{<, Attacher, VDomContent, VDomNode, ^}
 import com.wbillingsley.veautiful.templates.{HistoryRouter, VSlides, Challenge}
 
 import scala.collection.mutable
@@ -24,7 +24,7 @@ class Site() {
   case class ChallengeRoute(name:String, level:Int, stage:Int) extends Route
   
   trait CustomRoute extends Route {
-    def render():VDomNode
+    def render():VDomContent
 
     def path:String
   }
@@ -34,10 +34,10 @@ class Site() {
   }
 
   trait CustomTocElement {
-    def render:VDomNode
+    def render:VDomContent
   }
   
-  class TocNodeLink(node: => VDomNode, val route: Route) extends CustomTocElement {
+  class TocNodeLink(node: => VDomContent, val route: Route) extends CustomTocElement {
     def render = <.a(^.href := router.path(route), node)
   }
   
@@ -47,7 +47,7 @@ class Site() {
 
   type TocEntry = (String, Route) | (String, Toc) | CustomTocElement
   
-  private var pages:mutable.Map[String, () => VDomNode] = mutable.Map.empty
+  private var pages:mutable.Map[String, () => VDomContent] = mutable.Map.empty
   private var decks:mutable.Map[String, () => DeckResource] = mutable.Map.empty
   private var videos:mutable.Map[String, () => VideoResource] = mutable.Map.empty
   private var challenges:mutable.Map[String, () => Seq[Challenge.Level]] = mutable.Map.empty
@@ -55,11 +55,11 @@ class Site() {
   private var alternativeMap:mutable.Map[Route, Seq[(Route, Alternative)]] = mutable.Map.empty
   def alternativesTo(r:Route):Seq[(Route, Alternative)] = alternativeMap.getOrElse(r, Seq.empty)
   
-  var home:() => VDomNode = () => <.div("No home page has been set yet")
+  var home:() => VDomContent = () => <.div("No home page has been set yet")
   var toc = Toc()
   
   var pageLayout = PageLayout(this)
-  def renderPage(f: => VDomNode):VDomNode = pageLayout.renderPage(this, f)
+  def renderPage(f: => VDomContent):VDomContent = pageLayout.renderPage(this, f)
   
   var deckLayout = DeckLayout(this)
   def renderDeck(name:String, page:Int) = deckLayout.renderDeckGallery(this, name, decks(name)(), page)
@@ -78,7 +78,7 @@ class Site() {
     ).show(level, stage)
   }
 
-  def addPage(name:String, content: => VDomNode):PageRoute = {
+  def addPage(name:String, content: => VDomContent):PageRoute = {
     pages.put(name, () => content)
     PageRoute(name)
   }
@@ -87,7 +87,7 @@ class Site() {
   given DeckPlayer[VSlides] with 
     extension (v:VSlides) {
       // We need to at least be able to put the deck on the screen
-      def defaultView(name:String):VDomNode = <.div(DoctacularVSlidesGallery(site=Site.this, deckName=name, deck=v)(0))
+      def defaultView(name:String):VDomContent = <.div(DoctacularVSlidesGallery(site=Site.this, deckName=name, deck=v)(0))
 
       // Optionally, we might be able to directly play the deck full-screen
       def fullScreenPlayer = Some((name:String, slide:Int) => <.div(DoctacularFSVSlidesPlayer(site=Site.this, deckName=name, deck=v)(slide)))

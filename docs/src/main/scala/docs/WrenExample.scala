@@ -50,7 +50,7 @@ object WrenExample {
     circuit.rerender()
   }
 
-  def page:VDomNode = <.div(^.cls := "row",
+  def page = <.div(^.cls := "row",
     <.div(^.cls := "col", circuit)
   )
 

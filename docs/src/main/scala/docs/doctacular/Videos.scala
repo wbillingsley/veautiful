@@ -15,7 +15,7 @@ given VideoPlayer[YouTube] with
         ^.attr("allowfullscreen") := "allowfullscreen")
     )
 
-val videoIntro = unique(<.div(
+val videoIntro = <.div(
   markdown("""# Videos
     | 
     |There are many different places that a video could come from that you want to embed in a page or show as its own
@@ -68,4 +68,4 @@ val videoIntro = unique(<.div(
     |```
     |""".stripMargin),
   YouTube("YE7VzlLtp-4").embeddedPlayer(720, 480)
-))
+)

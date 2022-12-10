@@ -1,7 +1,7 @@
 package com.wbillingsley.veautiful.doctacular
 
 import com.wbillingsley.veautiful.{MakeItSo, Morphing}
-import com.wbillingsley.veautiful.html.{<, StyleSuite, Styling, DHtmlComponent, VDomNode, ^}
+import com.wbillingsley.veautiful.html.{<, StyleSuite, Styling, DHtmlComponent, VDomContent, DHtmlContent, ^}
 
 class PageLayout(site:Site) {
 
@@ -111,7 +111,7 @@ class PageLayout(site:Site) {
 
 
   /** A stateful component allowing us to open and close the sidebar */
-  case class SideBarAndLayout()(name:String, left: () => VDomNode, right: () => VDomNode, var open:Boolean = true) extends DHtmlComponent with Morphing((name, left, right)) {
+  case class SideBarAndLayout()(name:String, left: () => VDomContent, right: () => VDomContent, var open:Boolean = true) extends DHtmlComponent with Morphing((name, left, right)) {
 
     val morpher = createMorpher(this)
 
@@ -141,13 +141,13 @@ class PageLayout(site:Site) {
 
   //private val slideToggle = SideBarAndLayout()(() => <.div(), () => <.div())
 
-  def renderPage(site:Site, contentFunction: => VDomNode):VDomNode = {
+  def renderPage(site:Site, contentFunction: => VDomContent) = {
     SideBarAndLayout()(scala.util.Random.nextString(4), () => leftSideBar(site), () => contentFunction)
   }
 
   def leftSideBar(site:Site) = renderToc(site, site.toc)
 
-  def renderToc(site:Site, toc:site.Toc, depth:Int = 0):VDomNode = {
+  def renderToc(site:Site, toc:site.Toc, depth:Int = 0):DHtmlContent = {
     <.ul(^.cls := tocStyles.getOrElse(depth, tocStyles(-1)).className,
       for {
         entry <- toc.entries

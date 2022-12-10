@@ -4,7 +4,7 @@ import com.wbillingsley.veautiful.html.{<, EventMethods, VDomNode, ^, unique}
 import org.scalajs.dom
 import org.scalajs.dom.raw.HTMLInputElement
 
-val markupComponents = unique(<.div(
+val markupComponents = <.div(
     Common.markdown(
     """
       |# Markup components
@@ -101,4 +101,4 @@ val markupComponents = unique(<.div(
       |""".stripMargin
     )
 
-))
+)

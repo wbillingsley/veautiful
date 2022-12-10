@@ -28,4 +28,13 @@ class Unique[N](val delegate: VNode[N]) extends VNode[N] with Update {
   }
 }
 
+class Decorator[N](val delegate: VNode[N]) extends VNode[N] {
+  export delegate.domNode
+  export delegate.attach
+  export delegate.detach
 
+  override def beforeAttach(): Unit = delegate.beforeAttach()
+  override def beforeDetach(): Unit = delegate.beforeDetach()
+  override def afterAttach(): Unit = delegate.afterAttach()
+  override def afterDetach(): Unit = delegate.afterDetach()
+}

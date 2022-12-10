@@ -1,6 +1,6 @@
 package com.wbillingsley.veautiful.templates
 
-import com.wbillingsley.veautiful.html.{<, Styling, DHtmlComponent, VHtmlDiffNode, VDomNode, ^}
+import com.wbillingsley.veautiful.html.{<, Styling, DHtmlComponent, VHtmlDiffNode, VHtmlElement, ^}
 import com.wbillingsley.veautiful.Morphing
 import com.wbillingsley.veautiful.logging.Logger
 import org.scalajs.dom
@@ -10,13 +10,13 @@ object VSlides {
   val logger = Logger.getLogger(VSlides.getClass)
 
   trait Layout:
-    def apply(slides:VSlides, slide:VDomNode, index:Int):VDomNode
+    def apply(slides:VSlides, slide:VHtmlElement, index:Int):VHtmlElement
 
   object DefaultLayout extends Layout:
-    def apply(slides:VSlides, slide:VDomNode, index:Int):VDomNode =
+    def apply(slides:VSlides, slide:VHtmlElement, index:Int):VHtmlElement =
       <.div(
         ^.cls := s"v-slide ${defaultTheme.className}", ^.attr("style") := s"height: ${slides.height}px", slide
-      )
+      ).build()
 
   /*
    * Functional styles, e.g. for rescaling
@@ -99,7 +99,7 @@ case class VSlides(
 }
 
 /** Something that can take a deck, and a page number, and render it to a VDomNode */
-type VSlidesPlayer = (VSlides, Int) => VDomNode
+type VSlidesPlayer = (VSlides, Int) => VHtmlElement
 
 case class DefaultVSlidesPlayer(deck: VSlides, override val key: Option[String] = None, scaleToWindow:Boolean = true)(
   index: Int = 0,

@@ -12,7 +12,7 @@ class NumberInputTile (tileSpace:TileSpace[JSExpr], width:Int = 2, initial:Optio
 
   var number:Option[Double] = initial
 
-  val input = <.input(^.attr("type") := "Number", ^.cls := "scatter-number-input", ^.on("input") ==> onInput)
+  val input = <.input(^.attr("type") := "Number", ^.cls := "scatter-number-input", ^.on("input") ==> onInput).build()
 
   def setNumber(n:Double):Unit = {
     number = Some(n)

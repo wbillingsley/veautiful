@@ -13,7 +13,7 @@ case class ScatterPlot(plotWidth:Int, plotHeight:Int, xName:String, yName:String
 
   val viewBox = s"${-marginLeft} ${-marginTop} ${plotWidth + marginLeft + marginRight} ${plotHeight + marginTop + marginBottom}"
 
-  def plot(data:Seq[(Double, Double)]):VDomNode = {
+  def plot(data:Seq[(Double, Double)]) = {
 
     val xMax = if (data.isEmpty) defaultxMax else {
       Math.max(defaultxMax, data.maxBy(_._1)._1)
@@ -36,10 +36,10 @@ case class ScatterPlot(plotWidth:Int, plotHeight:Int, xName:String, yName:String
       plotHeight - (ratio * v).toInt
     }
 
-    def xAxis(ticks:Int, name:String):VDomNode = {
-      <("g", ns=DElement.svgNS)(
-        <("line", ns=DElement.svgNS)(^.attr("x1") := "0", ^.attr("x2") := plotWidth.toString, ^.attr("y1") := plotHeight.toString, ^.attr("y2") := plotHeight.toString),
-        <("text", ns=DElement.svgNS)(
+    def xAxis(ticks:Int, name:String) = {
+      SVG.g(
+        SVG.line(^.attr("x1") := "0", ^.attr("x2") := plotWidth.toString, ^.attr("y1") := plotHeight.toString, ^.attr("y2") := plotHeight.toString),
+        SVG.text(
           ^.attr("x") := plotWidth.toString, ^.attr("y") := s"${plotHeight + 60}", ^.cls := "axis-label-x", name
         ),
         for {
@@ -48,11 +48,11 @@ case class ScatterPlot(plotWidth:Int, plotHeight:Int, xName:String, yName:String
           val v = i * xInterval
           val x = xScale(v)
 
-          <("g", ns=DElement.svgNS)(
-            <("line", ns=DElement.svgNS)(
+          SVG.g(
+            SVG.line(
               ^.attr("x1") := x.toString, ^.attr("x2") := x.toString, ^.attr("y1") := plotHeight.toString, ^.attr("y2") := (plotHeight + 10).toString, ^.cls := "tick-line"
             ),
-            <("text", ns=DElement.svgNS)(
+            SVG.text(
               ^.attr("y") := (plotHeight + 30).toString, ^.attr("x") := x.toString, ^.cls := "tick-label-x",
               xLabel(v)
             )
@@ -61,13 +61,13 @@ case class ScatterPlot(plotWidth:Int, plotHeight:Int, xName:String, yName:String
       )
     }
 
-    def yAxis(ticks:Int, name:String):VDomNode = {
+    def yAxis(ticks:Int, name:String) = {
 
       SVG.g(
-        <("line", ns=DElement.svgNS)(
+        SVG.line(
           ^.attr("x1") := "0", ^.attr("x2") := "0", ^.attr("y1") := "0", ^.attr("y2") := plotHeight.toString
         ),
-        <("text", ns=DElement.svgNS)(
+        SVG.text(
           ^.attr("x") := "0", ^.attr("y") := "-50", ^.cls := "axis-label-y", name
         ),
         for {
@@ -77,10 +77,10 @@ case class ScatterPlot(plotWidth:Int, plotHeight:Int, xName:String, yName:String
           val y = yScale(v)
 
           SVG.g(
-            <("line", ns=DElement.svgNS)(
+            SVG.line(
               ^.attr("x1") := "0", ^.attr("x2") := "-10", ^.attr("y1") := y.toString, ^.attr("y2") := y.toString, ^.cls := "tick-line"
             ),
-            <("text", ns=DElement.svgNS)(^.attr("y") := y.toString, ^.attr("x") := "-20", ^.cls := "tick-label-y",
+            SVG.text(^.attr("y") := y.toString, ^.attr("x") := "-20", ^.cls := "tick-label-y",
               yLabel(v)
             )
           )

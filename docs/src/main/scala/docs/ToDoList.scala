@@ -90,7 +90,7 @@ object ToDoList {
   }
 
 
-  def page:VDomNode = <.div(
+  def page = <.div(
     Common.markdown(
       """
         |# Example: To Do List

@@ -111,7 +111,7 @@ object Diffusion {
       val c = SVG.circle(
         ^.attr("cx") := m.position.x, ^.attr("cy") := m.position.y, ^.attr("r") := 3,
         ^.cls := (if (m.ordinary) "molecule ordinary" else "molecule tracked")
-      ).create().asInstanceOf[Circle]
+      ).build().create()
 
       domNode = Some(c)
       c
@@ -130,7 +130,7 @@ object Diffusion {
 
   }
 
-  case object SimulationView extends ElementComponent(<.div()) {
+  case object SimulationView extends ElementComponent(<.div().build()) {
     // And these variables are used to keep track of how long it took us to render ourselves
     var last:Long = System.currentTimeMillis()
     var dt:Long = 0
@@ -141,7 +141,7 @@ object Diffusion {
       moleculeNodes = Simulation.molecules.map { m => new MoleculeView(m) }
     }
 
-    val style:DHtmlElement = <.style(
+    val style = <.style(
       """
         |svg {
         |  background: none;
@@ -173,14 +173,14 @@ object Diffusion {
     /**
      * The SVG that will contain the asteroid field
      */
-    def svg:DSvgElement = <.svg(
+    def svg = <.svg(
       ^.attr("viewbox") := s"${Simulation.bounds.p1.x} ${Simulation.bounds.p1.y} ${Simulation.bounds.p2.x} ${Simulation.bounds.p2.y}",
       ^.attr("width") := s"${Simulation.bounds.p2.x - Simulation.bounds.p1.x}",
       ^.attr("height") := s"${Simulation.bounds.p2.y - Simulation.bounds.p1.y}"
     )
 
     /** Turns an asteroid into an SVG DElement */
-    def svgMolecule(m:Molecule):VDomNode = {
+    def svgMolecule(m:Molecule) = {
       SVG.circle(
         ^.key := Random.nextString(7),
         ^.attr("cx") := m.position.x, ^.attr("cy") := m.position.y, ^.attr("r") := 3,
@@ -189,11 +189,11 @@ object Diffusion {
     }
 
     /** Turns an asteroid into an SVG DElement */
-    def svgRing(m:Ring):VDomNode = {
+    def svgRing(m:Ring) = {
       SVG.circle(^.attr("cx") := m.p.x, ^.attr("cy") := m.p.y, ^.attr("r") := m.r, ^.cls := "ring")
     }
 
-    def table():VDomNode = <.div(^.cls := "results col-lg overflow-auto",
+    def table() = <.div(^.cls := "results col-lg overflow-auto",
       <.table(^.cls := "table",
         <.thead(
           <.tr(
@@ -213,7 +213,7 @@ object Diffusion {
     )
 
     /** A function to work out what the local VDOM should look like for the current asteroids */
-    def card():VDomNode = <.div(^.cls := "row",
+    def card() = <.div(^.cls := "row",
       <.div(^.cls := "card",
         svg(
           svgRing(Simulation.boundaryRing),

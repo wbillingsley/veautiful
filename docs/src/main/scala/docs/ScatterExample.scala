@@ -26,13 +26,13 @@ object ScatterExample {
 
   scatterCanvas.addTiles(items:_*)
 
-  val output = <.textarea(^.attr("placeholder") := "Program will appear here")
+  val output = <.textarea(^.attr("placeholder") := "Program will appear here").build()
 
   def run():Unit = {
     output.makeItSo(<.textarea(^.attr("placeholder") := "Program will appear here", pt.toLanguage.toJS(0)))
   }
 
-  def page:VDomNode = <.div(^.cls := "row",
+  def page = <.div(^.cls := "row",
     <.div(^.cls := "col", scatterCanvas),
     <.div(^.cls := "col", output)
   )

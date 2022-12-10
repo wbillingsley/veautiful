@@ -5,10 +5,10 @@ import org.scalajs.dom
 
 import docs.Common._
 
-val introPage = unique(<.div(
+val introPage = <.div(
   markdown(
     """ # Doctacular
       | 
       | Doctacular is a site generator based on Veautiful.
       |""".stripMargin)
-)) 
+)
