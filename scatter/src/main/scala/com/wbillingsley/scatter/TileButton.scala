@@ -5,7 +5,7 @@ class TileButton[T](text:String, action: => Unit, cls:String = "btn btn-primary"
 
   override def emptySockets: Seq[(Int, Int, Socket[T])] = Seq.empty
 
-  val button = <.button(text, ^.cls := cls, ^.onClick --> action)
+  val button = <.button(text, ^.cls := cls, ^.onClick --> action).build()
 
   var width:Int = 20
   var height:Int = 20

@@ -61,7 +61,7 @@ object AssemblyExample {
     )
   }
 
-  def regs(cpu:CPU):VDomNode = {
+  def regs(cpu:CPU):VDomContent = {
     <.table(^.cls := "register reg-registers",
       (cpu.state.registers.iterator.zipWithIndex map {
         case (b, i) =>
@@ -75,7 +75,7 @@ object AssemblyExample {
   }
 
 
-  def io(state:CPUState):VDomNode = {
+  def io(state:CPUState):VDomContent = {
     <.table(^.cls := "register io-registers",
 
 
@@ -126,7 +126,7 @@ class CodeWidget(cols:Int = 40, rows:Int = 20) extends DHtmlComponent {
     rerender()
   }
 
-  val ta = <.textarea(^.attr("cols") := cols, ^.attr("rows") := rows, ^.on("input") --> textUpdate())
+  val ta = <.textarea(^.attr("cols") := cols, ^.attr("rows") := rows, ^.on("input") --> textUpdate()).build()
 
   def lineNums = <.textarea(^.attr("disabled") := "disabled", ^.cls := "linenums",
     (1 to (text + " ").linesIterator.size).mkString("\n")

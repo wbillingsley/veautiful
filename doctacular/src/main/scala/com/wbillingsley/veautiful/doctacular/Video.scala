@@ -1,12 +1,12 @@
 package com.wbillingsley.veautiful.doctacular
 
-import com.wbillingsley.veautiful.html.VDomNode
+import com.wbillingsley.veautiful.html.VDomContent
 
 /**
   * To play a video, we want to be able to produce an embedded player
   */
 trait VideoResource {
-  def embeddedPlayer(width:Int, height:Int):VDomNode
+  def embeddedPlayer(width:Int, height:Int):VDomContent
 }
 
 /**
@@ -14,7 +14,7 @@ trait VideoResource {
   * for which we have a given player
   */
 trait VideoPlayer[T]:
-  extension (v:T) def embeddedPlayer(width:Int, height:Int):VDomNode
+  extension (v:T) def embeddedPlayer(width:Int, height:Int):VDomContent
 
 /**
   * To allow us to (effecitvely) store the video alongside its given player, we also define a PlayableVideo class

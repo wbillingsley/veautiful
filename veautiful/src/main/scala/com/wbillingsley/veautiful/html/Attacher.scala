@@ -4,6 +4,7 @@ import com.wbillingsley.veautiful.reconcilers.Reconciler
 import com.wbillingsley.veautiful.{DefaultNodeOps, DiffNode, NodeOps, VNode, Blueprint}
 import org.scalajs.dom
 import org.scalajs.dom.{Element, Node}
+import java.{util => ju}
 
 /**
  * Responsible for mounting Veautiful scenes into an HTML document
@@ -46,11 +47,39 @@ object Attacher {
 
   }
 
+  /** Creates a new root element */
   def newRoot(el:dom.Element) = {
     val rn = new RootNode(el)
     rn.attach()
     rn
   }
 
+  def newRootById(id:String):RootNode = 
+    val el = dom.document.getElementById(id)
+    if el == null then 
+      dom.console.error(s"No element found with id $id") 
+      throw ju.NoSuchElementException(s"No element found with selector $id")
+    else newRoot(el)
+
+  def newRoot(selector:String):RootNode = 
+    val el = dom.document.querySelector(selector)
+    if el == null then 
+      dom.console.error(s"No element found with selector $selector") 
+      throw ju.NoSuchElementException(s"No element found with selector $selector")
+    else newRoot(el)
+
+  def mount(selector:String, e: VNode[dom.Node] | Blueprint[VNode[dom.Node]]) = 
+      val r = newRoot(selector)
+      r.render(e)
+      r
+
+
+  def mount(el:dom.Element, e: VNode[dom.Node] | Blueprint[VNode[dom.Node]]) = 
+    val r = newRoot(el)
+    r.render(e)
+    r
+  
 }
+
+export Attacher.*
 

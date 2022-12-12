@@ -4,7 +4,7 @@ import com.wbillingsley.veautiful
 import veautiful.html
 import org.scalajs.dom
 import org.scalajs.dom.{Element, Event, Node}
-import html.{DElementBuilder, ModifierDSL, DSLFactory, DEBlueprintBuilder}
+import html.{DBlueprintBuilder, ModifierDSL, DSLFactory, DEBlueprintBuilder, DElementBuilder}
 
 /** A DElement for SVG */
 type DSvgElement = html.DElement[dom.svg.Element]
@@ -116,11 +116,13 @@ trait SVGDSL[C[_ <: dom.svg.Element]](factory: DSLFactory[C, dom.svg.Element]) {
   def view = factory.applyT[dom.svg.View]("view")
 }
 
-val svgDElementBuilder = DElementBuilder[dom.svg.Element]("html", NS) 
+val svgDElementBuilder = DBlueprintBuilder[dom.svg.Element]("html", NS) 
 
-object SVG extends DElementBuilder[dom.svg.Element]("svg", NS) with SVGDSL(svgDElementBuilder) {
+object SVG extends DBlueprintBuilder[dom.svg.Element]("svg", NS) with SVGDSL(svgDElementBuilder) {
 
   object dynamic extends SVGDSL(DEBlueprintBuilder[dom.svg.Element](NS))
+
+  object mutable extends SVGDSL(DElementBuilder[dom.svg.Element]("svg", NS))
 }
 
 

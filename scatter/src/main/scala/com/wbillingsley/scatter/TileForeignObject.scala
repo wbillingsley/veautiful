@@ -1,8 +1,9 @@
 package com.wbillingsley.scatter
 
 import com.wbillingsley.veautiful.html.{SVG, VHtmlDiffNode, VDomNode, ^}
+import com.wbillingsley.veautiful.dom.DDomContent
 
-case class TileForeignObject[T](content: VDomNode) extends TileComponent[T] {
+case class TileForeignObject[T](content: DDomContent) extends TileComponent[T] {
 
   override def emptySockets: Seq[(Int, Int, Socket[T])] = Seq.empty
 

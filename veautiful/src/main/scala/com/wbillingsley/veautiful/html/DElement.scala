@@ -124,38 +124,49 @@ class DElement[+T <: dom.Element](name:String, var uniqEl:Option[Any] = None, ns
     } h.func.asInstanceOf[Function[Event, _]].apply(e)
   }
 
-  def updateSelf: PartialFunction[DiffNode[_, Node], _] = {
-    case el:DElement[_] =>
+  private def updateAttributes(incoming:mutable.Map[String, AttrVal]):Unit = {
+    // Update attributes
+    for { n <- domNode } {
+      for {
+        (k, _) <- attributes if !incoming.contains(k)
+      } n.removeAttribute(k)
 
-      // Update attributes
-      for { n <- domNode } {
+      for {
+        (k, v) <- incoming if !attributes.get(k).contains(v)
+      } n.setAttribute(v.name, v.value)
+    }
 
-        for {
-          (k, _) <- attributes if !el.attributes.contains(k)
-        } n.removeAttribute(k)
+    attributes = incoming
+  }
 
-        for {
-          (k, v) <- el.attributes if !attributes.get(k).contains(v)
-        } n.setAttribute(v.name, v.value)
+  private def updateProperties(incoming:mutable.Map[String, PropVal]):Unit = {
+    // Update properties
+    properties = incoming
+    for v <- properties.values do applyPropToNode(v)
+  }
 
-        attributes = el.attributes
-      }
+  private def updateStyles(incoming:Seq[InlineStyle]):Unit = {
+    removeStylesFromNode(styles)
+    applyStylesToNode(incoming)
+    styles = incoming
+  }
 
-      // Update properties
-      properties = el.properties
-      for v <- properties.values do applyPropToNode(v)
+  private def updateListeners(incoming:Map[String, EventListener[? <: Event]]):Unit = {
+    if (listeners.keys != incoming.keys) {
+      removeLsntrsFromNode(listeners.values)
+      applyLsntrsToNode(incoming.values)
+    }
+    listeners = incoming
+  }
 
-      removeStylesFromNode(styles)
-      styles = el.styles
-      applyStylesToNode(styles)
+  /** Called internally by MakeItSo to morph this DElement to match a target */
+  private def updateSelf(el:DElement[T]) = {
+    updateAttributes(el.attributes)
+    updateProperties(el.properties)
+    updateStyles(el.styles)
+    updateListeners(el.listeners)
 
-      if (listeners.keys != el.listeners.keys) {
-        removeLsntrsFromNode(listeners.values)
-        applyLsntrsToNode(el.listeners.values)
-      }
-      listeners = el.listeners
-
-      reconciler = el.reconciler
+    reconciler = el.reconciler
   }
 
   private def applyPropToNode(p:PropVal):Unit = {
@@ -276,7 +287,7 @@ class DElement[+T <: dom.Element](name:String, var uniqEl:Option[Any] = None, ns
       applyPropToNode(value)
   }
 
-  def updateChildren(to:collection.Seq[VNode[dom.Node]]):Unit = 
+  def updateChildren(to:collection.Seq[VNode[dom.Node] | Blueprint[VNode[dom.Node]]]):Unit = 
      _children = reconciler.updateChildren(this, to)
 
 
@@ -296,9 +307,9 @@ class DElement[+T <: dom.Element](name:String, var uniqEl:Option[Any] = None, ns
     case to:DElement[T] @unchecked => 
       updateSelf(to)
       updateChildren(to.children)
-    case bp:Blueprint[DElement[T]] @unchecked => 
+    case bp:DElementBlueprint[T] @unchecked => 
       val target = bp.build() // TODO: Update directly from a DElementBlueprint for better efficiency
-      makeItSo(bp)
+      makeItSo(target)
   }
 }
 
@@ -310,7 +321,7 @@ class DElement[+T <: dom.Element](name:String, var uniqEl:Option[Any] = None, ns
   * @param ns the namespace of the element
   * @param modifiers any number of ElementChildren, applied in order
   */
-class DElementBlueprint[+T <: dom.Element](name:String, ns:String = DElement.htmlNS, modifiers:Seq[ElementChild[T]] = Seq.empty) 
+class DElementBlueprint[+T <: dom.Element](name:String, ns:String = DElement.htmlNS, modifiers:Seq[ElementChild[T]] = scala.collection.immutable.ArraySeq.empty) 
   extends Blueprint[DElement[T]](classOf[DElement[T]]) {
 
     def apply(modifiers:ElementChild[T]*):DElementBlueprint[T] = DElementBlueprint[T](name, ns, this.modifiers ++ modifiers)
@@ -333,21 +344,36 @@ class DElementBlueprint[+T <: dom.Element](name:String, ns:String = DElement.htm
 
 }
 
+/** A builder for mutable DElements, so that we can declare <.mutable.div() etc in the DSLs */
+class DElementBuilder[Base <: dom.Element](defaultTag:String, ns:String) extends DSLFactory[DElement, Base] {
+  
+  def apply(n:String):DElement[Base] = DElement[Base](n, ns=ns)
+
+  def apply(modifiers:ElementChild[Base]*):DElement[Base] = DElement[Base](defaultTag, ns=ns)(modifiers*)
+
+  def applyT[T <: dom.Element](n:String):DElement[T] = DElement[T](n, ns=ns)
+
+  def apply[T <: dom.Element](n:String, u:String = "", ns:String):DElement[T] = 
+    if u.isEmpty then DElement[T](n, Some(u), ns) else DElement[T](n, None, ns)
+
+}
+
 /**
   * Trait implemented by the HTML and SVG objects
   *
   * @param defaultTag
   * @param defaultNS
   */
-class DElementBuilder[T <: dom.Element](defaultTag:String, defaultNS:String) extends DSLFactory[DElement, T] {
+class DBlueprintBuilder[T <: dom.Element](defaultTag:String, defaultNS:String) extends DSLFactory[DElementBlueprint, T] {
 
-  def apply(n:String):DElement[T] = DElement[T](n, ns=defaultNS)
+  def apply(n:String):DElementBlueprint[T] = DElementBlueprint[T](n, ns=defaultNS)
 
-  def apply(modifiers:ElementChild[T]*):DElement[T] = apply(defaultNS)(modifiers*)
+  def apply(modifiers:ElementChild[T]*):DElementBlueprint[T] = DElementBlueprint(defaultNS)(modifiers*)
 
-  def applyT[T <: dom.Element](n:String):DElement[T] = DElement[T](n, ns=defaultNS)
+  def applyT[T <: dom.Element](n:String):DElementBlueprint[T] = DElementBlueprint[T](n, ns=defaultNS)
 
-  def apply[T <: dom.Element](n:String, u:String = "", ns:String):DElement[T] = DElement[T](n, if (u.isEmpty) None else Some(u), ns)
+  def apply[T <: dom.Element](n:String, u:String = "", ns:String):DElementBlueprint[T] = 
+    if u.isEmpty then DElementBlueprint[T](n, ns) else DElementBlueprint[T](n, ns)(^.key := u)
   
 }
 

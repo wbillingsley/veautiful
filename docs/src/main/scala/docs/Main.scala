@@ -45,11 +45,12 @@ object Main {
       "Intro" -> site.Toc(
         "Home" -> site.HomeRoute,
         "Hello world" -> site.addPage("hello-world", helloWorld),
+        "Low-level components" -> site.addPage("low-level", lowlevelComponents),
         "Function components" -> site.addPage("pure-functions", pureFunctions),
         "Stateful components" -> site.addPage("stateful-components", statefulComponents),
         "Morphing components" -> site.addPage("morphing-components", morphingComponents),
         "Dynamic state" -> site.addPage("dynamic-state", dynamicState),
-        "Low level components" -> site.addPage("low-level-components", advancedComponents),
+        "Performance" -> site.addPage("low-level-components", performance),
         "Markup components" -> site.addPage("markup-components", markupComponents),
         "CSS in JS" -> site.addPage("style-suites", styleSuites)
       ),

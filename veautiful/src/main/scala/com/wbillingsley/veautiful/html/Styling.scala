@@ -118,7 +118,7 @@ class StyleSuite() {
   def render = <.style(^.attr("id") := name, ^.attr("type") := "text/css",
     globalRules.mkString("\n"), "\n", 
     generateCss
-  )
+  ).build()
 
 
 

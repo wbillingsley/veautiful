@@ -19,7 +19,7 @@ object ReactLike {
   /**
     * The SVG that will contain the asteroid field
     */
-  def svg:DSvgElement = <.svg(
+  def svg = <.svg(
     ^.attr("viewbox") := "0 0 640 480",
     ^.attr("width") := "100%",
     ^.attr("height") := "480"
@@ -34,7 +34,7 @@ object ReactLike {
   val polyShape = polyPoints.map(pointToString).mkString
 
   /** Turns an asteroid into an SVG DElement */
-  def svgAsteroid(a:Asteroid):VDomNode = {
+  def svgAsteroid(a:Asteroid) = {
     val (x, y) = a.pos
 
     // Once we've worked out what to put into it, the asteroid is just a polygon node
@@ -42,7 +42,7 @@ object ReactLike {
   }
 
   /** Creates an SVG for a gravity well */
-  def svgWell(w:Well):VDomNode = {
+  def svgWell(w:Well) = {
     val (x, y) = w.pos
 
     // This one's just a circle node
@@ -56,7 +56,7 @@ object ReactLike {
     * The is is the view code that the router directs to (puts into the page) when
     * you click on this page of the docs.
     */
-  def page:VDomNode = <.div(
+  def page = <.div(
       <.h1("Example -- asteroids rendering into an SVG"),
       <.p(
         <.a(^.href := "https://github.com/wbillingsley/veautiful/blob/master/docs/src/main/scala/example/ReactLike.scala",
@@ -112,7 +112,7 @@ object ReactLike {
     * so that each tick just the simulation is updated (we don't do a full page re-render
     * for this example).
     */
-  case object SimulationView extends ElementComponent(<.div()) {
+  case object SimulationView extends ElementComponent(<.div().build()) {
 
     /**
       * afterAttach is called when we're being asked to attach ourselves to a DOM node.
@@ -163,20 +163,20 @@ object ReactLike {
           <.p(s"${asteroids.length} asteroids rendering in ${dt}ms"),
           <.div(^.cls := "form-row",
             <.div(^.cls := "col-auto btn-group",
-              <("button")(
+              <.button(
                 ^.cls := "btn btn-sm btn-secondary", ^.onClick --> Model.stopTicking(),
-                <("i")(^.cls := "fa fa-pause")
+                <.i(^.cls := "fa fa-pause")
               ),
-              <("button")(
+              <.button(
                 ^.cls := "btn btn-sm btn-secondary", ^.onClick --> Model.startTicking(),
-                <("i")(^.cls := "fa fa-play")
+                <.i(^.cls := "fa fa-play")
               )
             ),
             <.div(^.cls := "input-group col-sm-6",
               <.div(^.cls := "input-group-prepend",
                 <.span(^.cls := "input-group-text", "Asteroids")
               ),
-              <("input")(^.attr("type") := "number", ^.cls := "form-control",
+              <.input(^.attr("type") := "number", ^.cls := "form-control",
                 ^.attr("value") := asteroidCount,
                 ^.on("change") ==> { event => event.target match {
                   case i:HTMLInputElement => asteroidCount = i.value.toInt
@@ -184,9 +184,7 @@ object ReactLike {
                 }}
               ),
               <.span(^.cls := "input-group-append",
-                <("button")(
-                  ^.cls := "btn btn-sm btn-secondary", ^.onClick --> reset(), "Reset"
-                )
+                <.button(^.cls := "btn btn-sm btn-secondary", ^.onClick --> reset(), "Reset")
               )
             )
           )

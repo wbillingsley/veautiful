@@ -1,24 +1,24 @@
 package com.wbillingsley.veautiful.templates
 
 import com.wbillingsley.veautiful._
-import com.wbillingsley.veautiful.html.{<, Styling, DHtmlComponent, VHtmlDiffNode, VDomNode, ^}
+import com.wbillingsley.veautiful.html.{<, Styling, DHtmlComponent, VHtmlDiffNode, DHtmlModifier, VHtmlElement, ^}
 import com.wbillingsley.veautiful.reconcilers.Reconciler
 import com.wbillingsley.veautiful.templates.Sequencer.{LayoutFunc, defaultFootBoxStyle, sequencerSlideStyle}
 
 object Sequencer {
 
-  type LayoutFunc = (Sequencer, VDomNode, Int) => VDomNode
+  type LayoutFunc = (Sequencer, DHtmlModifier, Int) => VHtmlElement
 
-  def footBoxLayout(additionalItems:Seq[VDomNode]):LayoutFunc = { (sequencer, item, i) =>
-    <.div(^.cls := inheritWrapper.className, item, sequencer.footBoxWithInsert(additionalItems))
+  def footBoxLayout(additionalItems:Seq[VHtmlElement]):LayoutFunc = { (sequencer, item, i) =>
+    <.div(^.cls := inheritWrapper.className, item, sequencer.footBoxWithInsert(additionalItems)).build()
   }
 
   def defaultLayout:LayoutFunc = { (sequencer, item, i) =>
-    <.div(^.cls := inheritWrapper.className, item, sequencer.footBox)
+    <.div(^.cls := inheritWrapper.className, item, sequencer.footBox).build()
   }
 
   def bareLayout:LayoutFunc = { (sequencer, item, i) =>
-    <.div(^.cls := inheritWrapper.className, item)
+    <.div(^.cls := inheritWrapper.className, item).build()
   }
   
   /** The surround, that contains the slide deck */
@@ -101,19 +101,19 @@ case class Sequencer(override val key:Option[String] = None)(
     }
   }
 
-  private def prevButton():VDomNode =
+  private def prevButton() =
     if (prop.index > 0) then
       <.button(^.onClick --> previous(), "<")
     else
       <.button(^.attr("disabled") := "disabled", "<")
 
-  private def nextButton():VDomNode =
+  private def nextButton() =
     if (prop.index + 1 < nodes.length) then
       <.button(^.onClick --> next(), ">")
     else
       <.button(^.attr("disabled") := "disabled", ">")
 
-  def footBoxWithInsert(additional:Seq[VDomNode]):VDomNode = {
+  def footBoxWithInsert(additional:Seq[VHtmlElement]) = {
     <.div(^.cls := s"v-sequencer-footbox ${defaultFootBoxStyle.className} ",
       additional,
       prevButton(),
@@ -122,7 +122,7 @@ case class Sequencer(override val key:Option[String] = None)(
     )
   }
   
-  def footBox:VDomNode = {
+  def footBox = {
     <.div(^.cls := s"v-sequencer-footbox ${defaultFootBoxStyle.className} ",
       prevButton(),
       <.span(s" ${prop.index+1} / ${nodes.size} "),
@@ -130,10 +130,10 @@ case class Sequencer(override val key:Option[String] = None)(
     )
   }
   
-  private def layoutItem(item:SequenceItem, i:Int):VDomNode = {
+  private def layoutItem(item:SequenceItem, i:Int):VHtmlElement = {
     item match {
       case csi:CustomSequenceItem => csi.layout(this, i)
-      case n:VDomNode => layout(this, n, i)
+      case n:VHtmlElement => layout(this, n, i)
     }
   }
 
@@ -157,9 +157,9 @@ case class Sequencer(override val key:Option[String] = None)(
 
 }
 
-type SequenceItem = VDomNode // | CustomSequenceItem
+type SequenceItem = VHtmlElement // | CustomSequenceItem
 
 trait CustomSequenceItem {
-  def layout(sequencer:Sequencer, index:Int):VDomNode
+  def layout(sequencer:Sequencer, index:Int):VHtmlElement
 }
 

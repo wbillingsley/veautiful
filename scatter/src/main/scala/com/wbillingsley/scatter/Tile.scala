@@ -162,7 +162,7 @@ abstract class Tile[T](val ts:TileSpace[T], val mobile:Boolean = true, val typeL
     */
   val tileContent:TileComponent[T]
 
-  val tileBoundary:DSvgElement = SVG.path(^.cls := "tile-path")
+  val tileBoundary:DSvgElement = SVG.path(^.cls := "tile-path").build()
 
   def layout():Unit = {
     tileContent.layoutChildren()

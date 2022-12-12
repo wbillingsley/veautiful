@@ -1,12 +1,12 @@
 package com.wbillingsley.scatter
 
 import com.wbillingsley.veautiful.VNode
-import com.wbillingsley.veautiful.html.VDomNode
+import com.wbillingsley.veautiful.dom.DDomContent
 
 trait TileLanguage[T] {
 
-  def nodeIcon(returnType:String):VDomNode
+  def nodeIcon(returnType:String):DDomContent
 
-  def socketIcon(acceptType:Option[String]):VDomNode
+  def socketIcon(acceptType:Option[String]):DDomContent
 
 }

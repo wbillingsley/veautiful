@@ -8,16 +8,24 @@ import org.scalajs.dom
 def helloWorld = <.div(Common.markdown(
   """# Hello World
     |
-    |As with any framework, we need a way of getting our UI onto the page. In Veautiful, this is the `Attacher`.
-    |The `Attacher` connects to a DOM element, and can render a Veautiful tree into it:
+    |Let's start with the short version
     |
     |```scala
-    |import com.wbillingsley.veautiful.html.{Attacher, HTML}
+    |import com.wbillingsley.veautiful.html.*
     |import HTML.*
-    |import org.scalajs.dom
     |
-    |val root = Attacher.newRoot(dom.document.getElementById("render-here"))
-    |root.render(p("Hello world"))
+    |mount("#render-here", p("Hello world"))
+    |```
+    |
+    |As with any framework, we need a way of getting our UI onto the page. In Veautiful, this is the `Attacher`.
+    |The `Attacher` connects to a DOM element, and can render a Veautiful tree into it. The `mount` method 
+    |asks the attacher to create a new root node and render some HTML into it.
+    |
+    |We can hold on to the root node to render different HTML later if we want
+    |
+    |```scala
+    |val root = mount("#render-here", p("Hello world"))
+    |root.render(p("Goodbye world"))
     |```
     |
     |Later, we'll render more interesting components that can update themselves, but this will get us started.

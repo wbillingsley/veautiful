@@ -22,7 +22,7 @@ case class MouseTrails() extends VDomNode {
       ^.on("mousemove") ==> { case e:MouseEvent =>
         update((e.clientX.toInt, e.clientY.toInt))
       }
-    ).create()
+    ).build().create()
     _domNode = Some(el)
     el
   }
@@ -57,62 +57,26 @@ case class MouseTrails() extends VDomNode {
   }
 }
 
-object Particles extends DHtmlComponent {
 
-  private val particles = Array.fill(1000)((Math.random() * 100, Math.random() * 100))
-
-  private var animating = false
-
-  def start() = {
-    animating = true
-    rerender()
-    dom.window.requestAnimationFrame(_ => animationLoop())
-  }
-
-  private def animationLoop():Unit = {
-    updateParticles()
-    if (animating) dom.window.requestAnimationFrame(_ => animationLoop())
-  }
-
-  private def updateParticles():Unit = {
-    for { i <- particles.indices } {
-      val (x, y) = particles(i)
-      particles(i) = (x + Math.random() * 2 - 1, y + Math.random() * 2 - 1)
-    }
-    plot.update()
-  }
-
-  val plot = new MutableArrayComponent[dom.Element, dom.Node, svg.Circle, (Double, Double)](
-    <.svg(
-      ^.attr("style") := "background: white; border-radius: 10px; margin-right: 15px;",
-      ^.attr("width") := 100, ^.attr("height") := 100, ^.cls := "particles"
-    ), particles
-  )(
-    onEnter = { (d:(Double, Double), _) => SVG.circle(^.cls := "particle", ^.attr("r") := "1") },
-    onUpdate = { (d:(Double, Double), i, v) =>
-      for { circle <- v.domNode } {
-        circle.setAttribute("cx", d._1.toInt.toString)
-        circle.setAttribute("cy", d._2.toInt.toString)
-      }
-    }
-  )
-
-  override protected def render = {
-    <.div(
-      plot,
-      if (animating) {
-        <.button(^.cls := "btn btn-secondary", ^.onClick --> { animating = false; rerender() }, <("i")(^.cls := "fa fa-pause"))
-      } else {
-        <.button(^.cls := "btn btn-secondary", ^.onClick --> start(), <("i")(^.cls := "fa fa-play"))
-      }
-    )
-  }
-  
-  override def afterAttach(): Unit = plot.update()
-}
-
-def advancedComponents = <.div(Common.markdown(
+def lowlevelComponents = <.div(Common.markdown(
   """# Low level components
+    |
+    |Veautiful is a mixed-paradigm toolkit that tries to be reasonably close to the metal in terms of its low level components,
+    |but makes declarative styles of UI simple. 
+    |
+    |### The fundamental problem of the Web
+    |
+    |The fundamental problem of the web, as I see it, is that we have a markup language that looks declarative 
+    |(HTML) that has to be mutable because there is a lot of transient state - e.g. scroll positions, where were up to in a video, etc.
+    |
+    |So, at the lowest level, we're trying to enable two kinds of working:
+    |
+    |* mutable manipulation of elements, and
+    |* declarative declaration of what the UI should look like.
+    |
+    |Fortunately, that is fairly idiomatic for Scala. It doesn't prevent mutation; it just makes functional code easy to write.
+    |
+    |### Mutable VNodes
     |
     |At the lowest level, a Veautiful UI is made up of `VNode[N]`s. These are JavaScript objects that own
     |and control a node in the UI. When working with HTML, these control DOM nodes and elements, and we use
@@ -138,7 +102,7 @@ def advancedComponents = <.div(Common.markdown(
     |Effectively, this gives us a tree of View Controllers. But we can pass around trees of *unattached* View Controllers
     |as if they were a virtual DOM whenever we want.
     |
-    |## Manually implementing a Veautiful node
+    |## Manually implementing a mutable VNode
     |
     |This means we can implement components as low-level `VNode`s by directly calling operations on their nodes.
     |It's a little more verbose, but not complicated.
@@ -235,102 +199,15 @@ def advancedComponents = <.div(Common.markdown(
       |We can also extend `DirectElement` if we want to manipulate the element ourselves. This isn't a hack; it is idiomatic in Veautiful.
       |The role of a `VNode` is to *own and control* an element in the tree.
       |
-      |### Example: Mutable Array Components
+      |### Performance
       |
-      |To demonstrate how components can be quite different if they need to be, let's show a `MutableArrayComponent`.
-      |This is an experimental little node, designed to work a little more like d3.js. It's not a full implementation (for that, just embed d3 in a
-      |VNode), but it holds a data array, and *enter*, *exit*, and *update* sets for determining what to do with the child nodes.
+      |Being able to create low level nodes is useful for performance. Sometimes, I do have simulations of a thousand particles moving at once.
+      |In those cases, it can be helpful to know that you can write a mutable VNode for it and not worry a jot about the performance of reconcilers,
+      |dynamic bindings, or other high level fun.
       |
-      |There are other ways of doing this reasonably efficiently in Veautiful, but perhaps sometimes the d3 style is clearer.
+      |But for everyday work, it's often nicer to use something declarative and high level. Veautiful UIs are similar: most of the code we write is 
+      |declarative, but when we need to we can insert some mutation.
       |
-      |In this case, we'll render 1,000 particles moving randomly in a small box.
-      |The full code, including the play-pause button and the changes to the particle array, are in the demo box below,
-      |but our d3-like component (the SVG containing the particles) looks like this:
-      |
-      |```scala
-      |  val plot = new MutableArrayComponent[dom.Element, dom.Node, svg.Circle, (Double, Double)](
-      |    <.svg(
-      |      ^.attr("style") := "background: white; border-radius: 10px; margin: 15px;",
-      |      ^.attr("width") := 100, ^.attr("height") := 100, ^.cls := "particles"
-      |    ), particles
-      |  )(
-      |    onEnter = { (d:(Double, Double), _) => SVG.circle(^.cls := "particle", ^.attr("r") := "1") },
-      |    onUpdate = { (d:(Double, Double), i, v) =>
-      |      for { circle <- v.domNode } {
-      |        circle.setAttribute("cx", d._1.toInt.toString)
-      |        circle.setAttribute("cy", d._2.toInt.toString)
-      |      }
-      |    }
-      |  )
-      |```
-      |
-      |""".stripMargin,
-  ),
-  <.div(^.cls := embeddedExampleStyle.className,
-    Particles, <.p(),
-    Common.markdown(
-      """
-        |```scala
-        |import com.wbillingsley.veautiful.html.{VDomNode, <, ^}
-        |import org.scalajs.dom
-        |import org.scalajs.dom.{MouseEvent, Node}
-        |import org.scalajs.dom.html.Canvas
-        |
-        |object Particles extends DHtmlComponent {
-        |
-        |    private val particles = Array.fill(1000)((Math.random() * 100, Math.random() * 100))
-        |
-        |    private var animating = false
-        |
-        |    def start() = {
-        |      animating = true
-        |      rerender()
-        |      dom.window.requestAnimationFrame(_ => animationLoop())
-        |    }
-        |
-        |    private def animationLoop():Unit = {
-        |      updateParticles()
-        |      if (animating) dom.window.requestAnimationFrame(_ => animationLoop())
-        |    }
-        |
-        |    private def updateParticles():Unit = {
-        |      for { i <- particles.indices } {
-        |        val (x, y) = particles(i)
-        |        particles(i) = (x + Math.random() * 2 - 1, y + Math.random() * 2 - 1)
-        |      }
-        |      plot.update()
-        |    }
-        |
-        |    val plot = new MutableArrayComponent[dom.Element, dom.Node, svg.Circle, (Double, Double)](
-        |      <.svg(), particles
-        |    )(
-        |      onEnter = { (d:(Double, Double), _) => SVG.circle(^.cls := "particle", ^.attr("r") := "1") },
-        |      onUpdate = { (d:(Double, Double), i, v) =>
-        |        for { circle <- v.domNode } {
-        |          circle.setAttribute("cx", d._1.toInt.toString)
-        |          circle.setAttribute("cy", d._2.toInt.toString)
-        |        }
-        |      }
-        |    )
-        |
-        |    override protected def render = {
-        |      <.div(
-        |        plot,
-        |        <.div(
-        |          if (animating) {
-        |            <.button(^.cls := "btn btn-secondary", ^.onClick --> { animating = false; rerender() }, <.i(^.cls := "fa fa-pause"))
-        |          } else {
-        |            <.button(^.cls := "btn btn-secondary", ^.onClick --> start(), <.i(^.cls := "fa fa-play"))
-        |          }
-        |        )
-        |      )
-        |    }
-        |  }
-        |
-        |  override def afterAttach(): Unit = plot.update()
-        |}
-        |```
-        |""".stripMargin)
+      |""".stripMargin)
   )
-)
 

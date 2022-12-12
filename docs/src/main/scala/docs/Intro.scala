@@ -45,18 +45,17 @@ def intro = <.div(
       |# Getting it
       |
       |Veautiful (the core UI toolkit), veautiful-templates (a collection of useful stuff like a router and slide decks), and 
-      |doctacular (a system for publishing docs or teaching sites) are published to Maven Central.
+      |doctacular (a system for publishing docs or teaching sites) are published to Maven Central and listed on 
+      |[Scaladex](https://index.scala-lang.org/wbillingsley/veautiful).
       |
       |```
-      |"com.wbillingsley" %%% "veautiful" % "0.3-M2" // just the core toolkit, latest milestone
-      |"com.wbillingsley" %%% "veautiful" % "0.3-SNAPSHOT" // just the core toolkit, latest snapshot
+      |"com.wbillingsley" %%% "veautiful" % "0.3-M4" // just the core toolkit, latest milestone
       |```
       |
       |or
       |
       |```
-      |"com.wbillingsley" %%% "doctacular" % "0.3-M1" // also includes some components and the site system, latest milestone
-      |"com.wbillingsley" %%% "doctacular" % "0.3-SNAPSHOT" // also includes some components and the site system, latest snapshot
+      |"com.wbillingsley" %%% "doctacular" % "0.3-M4" // also includes some components and the site system, latest milestone
       |```
       |
       |### What's unique about Veautiful?

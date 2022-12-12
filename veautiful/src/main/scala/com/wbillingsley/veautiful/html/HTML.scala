@@ -17,7 +17,13 @@ type VDomNode = veautiful.dom.VDomNode
 
 type VDomElement = veautiful.dom.VDomElement
 
+type VDomContent = veautiful.dom.VDomContent
+
 type VHtmlElement = VNode[dom.html.Element]
+
+type VHtmlBlueprint = Blueprint[VHtmlElement]
+
+type VHtmlContent = VHtmlElement | VHtmlBlueprint
 
 type VHtmlDiffNode = DiffNode[dom.Element, dom.Node]
 
@@ -39,8 +45,14 @@ type DHtmlModifier = ElementChild[dom.html.Element]
 /** For convenience, we alias the DSvgElement type into the html package as well */
 type DSvgElement = veautiful.svg.DSvgElement
 
+/** For convenience, we alias the DSvgElement type into the html package as well */
+type DSvgContent = veautiful.svg.DSvgContent
+
 /** For convenience, aliased in from the dom package */
 type DDomElement = veautiful.dom.DDomElement
+
+/** For convenience, aliased in from the dom package */
+type DDomContent = veautiful.dom.DDomContent
 
 /** For convenience, aliased in from the svg package */
 type DSvgComponent = veautiful.svg.DSvgComponent
@@ -48,9 +60,12 @@ type DSvgComponent = veautiful.svg.DSvgComponent
 /** For convenience, aliased in from the dom package */
 type DDomComponent = veautiful.dom.DDomComponent
 
-
 /** For convenience, we alias the VSVGModifier type into the html package as well */
 type DSvgModifier = veautiful.svg.DSvgModifier
+
+/** For convenience, we alias the VSVGModifier type into the html package as well */
+type DDomModifier = veautiful.dom.DDomModifier
+
 
 @deprecated("This has been renamed to DDomComponent since 0.3-M2. Or use DHtmlComponent if you produce DHtmlContent")
 type VHtmlComponent = DDomComponent
@@ -189,12 +204,14 @@ trait HTMLDSL[C[_ <: dom.html.Element]](factory: DSLFactory[C, dom.html.Element]
 
 }
 
-val htmlDElementBuilder = DElementBuilder[dom.html.Element]("html", NS) 
+val htmlDElementBuilder = DBlueprintBuilder[dom.html.Element]("html", NS) 
 
-object HTML extends DElementBuilder[dom.HTMLElement]("html", NS) with HTMLDSL(htmlDElementBuilder) {
+object HTML extends DBlueprintBuilder[dom.HTMLElement]("html", NS) with HTMLDSL(htmlDElementBuilder) {
   def svg = veautiful.svg.svg
 
   object dynamic extends HTMLDSL(DEBlueprintBuilder[dom.html.Element](NS))
+
+  object mutable extends HTMLDSL(DElementBuilder[dom.html.Element]("html", NS))
 }
 
 val el = HTML

@@ -24,7 +24,7 @@ class ValueSlider(v:Value, pos:(Int, Int), orientation: Orientation = Orientatio
     ^.attr("max") := max,
     ^.attr("list") := id,
     ^.on("input") ==> updateValue
-  )
+  ).build()
 
   def sliderVal = slider.domNode match {
     case Some(i:HTMLInputElement) => Some(i.value)

@@ -1,6 +1,6 @@
 package com.wbillingsley.wren
 
-import com.wbillingsley.veautiful.svg.{DSvgComponent, DSvgElement}
+import com.wbillingsley.veautiful.svg.{DSvgComponent, DSvgContent}
 import com.wbillingsley.veautiful.{DiffComponent, DiffNode, VNode}
 
 trait Component extends DSvgComponent {
@@ -9,6 +9,6 @@ trait Component extends DSvgComponent {
 
   def constraints:Seq[Constraint]
 
-  def render:DSvgElement
+  def render:DSvgContent
 
 }
