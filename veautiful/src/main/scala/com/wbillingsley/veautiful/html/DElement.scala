@@ -124,34 +124,47 @@ class DElement[+T <: dom.Element](name:String, var uniqEl:Option[Any] = None, ns
     } h.func.asInstanceOf[Function[Event, _]].apply(e)
   }
 
-  private def updateSelf(el:DElement[T]) = {
+  private def updateAttributes(incoming:mutable.Map[String, AttrVal]):Unit = {
     // Update attributes
     for { n <- domNode } {
-
       for {
-        (k, _) <- attributes if !el.attributes.contains(k)
+        (k, _) <- attributes if !incoming.contains(k)
       } n.removeAttribute(k)
 
       for {
-        (k, v) <- el.attributes if !attributes.get(k).contains(v)
+        (k, v) <- incoming if !attributes.get(k).contains(v)
       } n.setAttribute(v.name, v.value)
-
-      attributes = el.attributes
     }
 
+    attributes = incoming
+  }
+
+  private def updateProperties(incoming:mutable.Map[String, PropVal]):Unit = {
     // Update properties
-    properties = el.properties
+    properties = incoming
     for v <- properties.values do applyPropToNode(v)
+  }
 
+  private def updateStyles(incoming:Seq[InlineStyle]):Unit = {
     removeStylesFromNode(styles)
-    styles = el.styles
-    applyStylesToNode(styles)
+    applyStylesToNode(incoming)
+    styles = incoming
+  }
 
-    if (listeners.keys != el.listeners.keys) {
+  private def updateListeners(incoming:Map[String, EventListener[? <: Event]]):Unit = {
+    if (listeners.keys != incoming.keys) {
       removeLsntrsFromNode(listeners.values)
-      applyLsntrsToNode(el.listeners.values)
+      applyLsntrsToNode(incoming.values)
     }
-    listeners = el.listeners
+    listeners = incoming
+  }
+
+  /** Called internally by MakeItSo to morph this DElement to match a target */
+  private def updateSelf(el:DElement[T]) = {
+    updateAttributes(el.attributes)
+    updateProperties(el.properties)
+    updateStyles(el.styles)
+    updateListeners(el.listeners)
 
     reconciler = el.reconciler
   }
@@ -308,7 +321,7 @@ class DElement[+T <: dom.Element](name:String, var uniqEl:Option[Any] = None, ns
   * @param ns the namespace of the element
   * @param modifiers any number of ElementChildren, applied in order
   */
-class DElementBlueprint[+T <: dom.Element](name:String, ns:String = DElement.htmlNS, modifiers:Seq[ElementChild[T]] = Seq.empty) 
+class DElementBlueprint[+T <: dom.Element](name:String, ns:String = DElement.htmlNS, modifiers:Seq[ElementChild[T]] = scala.collection.immutable.ArraySeq.empty) 
   extends Blueprint[DElement[T]](classOf[DElement[T]]) {
 
     def apply(modifiers:ElementChild[T]*):DElementBlueprint[T] = DElementBlueprint[T](name, ns, this.modifiers ++ modifiers)

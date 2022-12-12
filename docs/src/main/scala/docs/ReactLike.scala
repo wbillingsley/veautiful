@@ -163,20 +163,20 @@ object ReactLike {
           <.p(s"${asteroids.length} asteroids rendering in ${dt}ms"),
           <.div(^.cls := "form-row",
             <.div(^.cls := "col-auto btn-group",
-              <("button")(
+              <.button(
                 ^.cls := "btn btn-sm btn-secondary", ^.onClick --> Model.stopTicking(),
-                <("i")(^.cls := "fa fa-pause")
+                <.i(^.cls := "fa fa-pause")
               ),
-              <("button")(
+              <.button(
                 ^.cls := "btn btn-sm btn-secondary", ^.onClick --> Model.startTicking(),
-                <("i")(^.cls := "fa fa-play")
+                <.i(^.cls := "fa fa-play")
               )
             ),
             <.div(^.cls := "input-group col-sm-6",
               <.div(^.cls := "input-group-prepend",
                 <.span(^.cls := "input-group-text", "Asteroids")
               ),
-              <("input")(^.attr("type") := "number", ^.cls := "form-control",
+              <.input(^.attr("type") := "number", ^.cls := "form-control",
                 ^.attr("value") := asteroidCount,
                 ^.on("change") ==> { event => event.target match {
                   case i:HTMLInputElement => asteroidCount = i.value.toInt
@@ -184,9 +184,7 @@ object ReactLike {
                 }}
               ),
               <.span(^.cls := "input-group-append",
-                <("button")(
-                  ^.cls := "btn btn-sm btn-secondary", ^.onClick --> reset(), "Reset"
-                )
+                <.button(^.cls := "btn btn-sm btn-secondary", ^.onClick --> reset(), "Reset")
               )
             )
           )
