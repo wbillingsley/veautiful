@@ -28,6 +28,12 @@ def helloWorld = <.div(Common.markdown(
     |root.render(p("Goodbye world"))
     |```
     |
+    |If we want to take over the whole page body, we can also mount to the body directly
+    |
+    |```scala
+    |val root = mountToBody(p("Let's clear the body of the page and just insert our stuff"))
+    |```
+    |
     |Later, we'll render more interesting components that can update themselves, but this will get us started.
     |
     |## Rendering elements
@@ -130,6 +136,12 @@ def helloWorld = <.div(Common.markdown(
     |* `^.prop("propName") := "foo"` sets a property (e.g. `value` for `input` elements)
     |
     |Again, the notation for event handlers is inspired from scalajs-react and scalatags.
+    |
+    |If you don't like to see so many `"` marks in your code, `^.attr` and `^.prop` use Scala 3's [Dynamic field selector](https://dotty.epfl.ch/api/scala/Dynamic.html) 
+    |so that you can also use them just with dot syntax. e.g.
+    |
+    |* `^.attr.x := 3`
+    |* `^.prop.value := "my value"`
     |
     |## Children and Modifiers
     |
