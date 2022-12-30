@@ -52,6 +52,7 @@ object Main {
         "Dynamic state" -> site.addPage("dynamic-state", dynamicState),
         "Performance" -> site.addPage("low-level-components", performance),
         "Markup components" -> site.addPage("markup-components", markupComponents),
+        "Routing" -> site.addPage("routing", routing),
         "CSS in JS" -> site.addPage("style-suites", styleSuites)
       ),
       "Design" -> site.Toc(
@@ -87,7 +88,7 @@ object Main {
     siteStyles.install()
     
     // Render our site into the page 
-    site.attachTo(dom.document.getElementById("render-here"))
+    site.attachTo(dom.document.body)
   }
 
 }

@@ -1,4 +1,4 @@
-package com.wbillingsley.veautiful.templates
+package com.wbillingsley.veautiful.html
 
 import com.wbillingsley.veautiful.html.{<, ElementComponent, VDomNode}
 import com.wbillingsley.veautiful.logging.Logger
