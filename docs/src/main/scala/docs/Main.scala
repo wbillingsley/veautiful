@@ -55,16 +55,10 @@ object Main {
         "Routing" -> site.addPage("routing", routing),
         "CSS in JS" -> site.addPage("style-suites", styleSuites)
       ),
-      "Design" -> site.Toc(
-        
-      ),
-      "Extras" -> site.Toc(
-        "VSlides" -> site.addPage("vslides", VSlidesExample.page(0)),
-        "Challenges" -> site.addChallenge("challenges", ChallengeExample.levels)
-      ),
       "Doctacular" -> site.Toc(
         "Intro" -> site.addPage("doctacular-intro", doctacular.introPage),
-        "Slides: Tutorial" -> site.addDeck("doctacular-tutorial-deck", doctacular.tutorialDeck),
+        "Sites" -> site.addPage("doctacular-sites", doctacular.sites),
+        "Decks (VSlides)" -> site.addPage("vslides", VSlidesExample.page(0)),
         "Videos" -> site.addPage("doctacular-videos", doctacular.videoIntro),
         "Alternatives" -> site.add("alternatives", 
           Alternative("Play a slide deck", Medium.Deck(() => GoogleSlides("2PACX-1vQ8ZlyoV6f1g1-AWiKiqJ886n6O9sK8XymUirDVUbHYZaTalHE4Cty1BMbZLm0t0SBywAZkmGAOEb0Q"))),
@@ -73,9 +67,13 @@ object Main {
       ),
       "Examples" -> site.Toc(
         "To-Do List" -> site.addPage("to-do-list", ToDoList.page),
+      ),
+      "Test pages" -> site.Toc(
         "Orbiting asteroids" -> site.addPage("orbiting-asteroids", ReactLike.page),
         "Diffusion" -> site.addPage("diffusion-experiment", Diffusion.SimulationView),
-        "Scatter" -> site.addPage("scatter", ScatterExample.page)
+        "Scatter" -> site.addPage("scatter", ScatterExample.page),
+        "Slides: Tutorial" -> site.addDeck("doctacular-tutorial-deck", doctacular.tutorialDeck),
+        "Challenges" -> site.addChallenge("challenges", ChallengeExample.levels)
       )
     )
     

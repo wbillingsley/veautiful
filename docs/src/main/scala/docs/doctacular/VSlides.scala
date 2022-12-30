@@ -74,14 +74,17 @@ object VSlidesExample {
       <.div(
         Common.markdown(
           s"""
-            |## VSlides
+            |# Slide Decks (VSlides)
             |
-            |VSlides decks are written as scripts, adding slides to a builder, letting users mix slides written in
+            |Slide decks are written as scripts, adding slides to a builder, letting users mix slides written in
             |markdown with slides that contain more complex or interactive features.
+            |
+            |When played full-screen, they can auto-scale to the window, so that you can lay out the internals of your deck as if you had 
+            |a fixed resolution canvas. They also have a vertical view that can lay the entire deck out in a scrollable format.
             |
             |A basic builder is created like this:
             |
-            |```
+            |```scala
             |val simpleDeck = DeckBuilder(1920, 1080)(using marked)
             |  .markdownSlide("# This is a title slide").withClass("center middle")
             |  .markdownSlide(\"\"\"
