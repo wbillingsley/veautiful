@@ -41,6 +41,7 @@ object Common {
       ^.attr("style") :=
         """stroke: #ff930080;
           |stroke-width: 7;
+          |stroke-linecap: round;
           |fill: transparent;
           |""".stripMargin,
       ^.attr("d") :=
@@ -55,20 +56,18 @@ object Common {
           |M 215 88 c 0 -20, 12 -50, 42 -50
           |M 165 109 l 54 0
           |M 192 109 l 0 84
-          |M 126 234 l 14 14 l 27 0 l 25 -25 l 25 25 l 27 0 l 14 -14
-          |M 139 273 l 106 0
-          |M 192 224 l 0 80
           |""".stripMargin
     ),
     SVG.path(
       ^.attr("style") :=
         """stroke: #004479d0;
           |stroke-width: 19;
+          |stroke-linecap: round;
           |fill: transparent;
           |""".stripMargin,
       ^.attr("d") :=
-        """M 118 179 C 158 179, 166 104, 98 109 C 22 111, 16 241, 192 362
-          |C 368 241, 362 111, 286 109 C 218 104, 226 179, 266 179
+        """M 148 159 c 0 0, 0 -50, -50 -50 C 22 111, 16 241, 192 362
+          |C 368 241, 362 111, 286 109 c -50 0, -50 50, -50 50
           |""".stripMargin
     )
   )
