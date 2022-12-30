@@ -137,10 +137,11 @@ def helloWorld = <.div(Common.markdown(
     |
     |Again, the notation for event handlers is inspired from scalajs-react and scalatags.
     |
-    |If you don't like to see so many `"` marks in your code, `^.attr` and `^.prop` use Scala 3's [Dynamic field selector](https://dotty.epfl.ch/api/scala/Dynamic.html) 
+    |If you don't like to see so many `"` marks in your code, `attr`, `on`, and `prop` use Scala 3's [Dynamic field selector](https://dotty.epfl.ch/api/scala/Dynamic.html) 
     |so that you can also use them just with dot syntax. e.g.
     |
     |* `^.attr.x := 3`
+    |* `^.on.click --> dom.window.alert("clicked")`
     |* `^.prop.value := "my value"`
     |
     |## Children and Modifiers

@@ -50,7 +50,7 @@ object Main {
         "Stateful components" -> site.addPage("stateful-components", statefulComponents),
         "Morphing components" -> site.addPage("morphing-components", morphingComponents),
         "Dynamic state" -> site.addPage("dynamic-state", dynamicState),
-        "Performance" -> site.addPage("low-level-components", performance),
+        "D3-like components" -> site.addPage("low-level-components", d3like),
         "Markup components" -> site.addPage("markup-components", markupComponents),
         "Routing" -> site.addPage("routing", routing),
         "CSS in JS" -> site.addPage("style-suites", styleSuites)

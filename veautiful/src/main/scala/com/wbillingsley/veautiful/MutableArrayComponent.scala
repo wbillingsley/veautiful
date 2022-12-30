@@ -6,11 +6,12 @@ package com.wbillingsley.veautiful
   * There's no "key" function (as there is in d3) because it might make sense to have a MutableMapComponent for that.
   * Note that this is not aimed at being a full d3 replacement. (Just use d3 for that - it can be embedded in a VNode)
   */
-class MutableArrayComponent[Container, AcceptChild, RealChild <: AcceptChild, Data](container: ParentNode[Container, AcceptChild], data: Array[Data])(
-  onEnter: (Data, Int) => VNode[RealChild],
-  onUpdate: (Data, Int, VNode[RealChild]) => Unit,
-  onExit: (Data, Int, VNode[RealChild]) => Unit = { (_:Data, _:Int, _:VNode[RealChild]) => },
+class MutableArrayComponent[Container, AcceptChild, VChild <: VNode[AcceptChild], Data](container: ParentNode[Container, AcceptChild], data: Array[Data])(
+  onEnter: (Data, Int) => VChild | Blueprint[VChild],
+  onUpdate: (Data, Int, VChild) => Unit = { (_:Data, _:Int, _:VChild) => () },
+  onExit: (Data, Int, VChild) => Unit = { (_:Data, _:Int, _:VChild) => },
 ) extends VNode[Container] with Update {
+  import scala.collection.mutable
 
   override def domNode: Option[Container] = container.domNode
 
@@ -26,12 +27,25 @@ class MutableArrayComponent[Container, AcceptChild, RealChild <: AcceptChild, Da
     */
   override def detach(): Unit = {
     lastData = Seq.empty
-    lastRendered = Array.empty
+    lastRendered = collection.Seq.empty
     container.detach()
   }
 
-  private var lastRendered: Array[VNode[RealChild]] = Array.empty
+  private var lastRendered: collection.Seq[VChild] = collection.Seq.empty
   private var lastData: collection.Seq[Data] = Seq.empty[Data]
+
+  /** Enables a builder-like syntax, where we can take a component and call .onEnter, .onUpdate, etc, to specialise it */
+  def onEnter(onEnter:(Data, Int) => VChild | Blueprint[VChild]):MutableArrayComponent[Container, AcceptChild, VChild, Data] = 
+    MutableArrayComponent(container, data)(onEnter, onUpdate, onExit)
+
+  /** Enables a builder-like syntax, where we can take a component and call .onEnter, .onUpdate, etc, to specialise it */
+  def onUpdate(onUpdate:(Data, Int, VChild) => Unit):MutableArrayComponent[Container, AcceptChild, VChild, Data] = 
+    MutableArrayComponent(container, data)(onEnter=onEnter, onUpdate, onExit)
+
+  /** Enables a builder-like syntax, where we can take a component and call .onEnter, .onUpdate, etc, to specialise it */
+  def onExit(onExit:(Data, Int, VChild) => Unit):MutableArrayComponent[Container, AcceptChild, VChild, Data] = 
+    MutableArrayComponent(container, data)(onEnter, onUpdate, onExit)
+
 
   override def update(): Unit = {
 
@@ -63,7 +77,10 @@ class MutableArrayComponent[Container, AcceptChild, RealChild <: AcceptChild, Da
       val added = for {
         i <- entering
       } yield {
-        val v = onEnter(data(i), i)
+        val v:VChild = onEnter(data(i), i) match {
+          case b:Blueprint[VChild] @unchecked => b.build()
+          case v:VChild @unchecked => v
+        }
         v.beforeAttach()
         v.attach()
         ops.appendAttachedChild(v)
@@ -86,5 +103,18 @@ class MutableArrayComponent[Container, AcceptChild, RealChild <: AcceptChild, Da
 
 object MutableArrayComponent {
 
+  extension [P, C] (parent:ParentNode[P, C]) {
+    def generateChildren[Data, VChild <: VNode[C]](data:Array[Data])(
+      onEnter: (Data, Int) => VChild | Blueprint[VChild]
+    ):MutableArrayComponent[P, C, VChild, Data] = 
+        MutableArrayComponent(parent, data)(onEnter)
+  }
+
+  extension [P, C] (parent:Blueprint[ParentNode[P, C]]) {
+    def generateChildren[Data, VChild <: VNode[C]](data:Array[Data])(
+      onEnter: (Data, Int) => VChild | Blueprint[VChild]
+    ):MutableArrayComponent[P, C, VChild, Data] = 
+        MutableArrayComponent(parent.build(), data)(onEnter)
+  }
 
 }
