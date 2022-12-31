@@ -437,10 +437,44 @@ trait ModifierDSL {
   def alt = attr("alt")
   def style = attr("style")
   def src = attr("src")
-  def `class` = attr("class")
-  def cls = `class`
   def role = attr("role")
   def href = attr("href")
+
+  /** 
+   * Helper for constructing class modifiers. Looks like Attrable, but has some extra options because
+   * classes are a space-separated token list
+   */
+  object `class` {
+    type ClassToken = String | Styling | Unit
+
+    def :=(s:String) = AttrVal("class", s)
+
+    def :=(i:Int) = AttrVal("class", i.toString)
+
+    def :=(d:Double) = AttrVal("class", d.toString)
+
+    def :=(s:Styling) = AttrVal("class", s.className)
+
+    def :=(m:Map[String | Styling, Boolean]) = 
+      AttrVal("class", m.keySet.filter(m(_)).map({
+        case s:String => s
+        case s:Styling => s.className
+      }).mkString(" "))
+
+    def :=(s:ClassToken*) = 
+      AttrVal("class", s.map({
+        case s:String => s
+        case s:Styling => s.className
+        case _ => ""
+      }).mkString(" "))
+
+
+    def ?=(o:Option[String]) = o.map(:=)
+
+    def <--[T] (dv:DynamicValue[T]) = DynamicModifier.DynamicAttr("class", dv)
+  }
+
+  def cls = `class`
 
   case class Lsntrable[T <: Event](n:String) {
     def -->(e: => Unit ) = EventListener[T](n, (x:T) => e, false)

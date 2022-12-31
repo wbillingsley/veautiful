@@ -32,6 +32,12 @@ class Styling(val initialModifiers: Map[String, String] = Map.empty, val initial
     ss.update()
   }
   
+  /** To allow sites to customise styles, we do provide mutable methods for adding rules */
+  def addRules(m:(String,String)*):Unit = {
+    _modifiers = merge(_modifiers, m.toMap)
+    ss.update()
+  }
+
   def addRules(s:String):Unit = addRules(Map("" -> s))
   
   def register() = ss.register(this)

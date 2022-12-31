@@ -36,6 +36,11 @@ object Main {
         |background: aliceblue;
         |border: none;
         |""".stripMargin)
+
+    site.pageLayout.contentStyle.addRules(
+      " pre" -> "background: aliceblue; padding: 10px; border-radius: 10px;",
+      " h1,h2,h3,h4" -> "font-family: 'Times New Roman', serif; color: #004479; font-style: italic; margin-top: 2rem;"
+    )
     
     // The TOC is the table of contents in teh left side-bar.
     // In this case, at the same time as setting the TOC, we're also adding the pages to the site's router.

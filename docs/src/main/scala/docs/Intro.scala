@@ -8,8 +8,35 @@ import org.scalajs.dom
 import org.scalajs.dom.{Element, MouseEvent, Node, svg}
 import org.scalajs.dom.html.Canvas
 
+val logoStyling = Styling(
+  """|margin-top: 50px;
+     |text-align: center;
+     |border-bottom: 1px solid #6c757d;
+     |margin-left: auto;
+     |margin-right: auto;
+     |""".stripMargin
+).modifiedBy(
+  " img" -> "max-height: 150px;",
+  " .logo-text" -> 
+    """|font-variant-caps: all-petite-caps;
+       |font-family: "Times New Roman", serif;
+       |font-size: 32px;
+       |font-variant: all-small-caps;
+       |color: #004479;
+       |font-weight: 600;
+       |margin-top: -15px;
+       |""".stripMargin,
+  " .logo-slogan" -> 
+    """|font-family: "Times New Roman", serif;
+       |font-style: italic;
+       |font-weight: 200;
+       |font-size: 24px;
+       |margin-top: -10px;
+       |""".stripMargin
+).register()
+
 def intro = <.div(
-  <.p(^.cls := "logo",
+  <.p(^.cls := logoStyling,
     Common.logoWithTitle(200, 200),
     <.p(^.cls := "logo-slogan", "A devastatingly simple Scala.js front end.")
   ),

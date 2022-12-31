@@ -29,6 +29,9 @@ class PageLayout(site:Site) {
     ".closed" -> "transform: translateX(-300px);"
   ).register()
 
+  /** Provided so that style modifications can hook into it */
+  val contentStyle = Styling("").register()
+
   val contentContainerStyle = Styling(
     """width: 100%;
       |margin-left: auto;
@@ -125,12 +128,15 @@ class PageLayout(site:Site) {
       val (name, l, r) = prop
 
       <.div(^.cls := (if open then leftSideBarAndContentStyle.className else s"${leftSideBarAndContentStyle.className} closed"),
-        <("aside")(^.cls := (if open then leftSideBarStyle.className else s"${leftSideBarStyle.className} closed"),
+        <.aside(^.cls := (if open then leftSideBarStyle.className else s"${leftSideBarStyle.className} closed"),
           l(),
         ),
         <.div(
           sideBarToggle,
-          <.div(^.cls := (if open then contentContainerSidebarOpenStyle.className else contentContainerStyle.className),
+          <.div(^.cls := (
+              contentStyle,
+              if open then contentContainerSidebarOpenStyle.className else contentContainerStyle.className
+            ),
             r()
           )
         )
