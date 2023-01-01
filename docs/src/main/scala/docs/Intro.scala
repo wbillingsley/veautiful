@@ -41,7 +41,7 @@ def intro = <.div(
     <.p(^.cls := "logo-slogan", "A devastatingly simple Scala.js front end.")
   ),
   Common.markdown(
-    """
+    s"""
       |Veautiful is a web front end for Scala.js, written by [Will Billingsley](https://www.wbillingsley.com).
       |It combines low level control with high level ease of use. 
       |
@@ -76,14 +76,16 @@ def intro = <.div(
       |[Scaladex](https://index.scala-lang.org/wbillingsley/veautiful).
       |
       |```
-      |"com.wbillingsley" %%% "veautiful" % "0.3-M4" // just the core toolkit, latest milestone
+      |"com.wbillingsley" %%% "veautiful" % "$latestVersion" // just the core toolkit, latest milestone
       |```
       |
       |or
       |
       |```
-      |"com.wbillingsley" %%% "doctacular" % "0.3-M4" // also includes some components and the site system, latest milestone
+      |"com.wbillingsley" %%% "doctacular" % "$latestVersion" // also includes some components and the site system, latest milestone
       |```
+      |
+      |The sourcecode is published to [GitHub](https://github.com/wbillingsley/veautiful) using the MIT Licence.
       |
       |### What's unique about Veautiful?
       |

@@ -7,7 +7,7 @@ import docs.Common._
 
 val introPage = <.div(
   markdown(
-    """# Doctacular
+    s"""# Doctacular
       | 
       |Doctacular is a suite of components making it easy to build interactive materials. e.g.:
       |
@@ -36,7 +36,7 @@ val introPage = <.div(
       |As Doctacular "feels like" scripting, it works well with scala-cli
       |
       |```scala
-      |import $dep.`com.wbillingsley::doctacular::0.3-M4`
+      |import $$dep.`com.wbillingsley::doctacular::${docs.latestVersion}`
       |```
       |
       |
@@ -45,7 +45,7 @@ val introPage = <.div(
       |Doctacular is published to Maven Central.
       |
       |```
-      |"com.wbillingsley" %%% "doctacular" % "0.3-M5"
+      |"com.wbillingsley" %%% "doctacular" % "${docs.latestVersion}"
       |```
       |""".stripMargin)
 )

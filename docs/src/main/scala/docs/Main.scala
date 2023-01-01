@@ -9,6 +9,7 @@ import org.scalajs.dom
 given siteStyles:StyleSuite = StyleSuite()
 val site = Site()
 
+val latestVersion = "0.3-M5"
 
 /** A style class for embedded examples */
 val embeddedExampleStyle = Styling(
