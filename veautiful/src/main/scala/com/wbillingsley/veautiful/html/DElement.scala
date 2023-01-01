@@ -395,33 +395,86 @@ trait ModifierDSL {
     def <--[T] (dv:DynamicValue[T]) = DynamicModifier.DynamicAttr(n, dv)
   }
 
-  case class Propable(n:String) {
-    def :=(j:String) = PropVal(n, j)
+  case class Propable[JSType <: js.Any](n:String) {
+    def :=(j:JSType) = PropVal(n, j)
 
-    def ?=(j:Option[String]) = PropVal(n, j.orNull[String])
+    def ?=(j:Option[JSType]) = PropVal(n, j.orNull[JSType | Null])
 
-    def <--[T <: js.Any] (dv:DynamicValue[T]) = DynamicModifier.DynamicProp(n, dv)
+    def <--[T <: JSType] (dv:DynamicValue[T]) = DynamicModifier.DynamicProp(n, dv)
   }
+
+  import scala.language.dynamics
+
+  /**
+   * Supports `^.prop("foo") := ` and `^.prop.foo :=`
+   */
+  object prop extends Dynamic {
+    def apply(n:String) = Propable[js.Any](n)
+    def selectDynamic(s:String) = apply(s)
+  }
+
 
   object reconciler {
     def :=(r:Reconciler) = new ElementAction[dom.Element]({ x => x.reconciler = r })
   }
 
+  /**
+   * Supports ^.key := "my-key", which tends also to change the retention strategy of an element to Keyed
+   */
   object key {
     def :=(k: String) = KeyVal(k)
   }
 
-  def attr(x:String) = Attrable(x)
+  /**
+   * Supports `^.attr("foo") := ` and `^.attr.foo :=`
+   */
+  object attr extends Dynamic {
+    def apply(x:String) = Attrable(x)
+    final def selectDynamic(s:String):Attrable = apply(s)
+  }
 
-  def prop(n:String) = Propable(n)
 
   def alt = attr("alt")
   def style = attr("style")
   def src = attr("src")
-  def `class` = attr("class")
-  def cls = `class`
   def role = attr("role")
   def href = attr("href")
+
+  /** 
+   * Helper for constructing class modifiers. Looks like Attrable, but has some extra options because
+   * classes are a space-separated token list
+   */
+  object `class` {
+    type ClassToken = String | Styling | Unit
+
+    def :=(s:String) = AttrVal("class", s)
+
+    def :=(i:Int) = AttrVal("class", i.toString)
+
+    def :=(d:Double) = AttrVal("class", d.toString)
+
+    def :=(s:Styling) = AttrVal("class", s.className)
+
+    def :=(m:Map[String | Styling, Boolean]) = 
+      AttrVal("class", m.keySet.filter(m(_)).map({
+        case s:String => s
+        case s:Styling => s.className
+      }).mkString(" "))
+
+    def :=(s:ClassToken*) = 
+      AttrVal("class", s.map({
+        case s:String => s
+        case s:Styling => s.className
+        case _ => ""
+      }).mkString(" "))
+
+
+    def ?=(o:Option[String]) = o.map(:=)
+
+    def <--[T] (dv:DynamicValue[T]) = DynamicModifier.DynamicAttr("class", dv)
+  }
+
+  def cls = `class`
 
   case class Lsntrable[T <: Event](n:String) {
     def -->(e: => Unit ) = EventListener[T](n, (x:T) => e, false)
@@ -435,7 +488,10 @@ trait ModifierDSL {
     }
   }
 
-  def on[T <: Event](s:String) = Lsntrable[T](s)
+  object on extends Dynamic {
+    def apply[T <: Event](s:String) = Lsntrable[T](s)
+    def selectDynamic(s:String) = apply[Event](s)
+  }
 
   def onClick = Lsntrable[dom.MouseEvent]("click")
   def onDblClick = Lsntrable[dom.MouseEvent]("dblclick")

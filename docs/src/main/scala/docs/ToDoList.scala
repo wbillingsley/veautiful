@@ -15,11 +15,11 @@ object ToDoList {
   object MyToDoList extends DHtmlComponent {
 
     /** To-do items are data */
-    case class ToDoItem(val s:String, var done:Boolean)
+    class ToDoItem(val s:String, var done:Boolean)
 
     /** We can hold the data model in anything we want */
     private val toDo:mutable.Buffer[ToDoItem] = mutable.Buffer(
-      new ToDoItem("Add more to-do items", false)
+      ToDoItem("Add more to-do items", false)
     )
 
     /** called to add the item to the model */
@@ -40,7 +40,7 @@ object ToDoList {
       private var adding:Option[String] = None
 
       override def render = <.div(^.cls := "input-group",
-        <.input(^.attr("type") := "text", ^.cls := "form-control",
+        <.input(^.attr("type") := "text", ^.cls := "form-control", ^.style := "margin: 5px",
           ^.attr("placeholder") := "type item here",
           ^.prop("value") := adding.getOrElse(""),
           ^.on("change") ==> { e => adding = e.inputValue }
@@ -69,19 +69,11 @@ object ToDoList {
           for {
             (item, idx) <- toDo.zipWithIndex
           } yield {
-            if (item.done) {
-              <.li(^.cls := "list-group-item item-done",
-                <.input(^.attr("type") := "checkbox", ^.prop("checked") := "checked", ^.onClick --> { item.done = false; rerender() }),
-                item.s,
-                <.button(^.cls := "btn btn-sm btn-secondary float-right", ^.onClick --> remove(idx), <("i")(^.cls := "material-icons", "delete"))
-              )
-            } else {
-              <.li(^.cls := "list-group-item",
-                <.input(^.attr("type") := "checkbox", ^.cls := "input-control", ^.onClick --> { item.done = true; rerender() }),
-                item.s,
-                <.button(^.cls := "btn btn-sm btn-secondary float-right", ^.onClick --> remove(idx), <("i")(^.cls := "material-icons", "delete"))
-              )
-            }
+            <.li(^.cls := "list-group-item", 
+              <.input(^.attr("type") := "checkbox", ^.prop("checked") := item.done, ^.style := "margin: 5px;", ^.onClick --> { item.done = !item.done; rerender() }),
+              if item.done then <.del(item.s) else item.s,
+              <.button(^.cls := "btn btn-sm btn-secondary float-right", ^.onClick --> remove(idx), <("i")(^.cls := "material-icons", "delete"))
+            )
           }
         ),
         <.div(^.cls := "card-footer", AddItem())

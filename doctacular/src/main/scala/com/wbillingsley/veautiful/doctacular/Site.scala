@@ -1,9 +1,9 @@
 package com.wbillingsley.veautiful.doctacular
 
-import com.wbillingsley.veautiful.{PathDSL, Blueprint}
+import com.wbillingsley.veautiful.Blueprint
+import com.wbillingsley.veautiful.html.{<, Attacher, VDomContent, VDomNode, HistoryRouter, ^, PathDSL}
 import PathDSL.Compose._
-import com.wbillingsley.veautiful.html.{<, Attacher, VDomContent, VDomNode, ^}
-import com.wbillingsley.veautiful.templates.{HistoryRouter, VSlides, Challenge}
+import com.wbillingsley.veautiful.templates.{VSlides, Challenge}
 
 import scala.collection.mutable
 import scala.util.Try
@@ -196,6 +196,7 @@ class Site() {
     route.render(router)
   }
   
+  def attachToBody():Unit = attachTo(org.scalajs.dom.document.body)
   
 }
 

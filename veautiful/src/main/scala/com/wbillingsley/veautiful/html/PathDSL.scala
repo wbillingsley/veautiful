@@ -1,4 +1,4 @@
-package com.wbillingsley.veautiful
+package com.wbillingsley.veautiful.html
 
 import com.wbillingsley.veautiful.logging.Logger
 import org.scalajs.dom

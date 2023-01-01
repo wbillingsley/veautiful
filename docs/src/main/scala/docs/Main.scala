@@ -9,6 +9,7 @@ import org.scalajs.dom
 given siteStyles:StyleSuite = StyleSuite()
 val site = Site()
 
+val latestVersion = "0.3-M5"
 
 /** A style class for embedded examples */
 val embeddedExampleStyle = Styling(
@@ -36,6 +37,11 @@ object Main {
         |background: aliceblue;
         |border: none;
         |""".stripMargin)
+
+    site.pageLayout.contentStyle.addRules(
+      " pre" -> "background: aliceblue; padding: 10px; border-radius: 10px;",
+      " h1,h2,h3,h4" -> "font-family: 'Times New Roman', serif; color: #004479; font-style: italic; margin-top: 2rem;"
+    )
     
     // The TOC is the table of contents in teh left side-bar.
     // In this case, at the same time as setting the TOC, we're also adding the pages to the site's router.
@@ -50,20 +56,15 @@ object Main {
         "Stateful components" -> site.addPage("stateful-components", statefulComponents),
         "Morphing components" -> site.addPage("morphing-components", morphingComponents),
         "Dynamic state" -> site.addPage("dynamic-state", dynamicState),
-        "Performance" -> site.addPage("low-level-components", performance),
+        "D3-like components" -> site.addPage("low-level-components", d3like),
         "Markup components" -> site.addPage("markup-components", markupComponents),
+        "Routing" -> site.addPage("routing", routing),
         "CSS in JS" -> site.addPage("style-suites", styleSuites)
-      ),
-      "Design" -> site.Toc(
-        
-      ),
-      "Extras" -> site.Toc(
-        "VSlides" -> site.addPage("vslides", VSlidesExample.page(0)),
-        "Challenges" -> site.addChallenge("challenges", ChallengeExample.levels)
       ),
       "Doctacular" -> site.Toc(
         "Intro" -> site.addPage("doctacular-intro", doctacular.introPage),
-        "Slides: Tutorial" -> site.addDeck("doctacular-tutorial-deck", doctacular.tutorialDeck),
+        "Sites" -> site.addPage("doctacular-sites", doctacular.sites),
+        "Decks (VSlides)" -> site.addPage("vslides", VSlidesExample.page(0)),
         "Videos" -> site.addPage("doctacular-videos", doctacular.videoIntro),
         "Alternatives" -> site.add("alternatives", 
           Alternative("Play a slide deck", Medium.Deck(() => GoogleSlides("2PACX-1vQ8ZlyoV6f1g1-AWiKiqJ886n6O9sK8XymUirDVUbHYZaTalHE4Cty1BMbZLm0t0SBywAZkmGAOEb0Q"))),
@@ -72,9 +73,13 @@ object Main {
       ),
       "Examples" -> site.Toc(
         "To-Do List" -> site.addPage("to-do-list", ToDoList.page),
+      ),
+      "Test pages" -> site.Toc(
         "Orbiting asteroids" -> site.addPage("orbiting-asteroids", ReactLike.page),
         "Diffusion" -> site.addPage("diffusion-experiment", Diffusion.SimulationView),
-        "Scatter" -> site.addPage("scatter", ScatterExample.page)
+        "Scatter" -> site.addPage("scatter", ScatterExample.page),
+        "Slides: Tutorial" -> site.addDeck("doctacular-tutorial-deck", doctacular.tutorialDeck),
+        "Challenges" -> site.addChallenge("challenges", ChallengeExample.levels)
       )
     )
     
@@ -87,7 +92,7 @@ object Main {
     siteStyles.install()
     
     // Render our site into the page 
-    site.attachTo(dom.document.getElementById("render-here"))
+    site.attachTo(dom.document.body)
   }
 
 }

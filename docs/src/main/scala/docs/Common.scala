@@ -6,12 +6,25 @@ import scala.scalajs.js
 import scala.scalajs.js.annotation._
 
 @js.native
+@JSImport("highlight.js", JSImport.Default)
+object HLJS extends js.Object:
+  def highlight(code:String, d:js.Dictionary[String]):js.Dynamic = js.native
+  def getLanguage(lang:String):js.Dynamic = js.native
+
+@js.native
 @JSImport("marked", "marked")
 object Marked extends js.Object:
-  def parse(s:String):String = js.native
+  def parse(s:String, d:js.Dictionary[js.Function]):String = js.native
   def parseInline(s:String):String = js.native
 
-given marked:Markup = Markup({ (s:String) => Marked.parse(s) })
+given marked:Markup = Markup({ (s:String) => Marked.parse(s, js.Dictionary("highlight" -> 
+    { (code:String, lang:String) => 
+      import scalajs.js.DynamicImplicits.truthValue
+      val l = if HLJS.getLanguage(lang) then lang else "plaintext"
+      HLJS.highlight(code, js.Dictionary("language" -> l)).value 
+    }
+  )) 
+})
 
 val markedInline:Markup = Markup({ (s:String) => Marked.parseInline(s) })
 
@@ -28,6 +41,7 @@ object Common {
       ^.attr("style") :=
         """stroke: #ff930080;
           |stroke-width: 7;
+          |stroke-linecap: round;
           |fill: transparent;
           |""".stripMargin,
       ^.attr("d") :=
@@ -42,20 +56,18 @@ object Common {
           |M 215 88 c 0 -20, 12 -50, 42 -50
           |M 165 109 l 54 0
           |M 192 109 l 0 84
-          |M 126 234 l 14 14 l 27 0 l 25 -25 l 25 25 l 27 0 l 14 -14
-          |M 139 273 l 106 0
-          |M 192 224 l 0 80
           |""".stripMargin
     ),
     SVG.path(
       ^.attr("style") :=
         """stroke: #004479d0;
           |stroke-width: 19;
+          |stroke-linecap: round;
           |fill: transparent;
           |""".stripMargin,
       ^.attr("d") :=
-        """M 118 179 C 158 179, 166 104, 98 109 C 22 111, 16 241, 192 362
-          |C 368 241, 362 111, 286 109 C 218 104, 226 179, 266 179
+        """M 148 159 c 0 0, 0 -50, -50 -50 C 22 111, 16 241, 192 362
+          |C 368 241, 362 111, 286 109 c -50 0, -50 50, -50 50
           |""".stripMargin
     )
   )

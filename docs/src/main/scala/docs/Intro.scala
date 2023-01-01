@@ -8,13 +8,40 @@ import org.scalajs.dom
 import org.scalajs.dom.{Element, MouseEvent, Node, svg}
 import org.scalajs.dom.html.Canvas
 
+val logoStyling = Styling(
+  """|margin-top: 50px;
+     |text-align: center;
+     |border-bottom: 1px solid #6c757d;
+     |margin-left: auto;
+     |margin-right: auto;
+     |""".stripMargin
+).modifiedBy(
+  " img" -> "max-height: 150px;",
+  " .logo-text" -> 
+    """|font-variant-caps: all-petite-caps;
+       |font-family: "Times New Roman", serif;
+       |font-size: 32px;
+       |font-variant: all-small-caps;
+       |color: #004479;
+       |font-weight: 600;
+       |margin-top: -15px;
+       |""".stripMargin,
+  " .logo-slogan" -> 
+    """|font-family: "Times New Roman", serif;
+       |font-style: italic;
+       |font-weight: 200;
+       |font-size: 24px;
+       |margin-top: -10px;
+       |""".stripMargin
+).register()
+
 def intro = <.div(
-  <.p(^.cls := "logo",
+  <.p(^.cls := logoStyling,
     Common.logoWithTitle(200, 200),
     <.p(^.cls := "logo-slogan", "A devastatingly simple Scala.js front end.")
   ),
   Common.markdown(
-    """
+    s"""
       |Veautiful is a web front end for Scala.js, written by [Will Billingsley](https://www.wbillingsley.com).
       |It combines low level control with high level ease of use. 
       |
@@ -49,14 +76,16 @@ def intro = <.div(
       |[Scaladex](https://index.scala-lang.org/wbillingsley/veautiful).
       |
       |```
-      |"com.wbillingsley" %%% "veautiful" % "0.3-M4" // just the core toolkit, latest milestone
+      |"com.wbillingsley" %%% "veautiful" % "$latestVersion" // just the core toolkit, latest milestone
       |```
       |
       |or
       |
       |```
-      |"com.wbillingsley" %%% "doctacular" % "0.3-M4" // also includes some components and the site system, latest milestone
+      |"com.wbillingsley" %%% "doctacular" % "$latestVersion" // also includes some components and the site system, latest milestone
       |```
+      |
+      |The sourcecode is published to [GitHub](https://github.com/wbillingsley/veautiful) using the MIT Licence.
       |
       |### What's unique about Veautiful?
       |
