@@ -69,6 +69,38 @@ def styleSuites = <.div(
       |).register()
       |```
       |
+      |Any spaces at the beginning of a modifier are significant. The Styling, when writing itself to CSS, will prepend its class to the modifier. So,
+      |
+      |```scala
+      |Styling("").modifiedBy(
+      |  " .selected" -> "font-size: 15px;"
+      |).register()
+      |```
+      |
+      |Will produce a CSS rule that looks something like
+      |
+      |```css
+      |stylingClass.selected {
+      |  font-size: 15px;
+      |}
+      |```
+      |
+      |Whereas 
+      |
+      |```scala
+      |Styling("").modifiedBy(
+      |  " .selected" -> "font-size: 15px;"
+      |).register()
+      |```
+      |
+      |Will produce a CSS rule that selects on its descendents: 
+      |
+      |```css
+      |stylingClass .selected {
+      |  font-size: 15px;
+      |}
+      |```
+      |
       |## At-Rules
       |
       |In CSS, At-Rules (e.g. `@media`) go at the top level of a stylesheet, rather than embedding the at-rule embedded in the style.
@@ -88,6 +120,29 @@ def styleSuites = <.div(
       |
       |Note that you can't currently apply modifiers into the at-rule. Largely because I haven't yet 
       |encountered a case where I'd need to, instead of it being cleaner just to change between two stylings instead.
+      |
+      |## Applying a styling to an element
+      |
+      |The little language for writing VHtmlContent accepts stylings' `className` or just the styling itself into the `^.attr` modifier
+      |
+      |e.g.
+      |
+      |```scala
+      |div(^.cls := myStyling.clasName, "Some content")
+      |```
+      |
+      |or
+      |
+      |```scala
+      |div(^.cls := mySyling, "Some content")
+      |```
+      |
+      |or even 
+      |
+      |```scala
+      |div(^.cls := (myFirstSyling, mySecondStyling, "selected"), "Some content")
+      |```
+      |
       |
       |## Going mutable
       |

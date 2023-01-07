@@ -8,6 +8,21 @@ import org.scalajs.dom
 
 object WindowScaler {
 
+  /** A styling that can be applied to a div in a page to allow it to be resized. */
+  val resizableSurround = Styling(
+    """|min-height: 480px;
+       |resize: both;
+       |overflow: hidden;
+       |margin-right: 0.25rem;
+       |background-clip: border-box;
+       |border: 1px solid rgba(0,0,0,0.125);
+       |position: relative;
+       |left: 0;
+       |top: 0;
+       |""".stripMargin).modifiedBy(
+    ".unscaled" -> "overflow: inherit;"
+  ).register()
+
   /** The surround, that contains the slide deck */
   val scalerTopStyle = Styling(
     """position: absolute;

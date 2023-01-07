@@ -2,7 +2,7 @@ package com.wbillingsley.veautiful.doctacular
 
 import com.wbillingsley.veautiful.Morphing
 import com.wbillingsley.veautiful.html.{<, DHtmlComponent, VHtmlDiffNode, VHtmlContent, ^, StyleSuite, unique, Styling}
-import com.wbillingsley.veautiful.templates.{DefaultVSlidesPlayer, Sequencer, VSlides, VSlidesConfig, WindowScaler, WindowWidthScaler}
+import com.wbillingsley.veautiful.templates.{Sequencer, WindowScaler, WindowWidthScaler}
 import org.scalajs.dom
 import org.scalajs.dom.raw.{Event, HTMLElement}
 

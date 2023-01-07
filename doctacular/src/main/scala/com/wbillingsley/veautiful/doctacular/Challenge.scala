@@ -1,12 +1,9 @@
-package com.wbillingsley.veautiful.templates
+package com.wbillingsley.veautiful.doctacular
 
 import com.wbillingsley.veautiful.html.{<, DElement, SVG, Styling, DHtmlModifier, DHtmlComponent, DDomContent, ^, CustomElementChild, VHtmlElement}
-import com.wbillingsley.veautiful.templates.Challenge.{HomePath, LevelPath, StagePath}
-import com.wbillingsley.veautiful.templates.Sequencer.LayoutFunc
+import com.wbillingsley.veautiful.templates.{Sequencer, templateStyleSuite}
+import Sequencer.LayoutFunc
 
-/**
-  * Layout based on the one that is used for Escape the Lava Maze
-  */
 object Challenge {
 
   val challengeHeaderHeight = "50px"
@@ -58,9 +55,6 @@ object Challenge {
         |border-left: 1px solid lightgray; background: white;""".stripMargin
   ).register()
 
-
-
-
   def hgutter = <.div(^.cls := "row hgutter")
 
   def card(s:String)(ac: DHtmlModifier *) = <.div(^.cls := "card",
@@ -92,14 +86,18 @@ object Challenge {
   )
 
 
+  /** A Stage within a Level */
   trait Stage extends DHtmlComponent {
 
+    /** Stages can be marked complete or partially complete. This is used, for instance, in Circuits Up! to visualise progress. */
     def completion:Completion
 
+    /** The "kind" of Stage changes the icon shown for it. */
     def kind:String
 
   }
 
+  /** A Level has a name and a sequences of Stages */
   case class Level(name:String, stages:Seq[Stage])
 
   sealed trait Completion {
@@ -188,6 +186,17 @@ object Challenge {
   }
 }
 
+
+/**
+  * A self-paced interactive tutorial laid out in a fixed resolution (that then auto-scales to fit in the screen).
+  * It is divided into `Level`s that have a title and are themselves divided into `Stage`s. 
+  * 
+  * The Levels of one Stage are held in the DOM at any time. This hopefully makes a good trade-off between wanting 
+  * movement back and forth between stages not to cause re-loads of slow-to-load items (e.g. videos), but not keeping
+  * the entire tree loaded into the DOM at once.
+  * 
+  * Currently, Challenges are laid out in 1080p (i.e. 1920 x 1080), however this might be made variable in future versions.
+  */
 class Challenge(val levels: Seq[Challenge.Level],
                 val header: (Challenge) => DDomContent,
                 val tr: (Challenge) => DDomContent,
@@ -199,18 +208,21 @@ class Challenge(val levels: Seq[Challenge.Level],
   var level:Int = 0
   var stage:Int = 0
 
+  /** The level and stage number preceeding this one */
   def previous:Option[(Int, Int)] = {
     if (level <= 0 && stage <= 0) None else Some(
       if (stage > 0) (level, stage - 1) else (level - 1, levels(level - 1).stages.length - 1)
     )
   }
 
+  /** The level and stage number after this one */
   def next:Option[(Int, Int)] = {
     if (level >= levels.length - 1 && stage >= levels(level).stages.length -1 ) None else Some(
       if (stage >= levels(level).stages.length - 1) (level + 1, 0) else (level, stage + 1)
     )
   }
 
+  /** Show a particular level and stage */
   def show(l:Int, s:Int) = {
     level = l
     stage = s
@@ -221,6 +233,7 @@ class Challenge(val levels: Seq[Challenge.Level],
     levels(level).stages
   }
 
+  /** Levels are rendered as a slide deck. This gives access to the slides. */
   def levelSlides:VSlides = {
     VSlides(1920, 1080, elements, layout=Layout)
   }

@@ -1,12 +1,13 @@
 package com.wbillingsley.veautiful.html
 
+import com.wbillingsley.veautiful.Update
 import com.wbillingsley.veautiful.html.{<, ElementComponent, VDomNode}
 import com.wbillingsley.veautiful.logging.Logger
 import org.scalajs.dom
 import org.scalajs.dom.Event
 import com.wbillingsley.veautiful.Blueprint
 
-abstract class HistoryRouter[Route] extends ElementComponent(<.div.build()) {
+abstract class HistoryRouter[Route] extends ElementComponent(<.div.build()) with Update {
 
   private val logger = Logger.getLogger("com.wbillingsley.veautiful.templates.HistoryRouter")
 
@@ -68,6 +69,8 @@ abstract class HistoryRouter[Route] extends ElementComponent(<.div.build()) {
     dom.window.history.replaceState(r.toString, "", p)
     renderElements(render)
   }
+
+  def update():Unit = renderElements(render)
 
   override def afterDetach():Unit = {
     deregisterHistoryListeners()

@@ -3,7 +3,6 @@ package com.wbillingsley.veautiful.doctacular
 import com.wbillingsley.veautiful.Blueprint
 import com.wbillingsley.veautiful.html.{<, Attacher, VDomContent, VDomNode, HistoryRouter, ^, PathDSL}
 import PathDSL.Compose._
-import com.wbillingsley.veautiful.templates.{VSlides, Challenge}
 
 import scala.collection.mutable
 import scala.util.Try

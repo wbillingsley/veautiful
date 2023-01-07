@@ -1,4 +1,4 @@
-package com.wbillingsley.veautiful.templates
+package com.wbillingsley.veautiful.doctacular
 
 import com.wbillingsley.veautiful.html.{<, Attacher, Markup, VHtmlContent, VHtmlElement, VHtmlBlueprint, ^}
 import org.scalajs.dom
@@ -12,6 +12,19 @@ sealed trait Slide
 @JSExportTopLevel("DeckBuilder")
 def makeDeckBuilder(parser:(String) => String) = (w:Int, h:Int) => DeckBuilder(w, h)(using Markup { parser })
 
+/**
+  * Allows creating VSlides decks using a builder-like notation.
+  * 
+  * VSlides decks use a fixed resolution for the slides, so that authors don't have to worry about making their slides responsive.
+  * The deck then uses a CSS scale transform to fit itself into the available space in the window.
+  * 
+  * Slides can be added using Markdown or Veautiful for interactive content
+  *
+  * @param width with of a slide
+  * @param height height of a slide
+  * @param slides any initial content to initialise the builder with
+  * @param markup the markup engine to use in Markdown slides
+  */
 class DeckBuilder(width:Int = 1920, height:Int = 1080, slides:List[Seq[() => VHtmlContent]] = Nil)(using markup:Markup) {
 
   def stripIndent(s:String):String = {

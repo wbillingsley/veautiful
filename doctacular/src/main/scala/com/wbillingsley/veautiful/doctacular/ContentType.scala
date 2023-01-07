@@ -1,8 +1,6 @@
 package com.wbillingsley.veautiful.doctacular
 
 import com.wbillingsley.veautiful.html.VHtmlContent
-import com.wbillingsley.veautiful.templates.VSlides
-
 
 enum Medium:
   case Video[T](video: () => T)(using val player:VideoPlayer[T])

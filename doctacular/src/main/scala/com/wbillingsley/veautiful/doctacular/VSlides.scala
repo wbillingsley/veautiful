@@ -1,6 +1,7 @@
-package com.wbillingsley.veautiful.templates
+package com.wbillingsley.veautiful.doctacular
 
 import com.wbillingsley.veautiful.html.{<, Styling, DHtmlComponent, VHtmlDiffNode, VHtmlElement, ^}
+import com.wbillingsley.veautiful.templates.{Sequencer, SequenceItem, templateStyleSuite, WindowScaler}
 import com.wbillingsley.veautiful.Morphing
 import com.wbillingsley.veautiful.logging.Logger
 import org.scalajs.dom
