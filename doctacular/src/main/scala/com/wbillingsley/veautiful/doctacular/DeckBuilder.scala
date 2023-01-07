@@ -1,6 +1,6 @@
 package com.wbillingsley.veautiful.doctacular
 
-import com.wbillingsley.veautiful.html.{<, Attacher, Markup, VHtmlContent, VHtmlElement, VHtmlBlueprint, ^}
+import com.wbillingsley.veautiful.html.{<, Attacher, RootNode, Markup, VHtmlContent, VHtmlElement, VHtmlBlueprint, ^}
 import org.scalajs.dom
 
 import scala.collection.mutable
@@ -72,6 +72,13 @@ class DeckBuilder(width:Int = 1920, height:Int = 1080, slides:List[Seq[() => VHt
     DeckBuilder.publishedDecks(selector) = slides
     val a = Attacher.newRoot(dom.document.querySelector(selector))
     a.render(slides)
+  }
+
+  /** Creates a micro-router that has a gallery view and a view for each slide, and mounts it to the root */
+  def mountToRoot(root:RootNode) = {
+    val deck = renderSlides
+    val microRouter = VSlidesMicroRouter(deck)
+    root.render(microRouter)
   }
 
 }

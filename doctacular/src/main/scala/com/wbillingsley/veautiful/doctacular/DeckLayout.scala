@@ -125,7 +125,7 @@ class DeckLayout(site:Site) {
   def renderDeckNFS(site:Site, name:String, deck:DeckResource, page:Int) = {
     site.pageLayout.renderPage(site, 
       deck.fullScreenPlayer match {
-        case Some(player) => <.div(^.key := "vslide-example2", ^.cls := "resizable", player(name, page))
+        case Some(player) => <.div(^.cls := WindowScaler.resizableSurround, player(name, page))
         case None => deck.defaultView(name)
       }
     )
