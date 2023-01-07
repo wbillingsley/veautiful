@@ -7,6 +7,7 @@ import com.wbillingsley.veautiful.templates.VSlides
 enum Medium:
   case Video[T](video: () => T)(using val player:VideoPlayer[T])
   case Deck[T](deck: () => T)(using val player:DeckPlayer[T])
+  case OtherListPath[T](content: () => T)(using val player:ListPathPlayer[T])
   case Page(f: () => VHtmlContent)
 
 /*
