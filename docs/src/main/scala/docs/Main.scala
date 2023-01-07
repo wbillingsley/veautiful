@@ -63,9 +63,14 @@ object Main {
       ),
       "Doctacular" -> site.Toc(
         "Intro" -> site.addPage("doctacular-intro", doctacular.introPage),
+        "Displaying a single deck" -> site.addPage("doctacular-a-single-deck", doctacular.singleDeck),
         "Sites" -> site.addPage("doctacular-sites", doctacular.sites),
-        "Decks (VSlides)" -> site.addPage("vslides", VSlidesExample.page(0)),
+        "Pages" -> site.addPage("doctacular-pages", doctacular.pages),
         "Videos" -> site.addPage("doctacular-videos", doctacular.videoIntro),
+        "Decks (VSlides)" -> site.addPage("doctacular-vslides", VSlidesExample.page(0)),
+        "Slide decks (other kinds)" -> site.addPage("doctacular-other-decks", otherDecks),
+        "Challenges" -> site.addPage("doctacular-challenges", doctacular.challenges),
+        "Other content" -> site.addPage("doctacular-other-content", doctacular.otherContent),
         "Alternatives" -> site.add("alternatives", 
           Alternative("Play a slide deck", Medium.Deck(() => GoogleSlides("2PACX-1vQ8ZlyoV6f1g1-AWiKiqJ886n6O9sK8XymUirDVUbHYZaTalHE4Cty1BMbZLm0t0SBywAZkmGAOEb0Q"))),
           Alternative("Play a video", Medium.Video(() => YouTube("YE7VzlLtp-4")))

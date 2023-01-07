@@ -16,7 +16,7 @@ val introPage = <.div(
       |  * Pages with a mix of markdown and interactive components
       |  * Teaching sites and open educational resources
       |
-      |You can build a whole site with it, or it's also easy just to write and display individual slide deck.
+      |You can build a whole site with it, or it's also easy just to [write and display individual slide deck](${docs.site.router.path(docs.site.PageRoute("doctacular-a-single-deck"))}).
       |
       |This documentation is built as a doctacular site. As are:
       |
@@ -33,7 +33,7 @@ val introPage = <.div(
       |
       |### Getting started with scala-cli
       |
-      |As Doctacular "feels like" scripting, it works well with scala-cli
+      |As Doctacular "feels like" scripting, it works well with scala-cli. If you're familiar with scala-cli, this is the import you noeed:
       |
       |```scala
       |import $$dep.`com.wbillingsley::doctacular::${docs.latestVersion}`
@@ -42,7 +42,7 @@ val introPage = <.div(
       |
       |### Getting started with sbt or mill
       |
-      |Doctacular is published to Maven Central.
+      |Doctacular is published to Maven Central. 
       |
       |```
       |"com.wbillingsley" %%% "doctacular" % "${docs.latestVersion}"

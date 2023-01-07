@@ -2,24 +2,8 @@ package docs.doctacular
 
 import com.wbillingsley.veautiful.html.{<, ^}
 import com.wbillingsley.veautiful.doctacular.*
-import com.wbillingsley.veautiful.templates.DeckBuilder
 
 import docs.given
-
-case class GoogleSlides(id:String)
-
-given DeckPlayer[GoogleSlides] with 
-  extension (v:GoogleSlides) {
-    def defaultView(name:String) =
-      <.div(
-        <.iframe(
-          ^.attr("width") := 960, ^.attr("height") := 749, ^.src := s"https://docs.google.com/presentation/d/e/${v.id}/embed?start=false&loop=false&delayms=3000",
-          ^.attr("frameborder") := "0", ^.attr("allow") :="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture",
-          ^.attr("allowfullscreen") := "allowfullscreen")
-      )
-
-    def fullScreenPlayer = None
-  }
 
 val tutorialDeck = DeckBuilder()
   .markdownSlide(

@@ -1,6 +1,7 @@
-package com.wbillingsley.veautiful.templates
+package com.wbillingsley.veautiful.doctacular
 
-import com.wbillingsley.veautiful.html.{<, Styling, DHtmlComponent, VHtmlDiffNode, VHtmlElement, ^}
+import com.wbillingsley.veautiful.html.{<, Styling, DHtmlComponent, VHtmlDiffNode, VHtmlElement, ^, HistoryRouter, PathDSL}
+import com.wbillingsley.veautiful.templates.{Sequencer, SequenceItem, templateStyleSuite, WindowScaler, WindowWidthScaler}
 import com.wbillingsley.veautiful.Morphing
 import com.wbillingsley.veautiful.logging.Logger
 import org.scalajs.dom
@@ -101,6 +102,9 @@ case class VSlides(
 /** Something that can take a deck, and a page number, and render it to a VDomNode */
 type VSlidesPlayer = (VSlides, Int) => VHtmlElement
 
+/**
+  * A bare-bones player for VSlides.
+  */
 case class DefaultVSlidesPlayer(deck: VSlides, override val key: Option[String] = None, scaleToWindow:Boolean = true)(
   index: Int = 0,
   onIndexChange: Option[Int => Unit] = None,
@@ -134,4 +138,94 @@ case class DefaultVSlidesPlayer(deck: VSlides, override val key: Option[String] 
   }
   
   def atSlide(i:Int):DefaultVSlidesPlayer = DefaultVSlidesPlayer(deck, key)(i, prop.onIndexChange)
+}
+
+object VSlidesMicroRouter {
+  enum Route:
+    case Gallery
+    case Slide(i:Int)
+
+  val slideGalleryBorder = Styling("border: 1px solid #ddd;").register()
+
+  val contentContainerStyle = Styling(
+    """width: 100%;
+      |margin-left: auto;
+      |margin-right: auto;
+      |padding-left: 15px;
+      |padding-right: 15px;
+      |""".stripMargin).withAtRules(
+    "@media (min-width: 576px)" -> "max-width: 540px;",
+    "@media (min-width: 768px)" -> "max-width: 720px;",
+    "@media (min-width: 992px)" -> "max-width: 960px;",
+    "@media (min-width: 1200px)" -> "max-width: 1140px;",
+  ).register()
+
+  val fsButtonStyle = Styling(
+    """border-radius: 5px;
+      |background-color: antiquewhite;
+      |text-align: center;
+      |border: 1px solid #aaa;
+      |margin-right: 1rem;
+      |""".stripMargin).modifiedBy(
+    ":hover" -> "filter: brightness(115%);"
+  ).register()
+}
+
+/**
+  * A micro-router if we want to mount a single deck as the entire site. 
+  *
+  * @param deck the VSlides deck to mount
+  */
+case class VSlidesMicroRouter(deck:VSlides) extends HistoryRouter[VSlidesMicroRouter.Route] {
+
+  import VSlidesMicroRouter.Route
+  import PathDSL.intParam
+
+  var route = Route.Gallery
+
+  def path(r:Route) = r match {
+    case Route.Gallery => "/"
+    case Route.Slide(i) => s"/$i"
+  }
+
+  def galleryButton = <.button(
+    ^.onClick --> routeTo(Route.Gallery), "≡"
+  ).build()
+
+  private val internalOnIndexChange: Int => Unit = { i =>
+    routeTo(Route.Slide(i))
+  }
+
+  def render = route match {
+    case Route.Gallery => <.div(
+
+      <.div(^.cls := VSlidesMicroRouter.contentContainerStyle,
+        <.div(^.style := "margin: 1em 0;",
+          <.button(
+            ^.cls := VSlidesMicroRouter.fsButtonStyle,
+            ^.on.click --> routeTo(Route.Slide(0)), 
+            "Play this deck fullscreen"
+          )
+        ),
+
+        <.div(^.cls := VSlidesMicroRouter.slideGalleryBorder,
+          WindowWidthScaler(deck.width)(
+            <.div(deck.laidOut).build(), true
+          )
+        )
+      )
+    )
+
+    case Route.Slide(i) => 
+      DefaultVSlidesPlayer(deck)(i, sequencerLayout = Sequencer.footBoxLayout(Seq(galleryButton)), onIndexChange = Some(internalOnIndexChange))
+  }
+
+  def routeFromLocation(): Route = PathDSL.hashPathList() match {
+    case intParam(i) :: _ if i <= deck.content.indices.max => Route.Slide(i)
+    case _ => Route.Gallery
+  }
+
+  // Ensure the template styles are installed
+  templateStyleSuite.install()
+
 }

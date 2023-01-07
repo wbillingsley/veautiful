@@ -1,6 +1,6 @@
 package docs
 
-import com.wbillingsley.veautiful.templates.Challenge
+import com.wbillingsley.veautiful.doctacular.Challenge
 import com.wbillingsley.veautiful.html.{<}
 import org.scalajs.dom.{Element, Node}
 

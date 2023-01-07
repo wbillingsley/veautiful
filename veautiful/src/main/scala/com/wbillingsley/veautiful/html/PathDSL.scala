@@ -84,6 +84,15 @@ object PathDSL {
     pairs.groupBy(_._1).map { case (k, arr) => (k, arr.map(_._2)) }
   }
 
+  /** Attempts to parse an int from a String */
+  object intParam {
+    def unapply(s:String) : Option[Int] = try {
+      Some(s.toInt)
+    } catch {
+      case _:Throwable => None
+    }
+  }
+
   /**
     * The classes and methods in this section are simple and designed just for constructing paths in a type-safe
     * manner. E.g., (/# / "courses" / course.id ? "name" -> "joe").stringify

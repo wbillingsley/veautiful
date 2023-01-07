@@ -3,7 +3,6 @@ package com.wbillingsley.veautiful.doctacular
 import com.wbillingsley.veautiful.Blueprint
 import com.wbillingsley.veautiful.html.{<, Attacher, VDomContent, VDomNode, HistoryRouter, ^, PathDSL}
 import PathDSL.Compose._
-import com.wbillingsley.veautiful.templates.{VSlides, Challenge}
 
 import scala.collection.mutable
 import scala.util.Try
@@ -21,7 +20,7 @@ class Site() {
   case class DeckRoute(name:String, slide:Int) extends Route
   case class FullScreenDeckRoute(name:String, slide:Int) extends Route
   case class VideoRoute(name:String) extends Route
-  case class ChallengeRoute(name:String, level:Int, stage:Int) extends Route
+  case class ListPathRoute(kind:String, name:String, subpath:List[String]) extends Route
   
   trait CustomRoute extends Route {
     def render():VDomContent
@@ -50,7 +49,7 @@ class Site() {
   private var pages:mutable.Map[String, () => VDomContent] = mutable.Map.empty
   private var decks:mutable.Map[String, () => DeckResource] = mutable.Map.empty
   private var videos:mutable.Map[String, () => VideoResource] = mutable.Map.empty
-  private var challenges:mutable.Map[String, () => Seq[Challenge.Level]] = mutable.Map.empty
+  private var otherListPathContent:mutable.Map[(String, String), () => ListPathResource] = mutable.Map.empty
 
   private var alternativeMap:mutable.Map[Route, Seq[(Route, Alternative)]] = mutable.Map.empty
   def alternativesTo(r:Route):Seq[(Route, Alternative)] = alternativeMap.getOrElse(r, Seq.empty)
@@ -68,20 +67,33 @@ class Site() {
   var videoLayout = VideoLayout(this)
   def renderVideo(name:String) = videoLayout.renderVideo(this, name, videos(name)())
 
-  def renderChallenge(name: String, level: Int, stage: Int) = {
-    val levels = challenges(name)()
-    Challenge.apply(
-      levels = levels,
-      homePath = (_:Challenge) => router.path(HomeRoute),
-      levelPath = (c:Challenge, l:Int) => router.path(ChallengeRoute(name, l, 0)),
-      stagePath = (c:Challenge, l:Int, s:Int) => router.path(ChallengeRoute(name, l, s)),
-    ).show(level, stage)
-  }
-
   def addPage(name:String, content: => VDomContent):PageRoute = {
     pages.put(name, () => content)
     PageRoute(name)
   }
+
+  given ListPathPlayer[Seq[Challenge.Level]] with
+    extension (levels:Seq[Challenge.Level]) {
+      def kind = "challenges"
+
+      def defaultSubpath = List("0", "0")
+
+      def view(name:String, subpath:List[String]) = {
+        val c = Challenge(
+          levels = levels,
+          homePath = (_:Challenge) => router.path(HomeRoute),
+          levelPath = (c:Challenge, l:Int) => router.path(ListPathRoute("challenges", name, List(l.toString))),
+          stagePath = (c:Challenge, l:Int, s:Int) => router.path(ListPathRoute("challenges", name, List(l.toString, s.toString))),
+        )
+
+        subpath match {
+          case Nil => c.show(0, 0)
+          case l :: Nil => c.show(l.toInt, 0)
+          case l :: s :: _ => c.show(l.toInt, s.toInt)
+        }
+      }
+
+    }
 
   // Built-in support for VSlides
   given DeckPlayer[VSlides] with 
@@ -108,11 +120,19 @@ class Site() {
     VideoRoute(name)
   }
 
-  def addChallenge(name:String, content: => Seq[Challenge.Level]):ChallengeRoute = {
-    challenges.put(name, () => content)
-    ChallengeRoute(name, 0, 0)
+  def addChallenge(name:String, content: => Seq[Challenge.Level]):ListPathRoute = {
+    addOther(name, content)
+  }
+
+  def addOtherResource(name:String, customResource:ListPathResource):ListPathRoute = {
+    otherListPathContent.put((customResource.kind, name), () => customResource)
+    ListPathRoute(customResource.kind, name, customResource.defaultSubpath)
   }
   
+  def addOther[T : ListPathPlayer](name:String, content: => T):ListPathRoute = {
+    addOtherResource(name, PlayableListPathResource(content))
+  }
+
   def addVideo[T : VideoPlayer](name: String, video:T):VideoRoute = {
     addVideoResource(name, PlayableVideo(video))
   }
@@ -124,6 +144,7 @@ class Site() {
       case Medium.Page(f) => addPage(name, f())
       case d:Medium.Deck[_] => addDeckResource(name, PlayableDeck(d.deck())(using d.player))
       case v:Medium.Video[_] => addVideoResource(name, PlayableVideo(v.video())(using v.player))
+      case o:Medium.OtherListPath[_] => addOtherResource(name, PlayableListPathResource(o.content())(using o.player))
     }
     
     val firstRoute = register(name, first.item)
@@ -157,7 +178,7 @@ class Site() {
       case DeckRoute(name, page) => (/# / "decks" / name / page.toString).stringify
       case FullScreenDeckRoute(name, page) => (/# / "decks" / name / page.toString / "fullscreen").stringify
       case VideoRoute(name) => (/# / "videos" / name).stringify
-      case ChallengeRoute(name, level, stage) => (/# / "challenges" / name / level.toString / stage.toString ).stringify
+      case ListPathRoute(kind, name, subpath) => subpath.foldLeft(/# / kind / name)((path, element) => path / element).stringify
       case c:CustomRoute => c.path
     }
 
@@ -167,9 +188,7 @@ class Site() {
       case "decks" :: name :: _ => DeckRoute(name, 0)
       case "pages" :: name :: _ => PageRoute(name)
       case "videos" :: name :: _ => VideoRoute(name)
-      case "challenges" :: name :: intParam(level) :: intParam(stage) :: _ => ChallengeRoute(name, level, stage)
-      case "challenges" :: name :: intParam(level) ::  _ => ChallengeRoute(name, level, 0)
-      case "challenges" :: name :: _ => ChallengeRoute(name, 0, 0)
+      case kind :: name :: subpath if otherListPathContent.contains((kind, name)) => ListPathRoute(kind, name, subpath)
       case _ => HomeRoute
     }
     
@@ -180,7 +199,7 @@ class Site() {
         case DeckRoute(name, slide) if decks.contains(name) => renderDeck(name, slide)
         case FullScreenDeckRoute(name, slide) if decks.contains(name) => renderDeckFS(name, slide)
         case VideoRoute(name) if videos.contains(name) => renderVideo(name)
-        case ChallengeRoute(name, level, stage) if challenges.contains(name) => renderChallenge(name, level, stage)
+        case ListPathRoute(kind, name, subpath) if otherListPathContent.contains((kind, name)) => otherListPathContent((kind, name))().view(name, subpath)
         case custom:CustomRoute => custom.render()
         case _ => home()
       }
