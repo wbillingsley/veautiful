@@ -90,6 +90,7 @@ class StyleSuite() {
     */
   def addGlobalRules(s:String):Unit =
     globalRules.append(s)
+    update()
   
   private def generateCss:String = {
     (for {
