@@ -87,6 +87,11 @@ def intro = <.div(
       |
       |The sourcecode is published to [GitHub](https://github.com/wbillingsley/veautiful) using the MIT Licence.
       |
+      |Scaladoc APIs can be found on javadoc.io:
+      |
+      |* [Veautiful API](https://javadoc.io/doc/com.wbillingsley/veautiful_sjs1_3)
+      |* [Doctacular API](https://javadoc.io/doc/com.wbillingsley/doctacular_sjs1_3/latest/index.html)
+      |
       |### What's unique about Veautiful?
       |
       |Scala is a mixed paradigm language that permits imperative code *and* makes functional code pleasent to write. 
