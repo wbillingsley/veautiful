@@ -173,6 +173,8 @@ def d3like = <.div(Common.markdown(
         |  override def afterAttach(): Unit = plot.update()
         |}
         |```
+        |
+        |A similar component is included for generating nodes from a mutable map (e.g. a JavaScript dictionary/map): `MutableMapComponent`
         |""".stripMargin)
   )
 )

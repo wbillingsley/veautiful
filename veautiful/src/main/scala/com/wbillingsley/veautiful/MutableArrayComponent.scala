@@ -9,7 +9,7 @@ package com.wbillingsley.veautiful
 class MutableArrayComponent[Container, AcceptChild, VChild <: VNode[AcceptChild], Data](container: ParentNode[Container, AcceptChild], data: Array[Data])(
   onEnter: (Data, Int) => VChild | Blueprint[VChild],
   onUpdate: (Data, Int, VChild) => Unit = { (_:Data, _:Int, _:VChild) => () },
-  onExit: (Data, Int, VChild) => Unit = { (_:Data, _:Int, _:VChild) => },
+  onExit: (Int, VChild) => Unit = { (_:Int, _:VChild) => },
 ) extends VNode[Container] with Update {
   import scala.collection.mutable
 
@@ -26,13 +26,11 @@ class MutableArrayComponent[Container, AcceptChild, VChild <: VNode[AcceptChild]
     * and then remove it from domNode so we know it's gone.
     */
   override def detach(): Unit = {
-    lastData = Seq.empty
     lastRendered = collection.Seq.empty
     container.detach()
   }
 
   private var lastRendered: collection.Seq[VChild] = collection.Seq.empty
-  private var lastData: collection.Seq[Data] = Seq.empty[Data]
 
   /** Enables a builder-like syntax, where we can take a component and call .onEnter, .onUpdate, etc, to specialise it */
   def onEnter(onEnter:(Data, Int) => VChild | Blueprint[VChild]):MutableArrayComponent[Container, AcceptChild, VChild, Data] = 
@@ -43,7 +41,7 @@ class MutableArrayComponent[Container, AcceptChild, VChild <: VNode[AcceptChild]
     MutableArrayComponent(container, data)(onEnter=onEnter, onUpdate, onExit)
 
   /** Enables a builder-like syntax, where we can take a component and call .onEnter, .onUpdate, etc, to specialise it */
-  def onExit(onExit:(Data, Int, VChild) => Unit):MutableArrayComponent[Container, AcceptChild, VChild, Data] = 
+  def onExit(onExit:(Int, VChild) => Unit):MutableArrayComponent[Container, AcceptChild, VChild, Data] = 
     MutableArrayComponent(container, data)(onEnter, onUpdate, onExit)
 
 
@@ -64,9 +62,8 @@ class MutableArrayComponent[Container, AcceptChild, VChild <: VNode[AcceptChild]
       for {
         i <- exiting
         v = lastRendered(i)
-        d = lastData(i)
       } {
-        onExit(d, i, v)
+        onExit(i, v)
         v.beforeDetach()
         ops.removeAttachedChild(v)
         v.detach()
@@ -87,7 +84,7 @@ class MutableArrayComponent[Container, AcceptChild, VChild <: VNode[AcceptChild]
         v
       }
 
-      val updateSeq = lastRendered ++ added
+      val updateSeq = lastRendered.take(data.length) ++ added
 
       for {
         i <- data.indices
@@ -96,7 +93,6 @@ class MutableArrayComponent[Container, AcceptChild, VChild <: VNode[AcceptChild]
       }
 
       lastRendered = updateSeq
-      lastData = data
     }
   }
 }
