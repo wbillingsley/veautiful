@@ -85,8 +85,10 @@ class StyleSuite() {
     if installed then styleElement.makeItSo(render)
 
   /**
-    * Not recommended generally, but useful for final sites - a place to put "global rules" that are not attached to
-    * classes, such as your font-family, body background, etc.
+    * Adds text that it put into the generated CSS stylesheet.
+    * 
+    * A place to put "global rules" that are not attached to classes, such as your font-family, body background, etc.
+    * Also useful for keyframes for animations.
     */
   def addGlobalRules(s:String):Unit =
     globalRules.append(s)
