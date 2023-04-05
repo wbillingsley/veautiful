@@ -27,6 +27,7 @@ object VSlides {
     """background: white;
       |padding: 50px;
       |display: flex;
+      |flex-direction: column;
       |height: 100%;
       |font-family: sans-serif;
       |font-weight: normal;

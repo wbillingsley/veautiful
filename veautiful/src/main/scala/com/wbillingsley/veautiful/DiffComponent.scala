@@ -7,17 +7,19 @@ trait DiffComponent[N, C] extends VNode[N] with Update {
   var lastRendered:Option[DiffNode[N, C]] = None
 
   def rerender():DiffNode[N, C] = {
-    val r = render
     lastRendered match {
-      case Some(lr) => lr.makeItSo(r); lr
+      case Some(lr) => lr.makeItSo(render); lr
       case _ =>  
-        r match {
+        // This is the first time this component has rendered
+        render match {
           // We shouldn't need to check these as they're the only two possibilities in the union type
           case d:DiffNode[N, C] @unchecked => 
+            d.beforeAttach()
             lastRendered = Some(d)
             d
           case b:Blueprint[DiffNode[N, C]] @unchecked =>
             val d = b.build()
+            d.beforeAttach()
             lastRendered = Some(d)
             d
         }
@@ -32,7 +34,7 @@ trait DiffComponent[N, C] extends VNode[N] with Update {
 
   override def beforeAttach(): Unit = {
     super.beforeAttach()
-    delegate.beforeAttach()
+    for d <- lastRendered do d.beforeAttach() // If the component has not yet rendered, we'll do beforeAttach() inside rerender()
   }
 
   override def attach(): N = delegate.attach()

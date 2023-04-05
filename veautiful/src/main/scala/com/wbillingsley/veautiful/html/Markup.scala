@@ -1,27 +1,34 @@
 package com.wbillingsley.veautiful.html
 
-import com.wbillingsley.veautiful.{MakeItSo, Update, Decorator, Morphing}
+import com.wbillingsley.veautiful.{MakeItSo, Update, Decorator, Morphing, VNode, Blueprint}
 import org.scalajs.dom.html.Element
 
+import org.scalajs.dom
+
 import scala.scalajs.js
+
+/**
+  * A MarkupTransformer knows how to translate some markup language into VNode content (or blueprints)
+  */
+trait MarkupTransformer[T <: dom.Element] {
+  def apply(data:String): VNode[T] | Blueprint[VNode[T]]
+}
 
 /**
   * Nodes for markup languages such as Markdown.
   *
   * @param transform The function that will transform the markup into HTML
   */
-class Markup(transform:(String) => String) {
+class Markup(val transform:(String) => String) extends MarkupTransformer[dom.html.Element] {
 
-  def div(data:String):Fixed = Fixed(data, <.div(^.cls := "markup-node"))
+  override def apply(data:String) = in(<.div(^.attr.style := "display: contents;"))(data)
 
-  def span(data:String):Fixed = Fixed(data, <.span(^.cls := "markup-node"))
-  
   /**
     * A Fixed MarkupNode is only equal if its data is equal. In most uses, this means that if the data has changed
     * the component will be replaced.
     * @param data
     */
-  case class Fixed(data:String, bp:DElementBlueprint[Element] = <.div(^.cls := "markup-node")) extends Decorator(bp.build()) {
+  case class Fixed(data:String, bp:DElementBlueprint[dom.html.Element]) extends Decorator(bp.build()) {
 
     override def afterAttach(): Unit = {
       super.afterAttach()
@@ -43,9 +50,9 @@ class Markup(transform:(String) => String) {
     * var, and "MakeItSo" will update it if the data has changed.
     * @param data
     */
-  case class Settable()(data:String) extends VHtmlComponent with Morphing(data) {
+  case class Settable(bp:DElementBlueprint[Element] = <.div(^.cls := "markup-node"))(data:String) extends VHtmlComponent with Morphing(data) {
     override val morpher = createMorpher(this)
-    def render = <.div(^.cls := "markup-node")(transform(prop))
+    def render = <.div(^.cls := "markup-node")(^.prop.innerHTML := transform(prop))
   }
 
   /**
@@ -53,7 +60,7 @@ class Markup(transform:(String) => String) {
     * return false because anonymous functions in JavaScript are not equal to each other even if they are the same.
     * @param data
     */
-  case class Updatable()(data: () => String) extends Decorator(<.div(^.cls := "markup-node").build()) with Update {
+  case class Updatable(bp:DElementBlueprint[Element] = <.div(^.cls := "markup-node"))(data: () => String) extends Decorator(bp.build()) with Update {
 
     private var lastData: Option[String] = None
 
@@ -89,6 +96,12 @@ class Markup(transform:(String) => String) {
       }
     }
   }
+  
+  def in(bp:DElementBlueprint[dom.html.Element])(data:String):VNode[dom.html.Element] = Fixed(data, bp)
+
+  def div(data:String) = in(<.div(^.cls := "markup-node"))(data)
+
+  def span(data:String) = in(<.span(^.cls := "markup-node"))(data)
 
 }
 
