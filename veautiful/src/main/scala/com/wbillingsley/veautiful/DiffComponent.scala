@@ -32,7 +32,7 @@ trait DiffComponent[N, C] extends VNode[N] with Update {
 
   override def beforeAttach(): Unit = {
     super.beforeAttach()
-    delegate.beforeAttach()
+    for d <- lastRendered do d.beforeAttach()
   }
 
   override def attach(): N = delegate.attach()

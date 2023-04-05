@@ -10,9 +10,10 @@ val markupComponents = <.div(
       |# Markup components
       |
       |A lot of sites contain content written in markup languages, such as *Markdown*.
-      |For example. much of this documentation is written in Markdown.
+      |For example. much of this documentation is written in Markdown. 
+      |Markup languages for diagrams, e.g. Mermaid, are also common.
       |
-      |Although Veautiful doesn't provide a Markdown parser, it does provide a component to help you wire one in.
+      |Veautiful provides a component that lets you wire in one or more markup languages.
       |How you use it depends on how you want to bring in a Markdown library.
       |
       |#### Wiring in a markup function from the global scope
@@ -55,7 +56,7 @@ val markupComponents = <.div(
       |will render a piece of markup into a `div` element. 
       |
       |```scala
-      |def myPage = <("article")(
+      |def myPage = <.article(
       |  marked.div("# This is a page about `SomeFunkyWidget`"),
       |  SomeFunkyWidget(),
       |  marked.div("This surrounding text is written in *Markdown*")    
@@ -66,12 +67,21 @@ val markupComponents = <.div(
       |
       |```scala
       |// This should take an element (not a nested structure) in its second parameter.
-      |marked.Fixed("Some *Markdown* text", <("article")(^.cls := "my-own-css-class"))
+      |marked.Fixed("Some *Markdown* text", <.article(^.cls := "my-own-css-class"))
+      |```
+      |
+      |Or, for a possibly nicer syntax in recent snapshots
+      |
+      |```scala
+      |// This should take an element (not a nested structure) in its second parameter.
+      |marked.in(<.article(^.cls := "my-own-css-class"))(
+      |  "Some *Markdown* text"
+      |)
       |```
       |
       |These produce a `Markup.Fixed` component that uses string equality to determine whether it should be replaced. 
       |In other words, if you re-render a page that contains a `markup.div(s)` with a different string, 
-      |the old `div` will be disposed of and you'll get a new `div` containing the new content.
+      |the old element will be disposed of and you'll get a new element containing the new content.
       |
       |#### Rendering to inline elements
       |

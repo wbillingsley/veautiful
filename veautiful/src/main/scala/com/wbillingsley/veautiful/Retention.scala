@@ -69,8 +69,10 @@ trait HasTestMatch { self:HasRetention =>
 
 
 /**
-  * A marker trait indicating that an item is a blueprint for a MakeItSo; 
-  * this is important if you want to pass a Blueprint (instead of a live object) to a Reconciler.
+  * A blueprint is an immutable representation of a (usually mutable) structure. 
+  * 
+  * The use of Blueprints his helps avoid the easy programming error of putting a mutable VNode structure into a val, 
+  * e.g. to describe a common element on a website, but being surprised when it morphs.
   * 
   * Blueprints have to have a retention strategy, so that the reconciler knows how to compare them.
   * 

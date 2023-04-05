@@ -34,7 +34,7 @@ val markedInline:Markup = Markup({ (s:String) => Marked.parseInline(s) })
   */
 object Common {
 
-  def markdown(s:String):VDomNode = marked.Fixed(s)
+  def markdown(s:String):VDomNode = marked.div(s)
   
   def logoPaths = SVG.g(
     SVG.path(
