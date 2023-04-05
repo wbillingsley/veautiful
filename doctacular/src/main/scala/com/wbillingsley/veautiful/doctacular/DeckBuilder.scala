@@ -1,6 +1,6 @@
 package com.wbillingsley.veautiful.doctacular
 
-import com.wbillingsley.veautiful.html.{<, Attacher, RootNode, Markup, VHtmlContent, VHtmlElement, VHtmlBlueprint, ^}
+import com.wbillingsley.veautiful.html.{<, Attacher, RootNode, Markup, MarkupTransformer, VHtmlContent, VHtmlElement, VHtmlBlueprint, ^}
 import org.scalajs.dom
 
 import scala.collection.mutable
@@ -25,7 +25,7 @@ def makeDeckBuilder(parser:(String) => String) = (w:Int, h:Int) => DeckBuilder(w
   * @param slides any initial content to initialise the builder with
   * @param markup the markup engine to use in Markdown slides
   */
-class DeckBuilder(width:Int = 1920, height:Int = 1080, slides:List[Seq[() => VHtmlContent]] = Nil)(using markup:Markup) {
+class DeckBuilder(width:Int = 1920, height:Int = 1080, slides:List[Seq[() => VHtmlContent]] = Nil)(using markup:MarkupTransformer[dom.html.Element]) {
 
   def stripIndent(s:String):String = {
     val lines = s.split('\n')
@@ -40,7 +40,7 @@ class DeckBuilder(width:Int = 1920, height:Int = 1080, slides:List[Seq[() => VHt
   }
 
   @JSExport
-  def markdownSlide(m:String):DeckBuilder = new DeckBuilder(width, height, Seq(() => markup.div(stripIndent(m))) :: slides)
+  def markdownSlide(m:String):DeckBuilder = new DeckBuilder(width, height, Seq(() => markup(stripIndent(m))) :: slides)
 
   def veautifulSlide(vnode:VHtmlContent):DeckBuilder = new DeckBuilder(width, height, Seq(() => vnode) :: slides)
 
@@ -48,7 +48,7 @@ class DeckBuilder(width:Int = 1920, height:Int = 1080, slides:List[Seq[() => VHt
   def markdownSlides(m:String):DeckBuilder = {
     val pattern = """(?:^|[\n\r\u0085\u2028\u2029])(---)(?=[\n\r\u0085\u2028\u2029]|$)""".r
     val lines = pattern.split(stripIndent(m))
-    new DeckBuilder(width, height, lines.toSeq.map(l => () => markup.div(l)) :: slides)
+    new DeckBuilder(width, height, lines.toSeq.map(l => () => markup(l)) :: slides)
   }
 
   @JSExport

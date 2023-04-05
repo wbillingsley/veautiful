@@ -1,21 +1,34 @@
 package com.wbillingsley.veautiful.html
 
-import com.wbillingsley.veautiful.{MakeItSo, Update, Decorator, Morphing, VNode}
+import com.wbillingsley.veautiful.{MakeItSo, Update, Decorator, Morphing, VNode, Blueprint}
 import org.scalajs.dom.html.Element
 
 import org.scalajs.dom
 
 import scala.scalajs.js
 
-trait MarkupProcessor[T <: dom.Element] {
-  def transform: String => String
+/**
+  * A MarkupTransformer knows how to translate some markup language into VNode content (or blueprints)
+  */
+trait MarkupTransformer[T <: dom.Element] {
+  def apply(data:String): VNode[T] | Blueprint[VNode[T]]
+}
+
+/**
+  * Nodes for markup languages such as Markdown.
+  *
+  * @param transform The function that will transform the markup into HTML
+  */
+class Markup(val transform:(String) => String) extends MarkupTransformer[dom.html.Element] {
+
+  override def apply(data:String) = in(<.div(^.attr.style := "display: contents;"))(data)
 
   /**
     * A Fixed MarkupNode is only equal if its data is equal. In most uses, this means that if the data has changed
     * the component will be replaced.
     * @param data
     */
-  case class Fixed(data:String, bp:DElementBlueprint[T]) extends Decorator(bp.build()) {
+  case class Fixed(data:String, bp:DElementBlueprint[dom.html.Element]) extends Decorator(bp.build()) {
 
     override def afterAttach(): Unit = {
       super.afterAttach()
@@ -83,14 +96,6 @@ trait MarkupProcessor[T <: dom.Element] {
       }
     }
   }
-}
-
-/**
-  * Nodes for markup languages such as Markdown.
-  *
-  * @param transform The function that will transform the markup into HTML
-  */
-class Markup(override val transform:(String) => String) extends MarkupProcessor[dom.html.Element] {
   
   def in(bp:DElementBlueprint[dom.html.Element])(data:String):VNode[dom.html.Element] = Fixed(data, bp)
 

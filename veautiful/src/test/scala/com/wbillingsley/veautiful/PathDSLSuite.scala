@@ -1,6 +1,6 @@
 package com.wbillingsley.veautiful
 
-import PathDSL._
+import html.PathDSL._
 import Extract._
 
 class PathDSLSuite extends munit.FunSuite {
