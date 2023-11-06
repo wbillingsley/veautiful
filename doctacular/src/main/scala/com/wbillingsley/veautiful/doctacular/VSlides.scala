@@ -185,8 +185,8 @@ case class VSlidesMicroRouter(deck:VSlides) extends HistoryRouter[VSlidesMicroRo
   var route = Route.Gallery
 
   def path(r:Route) = r match {
-    case Route.Gallery => "/"
-    case Route.Slide(i) => s"/$i"
+    case Route.Gallery => "#/"
+    case Route.Slide(i) => s"#/$i"
   }
 
   def galleryButton = <.button(

@@ -104,6 +104,7 @@ class DeckLayout(site:Site) {
             case Medium.Video(_) => s"⏵ ${alt.descriptor}"
             case Medium.Page(_) => s"🗎 ${alt.descriptor}"
             case Medium.Deck(_) => s"⧉ ${alt.descriptor}"
+            case Medium.OtherListPath(_) => s"⚙ ${alt.descriptor}"
           }
       )
   )
