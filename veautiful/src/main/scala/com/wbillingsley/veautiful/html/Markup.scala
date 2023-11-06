@@ -14,6 +14,9 @@ trait MarkupTransformer[T <: dom.Element] {
   def apply(data:String): VNode[T] | Blueprint[VNode[T]]
 }
 
+/** A shorthand alias for markup transformers that produce HTML VNodes */
+type HTMLMarkupTransformer = MarkupTransformer[dom.html.Element]
+
 /**
   * Nodes for markup languages such as Markdown.
   *
